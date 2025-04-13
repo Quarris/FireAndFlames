@@ -1,6 +1,8 @@
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
+    id 'com.matthewprenger.cursegradle'
+    id 'com.modrinth.minotaur'
 }
 
 neoForge {
