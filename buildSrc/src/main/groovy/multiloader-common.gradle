@@ -100,6 +100,7 @@ processResources {
         expand expandProps
     }
     inputs.properties(expandProps)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 publishing {

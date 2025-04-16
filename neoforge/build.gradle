@@ -5,6 +5,9 @@ plugins {
     id 'com.modrinth.minotaur'
 }
 
+var commonProj = project(":common")
+var commonDir = commonProj.projectDir
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
@@ -26,7 +29,7 @@ neoForge {
         }
         data {
             data()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            programArguments.addAll '--mod', mod_id, '--all', '--output', commonProj.file('src/generated/resources/').getAbsolutePath(), '--existing', commonProj.file('src/main/resources/').getAbsolutePath()
         }
         server {
             server()
@@ -40,4 +43,4 @@ neoForge {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources.srcDir project(":common").file('src/generated/resources')
