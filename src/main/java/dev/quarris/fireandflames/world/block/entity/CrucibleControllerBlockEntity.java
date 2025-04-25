@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.world.block.entity;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
@@ -21,10 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.function.BiConsumer;
@@ -34,11 +31,9 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     public static final Component TITLE = Component.translatable("container.fireandflames.crucible.title");
 
     // Structure properties
-    private BiConsumer<Integer, ItemStack> slotListener;
     private CrucibleStructure crucibleStructure;
 
-    private FluidTank fluidTank = new FluidTank(1000);
-
+    private CrucibleFluidTank fluidTank;
     private ItemStackHandler inventory;
 
     // Crucible state
@@ -51,7 +46,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         super(BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), pPos, pState);
         this.crucibleStructure = new CrucibleStructure(pPos);
         this.inventory = new ItemStackHandler(0);
-        this.fluidTank.setFluid(new FluidStack(Fluids.WATER, 1000));
+        this.fluidTank = new CrucibleFluidTank(0);
     }
 
     /**
@@ -62,10 +57,9 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
         // Check structure
         if (level.getGameTime() % 40 == 0) {
-            Fluid nextFluid = crucible.fluidTank.getFluid().is(Fluids.WATER) ? Fluids.LAVA : Fluids.WATER;
-            crucible.fluidTank.setFluid(new FluidStack(nextFluid, 1000));
             crucible.setChanged();
             crucible.getLevel().sendBlockUpdated(pos, state, state, 0);
+
         }
 
         if (!crucible.crucibleStructure.isStructureValid()) {
@@ -87,9 +81,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         return new ItemStackHandler(this.crucibleStructure.getVolume()) {
             @Override
             protected void onContentsChanged(int slot) {
-                if (CrucibleControllerBlockEntity.this.slotListener != null) {
-                    CrucibleControllerBlockEntity.this.slotListener.accept(slot, this.getStackInSlot(slot));
-                }
                 super.onContentsChanged(slot);
             }
 
@@ -102,19 +93,31 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             public int getSlotLimit(int slot) {
                 return 1;
             }
+        };
+    }
 
+    private CrucibleFluidTank createTank() {
+        return new CrucibleFluidTank(this.crucibleStructure.getVolume()) {
+            @Override
+            public void onContentsChanged() {
+                CrucibleControllerBlockEntity.this.setChanged();
+                CrucibleControllerBlockEntity.this.getLevel().sendBlockUpdated(
+                    CrucibleControllerBlockEntity.this.getBlockPos(),
+                    CrucibleControllerBlockEntity.this.getBlockState(),
+                    CrucibleControllerBlockEntity.this.getBlockState(),
+                    0
+                );
+            }
         };
     }
 
     private void onStructureEstablished() {
         this.inventory = this.createInventory();
+        this.fluidTank = this.createTank();
+        this.invalidateCapabilities();
     }
 
-    public void setSlotListener(BiConsumer<Integer, ItemStack> slotListener) {
-        this.slotListener = slotListener;
-    }
-
-    public FluidTank getFluidTank() {
+    public CrucibleFluidTank getFluidTank() {
         return this.fluidTank;
     }
 
@@ -129,7 +132,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             .resultOrPartial(ModRef.LOGGER::error)
             .ifPresent(nbt -> pTag.put("CrucibleStructure", nbt));
 
-        pTag.put("FluidTank", this.fluidTank.writeToNBT(pRegistries, new CompoundTag()));
+        pTag.put("FluidTank", this.fluidTank.serializeNBT(pRegistries));
         pTag.put("Inventory", this.inventory.serializeNBT(pRegistries));
     }
 
@@ -142,9 +145,11 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             .ifPresent(structure -> CrucibleControllerBlockEntity.this.crucibleStructure = structure);
 
         this.inventory = this.createInventory();
+        this.fluidTank = this.createTank();
+        this.invalidateCapabilities();
 
-        this.fluidTank.readFromNBT(pRegistries, pTag.getCompound("FluidTank"));
         this.inventory.deserializeNBT(pRegistries, pTag.getCompound("Inventory"));
+        this.fluidTank.deserializeNBT(pRegistries, pTag.getCompound("FluidTank"));
     }
 
     @Override

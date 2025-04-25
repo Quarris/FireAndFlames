@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.world.inventory.menu;
 
+import dev.quarris.fireandflames.client.screen.components.CrucibleFluidTankComponent;
 import dev.quarris.fireandflames.network.payload.CrucibleScrollC2SPayload;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
@@ -123,11 +124,23 @@ public class CrucibleMenu extends AbstractContainerMenu {
 
     @Override
     public void removed(Player player) {
-        this.crucible.setSlotListener(null);
         super.removed(player);
     }
 
     public int getScroll() {
         return this.scroll;
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int slot) {
+        if (slot < 0 || slot >= this.crucible.getFluidTank().getTanks()) {
+            return false;
+        }
+
+        this.crucible.getFluidTank().setFirst(slot);
+        if (!this.crucible.getLevel().isClientSide()) {
+        }
+
+        return true;
     }
 }
