@@ -1,12 +1,18 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -21,6 +27,20 @@ public class RecipesGen extends RecipeProvider {
         shapedRecipes(pOutput);
         smeltingRecipes(pOutput);
         blastingRecipes(pOutput);
+        crucibleRecipes(pOutput);
+    }
+
+    private void crucibleRecipes(RecipeOutput pOutput) {
+        CrucibleRecipeBuilder.smelting(RecipeCategory.MISC, new FluidStack(Fluids.WATER, 1000), Ingredient.of(Items.ICE), 100)
+            .byproduct(new ItemStack(Items.STICK))
+            .group("crucible")
+            .unlockedBy("has_ice", has(Items.ICE))
+            .save(pOutput, ModRef.res("crucible/water_from_ice"));
+
+        CrucibleRecipeBuilder.smelting(RecipeCategory.MISC, FluidTags.LAVA, 1000, Ingredient.of(Items.OBSIDIAN), 200)
+            .group("crucible")
+            .unlockedBy("has_ice", has(Items.ICE))
+            .save(pOutput, ModRef.res("crucible/lava_from_obsidian"));
     }
 
     public static void smeltingRecipes(RecipeOutput pOutput) {
@@ -50,5 +70,4 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
             .save(pOutput);
     }
-
 }
