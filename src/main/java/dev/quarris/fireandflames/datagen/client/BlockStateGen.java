@@ -1,0 +1,46 @@
+package dev.quarris.fireandflames.datagen.client;
+
+import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.setup.BlockSetup;
+import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+
+public class BlockStateGen extends BlockStateProvider {
+
+    public BlockStateGen(PackOutput output, ExistingFileHelper exFileHelper) {
+        super(output, ModRef.ID, exFileHelper);
+    }
+
+    @Override
+    protected void registerStatesAndModels() {
+        this.simpleBlockWithItem(BlockSetup.FIRE_CLAY.get(), this.models().cubeAll("fire_clay", blockTexture(BlockSetup.FIRE_CLAY.get())));
+        this.simpleBlockWithItem(BlockSetup.FIRE_BRICKS.get(), this.models().cubeAll("fire_bricks", blockTexture(BlockSetup.FIRE_BRICKS.get())));
+
+        BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
+            this.getVariantBuilder(block).forAllStates(
+                (state) -> {
+                    boolean lit = state.getValue(CrucibleControllerBlock.LIT);
+                    String name = "crucible_controller";
+                    ResourceLocation side = blockTexture(BlockSetup.FIRE_BRICKS.get());
+                    ResourceLocation front = blockTexture(state.getBlock());
+                    if (lit) {
+                        front = front.withSuffix("_on");
+                        name += "_on";
+                    }
+
+                    return ConfiguredModel.builder()
+                        .modelFile(models().cubeAll(name, side).texture("north", front))
+                        .uvLock(true)
+                        .rotationY(((int) state.getValue(BlockStateProperties.HORIZONTAL_FACING).toYRot() + 180) % 360)
+                        .build();
+                });
+        });
+
+        this.itemModels().simpleBlockItem(BlockSetup.CRUCIBLE_CONTROLLER.get());
+    }
+}
