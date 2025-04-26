@@ -22,7 +22,7 @@ public class CrucibleSmeltingSerializer implements RecipeSerializer<CrucibleReci
         Codec.STRING.optionalFieldOf("group", "").forGetter(recipe -> recipe.group),
         CookingBookCategory.CODEC.fieldOf("category").orElse(CookingBookCategory.MISC).forGetter(recipe -> recipe.category),
         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-        ItemStack.CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(recipe -> recipe.byproduct),
+        ItemStack.SINGLE_ITEM_CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(recipe -> recipe.byproduct),
         CrucibleRecipe.RESULT_CODEC.fieldOf("result").forGetter(recipe -> recipe.eitherResult),
         Codec.INT.fieldOf("smelting_time").orElse(200).forGetter(recipe -> recipe.smeltingTime)
     ).apply(instance, CrucibleRecipe::new));

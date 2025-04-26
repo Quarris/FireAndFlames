@@ -24,7 +24,7 @@ public class CrucibleFluidTank implements IFluidHandler {
 
     public CrucibleFluidTank(int volume) {
         this.volume = volume;
-        this.fluids = new ArrayList<>();
+        this.fluids = new ArrayList<>(MAX_FLUID_COUNT);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class CrucibleFluidTank implements IFluidHandler {
             storedFluid = pResource.copyWithAmount(Math.min(this.getRemainingVolume(), pResource.getAmount()));
             this.fluids.addLast(storedFluid);
             this.currentStored += storedFluid.getAmount();
+            this.onContentsChanged();
             return storedFluid.getAmount();
         }
 

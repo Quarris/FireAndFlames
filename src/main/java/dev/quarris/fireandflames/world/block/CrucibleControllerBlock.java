@@ -5,10 +5,7 @@ import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntit
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -24,6 +21,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class CrucibleControllerBlock extends BaseEntityBlock {
 
@@ -101,7 +100,16 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        Containers.dropContentsOnDestroy(state, newState, level, pos);
+        level.getBlockEntity(pos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
+            ItemStackHandler inventory = crucible.getInventory();
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), inventory.getStackInSlot(slot));
+            }
+
+            level.updateNeighbourForOutputSignal(pos, state.getBlock());
+        });
+
+
         super.onRemove(state, level, pos, newState, isMoving);
     }
 }

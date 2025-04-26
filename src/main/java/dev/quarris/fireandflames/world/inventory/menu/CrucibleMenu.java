@@ -10,9 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -24,23 +22,25 @@ public class CrucibleMenu extends AbstractContainerMenu {
     public final CrucibleControllerBlockEntity crucible;
     private int scroll = -1;
     private int maxScroll;
-
-    public CrucibleMenu(int id, Inventory playerInv, BlockPos pos) {
-        this(MenuSetup.CRUCIBLE.get(), id, playerInv, playerInv.player.level().getBlockEntity(pos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).orElseThrow());
-    }
+    private ContainerData dataAccess;
 
     public CrucibleMenu(int id, Inventory playerInv, RegistryFriendlyByteBuf data) {
         this(id, playerInv, playerInv.player.level().getBlockEntity(data.readBlockPos(), BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).orElseThrow());
     }
 
     public CrucibleMenu(int containerId, Inventory playerInv, CrucibleControllerBlockEntity crucible) {
-        this(MenuSetup.CRUCIBLE.get(), containerId, playerInv, crucible);
+        this(MenuSetup.CRUCIBLE.get(), containerId, playerInv, crucible, new SimpleContainerData(crucible.getInventory().getSlots()));
     }
 
-    public CrucibleMenu(@Nullable MenuType<CrucibleMenu> menuType, int containerId, Inventory pPlayerInv, CrucibleControllerBlockEntity crucible) {
+    public CrucibleMenu(int containerId, Inventory playerInv, CrucibleControllerBlockEntity crucible, ContainerData dataAccess) {
+        this(MenuSetup.CRUCIBLE.get(), containerId, playerInv, crucible, dataAccess);
+    }
+
+    public CrucibleMenu(@Nullable MenuType<CrucibleMenu> menuType, int containerId, Inventory pPlayerInv, CrucibleControllerBlockEntity crucible, ContainerData dataAccess) {
         super(menuType, containerId);
         this.playerInv = pPlayerInv;
         this.crucible = crucible;
+        this.dataAccess = dataAccess;
         this.maxScroll = Math.max(0, (int) Math.ceil((this.crucible.getInventory().getSlots() - 25) / 5.0));
 
         int slots = this.crucible.getInventory().getSlots();
@@ -68,6 +68,7 @@ public class CrucibleMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(pPlayerInv, hotbar, 8 + hotbar * 18, 185));
         }
 
+        this.addDataSlots(this.dataAccess);
         this.scrollTo(0);
     }
 
@@ -81,7 +82,6 @@ public class CrucibleMenu extends AbstractContainerMenu {
 
         this.scroll = scroll;
     }
-
 
     public boolean canScroll() {
         return this.maxScroll > 0;
