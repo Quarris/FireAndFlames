@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -119,6 +120,17 @@ public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu>
         }
 
         pGraphics.renderItemDecorations(this.font, pStack, drawX, drawY, pCountString);
+
+        var progress = getMenu().dataAccess.get(pSlot.index);
+        if (progress > 0) {
+            int alpha = Mth.lerpDiscrete(progress / 100f, 50, 150);
+            int red = Mth.lerpDiscrete(progress / 100f, 254, 254);
+            int green = Mth.lerpDiscrete(progress / 100f, 195, 75);
+            int drawHeight = Mth.lerpDiscrete(progress / 100f, 0, 16);
+            int color = alpha << 24 | red << 16 | green << 8;
+            pGraphics.fill(drawX, drawY + 16 - drawHeight, drawX + 16, drawY + 16, 200, color);
+        }
+
     }
 
     private boolean isPlayerSlot(Slot pSlot) {

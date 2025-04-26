@@ -164,9 +164,9 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
             this.recipe = null;
         }
 
-        public double getProgress() {
+        public float getProgress() {
             if (!this.hasRecipe()) return 0;
-            return this.ticks / (double) this.recipe.value().smeltingTime;
+            return this.ticks / (float) this.recipe.value().smeltingTime;
         }
 
         public boolean isFinished() {
@@ -188,7 +188,8 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
         }
 
         public int getTicks() {
-            return this.ticks;
+            if (!this.hasRecipe()) return 0;
+            return (int) Math.ceil((this.ticks / (double) this.recipe.value().smeltingTime) * 100);
         }
 
         public void setTicks(int ticks) {

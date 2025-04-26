@@ -22,7 +22,7 @@ public class CrucibleMenu extends AbstractContainerMenu {
     public final CrucibleControllerBlockEntity crucible;
     private int scroll = -1;
     private int maxScroll;
-    private ContainerData dataAccess;
+    public final ContainerData dataAccess;
 
     public CrucibleMenu(int id, Inventory playerInv, RegistryFriendlyByteBuf data) {
         this(id, playerInv, playerInv.player.level().getBlockEntity(data.readBlockPos(), BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).orElseThrow());

@@ -51,7 +51,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
         @Override
         public void set(int index, int value) {
-            CrucibleControllerBlockEntity.this.activeRecipes[index].setTicks(value);
+
         }
 
         @Override
@@ -103,12 +103,10 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                 if (recipe == null) {
                     recipe = new CrucibleRecipe.Active();
                     crucible.activeRecipes[slot] = recipe;
+                    crucible.setChanged();
                 }
 
                 recipe.updateWith(level, crucible.inventory.getStackInSlot(slot));
-                if (recipe.hasRecipe()) {
-                    ModRef.LOGGER.info("Ticking {} for {}", slot, recipe);
-                }
                 if (recipe.isFinished()) {
                     // If there is enough space to insert fluid
                     FluidStack output = recipe.createOutput();
@@ -126,10 +124,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     private ItemStackHandler createInventory(int size) {
         this.activeRecipes = new CrucibleRecipe.Active[size];
         return new ItemStackHandler(size) {
-            @Override
-            protected void onContentsChanged(int slot) {
-                super.onContentsChanged(slot);
-            }
 
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
@@ -148,12 +142,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             @Override
             public void onContentsChanged() {
                 CrucibleControllerBlockEntity.this.setChanged();
-                CrucibleControllerBlockEntity.this.getLevel().sendBlockUpdated(
-                    CrucibleControllerBlockEntity.this.getBlockPos(),
-                    CrucibleControllerBlockEntity.this.getBlockState(),
-                    CrucibleControllerBlockEntity.this.getBlockState(),
-                    0
-                );
             }
         };
     }
@@ -165,8 +153,24 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         this.invalidateCapabilities();
     }
 
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (this.getLevel() != null) {
+            this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 0);
+        }
+    }
+
     public CrucibleFluidTank getFluidTank() {
         return this.fluidTank;
+    }
+
+    public CrucibleRecipe.Active getRecipeAt(int slot) {
+        if (slot >= 0 && slot < this.activeRecipes.length) {
+            return this.activeRecipes[slot];
+        }
+
+        return null;
     }
 
     public boolean stillValid(Player player) {

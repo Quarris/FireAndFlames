@@ -14,4 +14,5 @@ public class ClientSetupEvents {
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(MenuSetup.CRUCIBLE.get(), CrucibleScreen::new);
     }
+
 }
