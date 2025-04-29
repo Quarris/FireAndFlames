@@ -3,8 +3,10 @@ package dev.quarris.fireandflames.world.block;
 import com.mojang.serialization.MapCodec;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
+import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +23,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class CrucibleControllerBlock extends BaseEntityBlock {
@@ -68,8 +69,12 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
         }
 
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-        if (blockEntity instanceof CrucibleControllerBlockEntity crucibleController) {
-            pPlayer.openMenu(crucibleController, pPos);
+        if (blockEntity instanceof CrucibleControllerBlockEntity crucible) {
+            if (crucible.getStructure() == null) {
+                pPlayer.displayClientMessage(Component.literal("Invalid Structure"), false);
+            } else {
+                pPlayer.openMenu(crucible, pPos);
+            }
 
             // Return success even if structure is invalid to prevent block placement
             return InteractionResult.CONSUME;
@@ -101,12 +106,14 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         level.getBlockEntity(pos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
+            BlockPos dropPos = pos.relative(state.getValue(FACING));
             ItemStackHandler inventory = crucible.getInventory();
             for (int slot = 0; slot < inventory.getSlots(); slot++) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), inventory.getStackInSlot(slot));
+                Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), inventory.getStackInSlot(slot));
             }
 
             level.updateNeighbourForOutputSignal(pos, state.getBlock());
+            CrucibleStructure.ALL_CRUCIBLES.remove(pos);
         });
 
 

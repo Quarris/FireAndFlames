@@ -24,7 +24,10 @@ public class BlockTagGen extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
         HolderLookup.RegistryLookup<Block> blocks = pLookup.lookupOrThrow(Registries.BLOCK);
-        this.tag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS).add(key(BlockSetup.FIRE_BRICKS.get()), key(BlockSetup.CRUCIBLE_CONTROLLER.get()));
+        this.tag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS).add(
+            key(BlockSetup.FIRE_BRICKS.get()),
+            key(BlockSetup.CRUCIBLE_CONTROLLER.get())
+        );
     }
 
     private static ResourceKey<Block> key(Block block) {

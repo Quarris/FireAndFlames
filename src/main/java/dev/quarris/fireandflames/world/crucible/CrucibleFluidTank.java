@@ -1,6 +1,5 @@
 package dev.quarris.fireandflames.world.crucible;
 
-import dev.quarris.fireandflames.ModRef;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -18,13 +17,23 @@ public class CrucibleFluidTank implements IFluidHandler {
 
     public static final int MAX_FLUID_COUNT = 79;
 
-    private final int volume;
+    private int capacity;
     private int currentStored;
     private List<FluidStack> fluids;
 
-    public CrucibleFluidTank(int volume) {
-        this.volume = volume;
+    private Runnable contentsChangedListener;
+
+    public CrucibleFluidTank(int capacity) {
+        this.capacity = capacity;
         this.fluids = new ArrayList<>(MAX_FLUID_COUNT);
+    }
+
+    public void updateCapacity(int newCapacity) {
+        this.capacity = newCapacity;
+    }
+
+    public void setListener(Runnable listener) {
+        this.contentsChangedListener = listener;
     }
 
     @Override
@@ -184,7 +193,9 @@ public class CrucibleFluidTank implements IFluidHandler {
 
     @Override
     public int getTankCapacity(int pTank) {
-        return this.getCapacityMb() - this.currentStored + this.fluids.get(pTank).getAmount();
+        if (pTank >= this.fluids.size()) return 0;
+
+        return this.getRemainingVolume() + this.fluids.get(pTank).getAmount();
     }
 
     @Override
@@ -193,7 +204,7 @@ public class CrucibleFluidTank implements IFluidHandler {
     }
 
     public int getRemainingVolume() {
-        return this.getCapacityMb() - this.currentStored;
+        return Math.max(0, this.getCapacityMb() - this.currentStored);
     }
 
     public int getStored() {
@@ -201,10 +212,13 @@ public class CrucibleFluidTank implements IFluidHandler {
     }
 
     public int getCapacityMb() {
-        return this.volume * FluidType.BUCKET_VOLUME;
+        return this.capacity * FluidType.BUCKET_VOLUME;
     }
 
     public void onContentsChanged() {
+        if (this.contentsChangedListener != null) {
+            this.contentsChangedListener.run();
+        }
     }
 
     @Override

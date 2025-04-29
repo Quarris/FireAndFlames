@@ -9,7 +9,6 @@ import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.world.item.crafting.CrucibleRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -17,6 +16,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,13 +31,10 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-import java.util.Arrays;
-
 public class CrucibleControllerBlockEntity extends BlockEntity implements MenuProvider {
 
     public static final Component TITLE = Component.translatable("container.fireandflames.crucible.title");
 
-    // Structure properties
     private CrucibleStructure crucibleStructure;
 
     private CrucibleFluidTank fluidTank;
@@ -68,52 +65,61 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
     public CrucibleControllerBlockEntity(BlockPos pPos, BlockState pState) {
         super(BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), pPos, pState);
-        this.crucibleStructure = new CrucibleStructure(pPos);
         this.inventory = new ItemStackHandler(0);
         this.fluidTank = new CrucibleFluidTank(0);
+        this.fluidTank.setListener(this::setChanged);
         this.activeRecipes = new CrucibleRecipe.Active[0];
     }
 
-    /**
-     * Server-side tick handler for the crucible controller
-     */
-    public static void serverTick(Level level, BlockPos pos, BlockState state, CrucibleControllerBlockEntity crucible) {
-        crucible.crucibleStructure.setLevel(level);
-
-        // Check structure
-        if (!crucible.crucibleStructure.isStructureValid()) {
-            crucible.crucibleStructure = new CrucibleStructure(pos);
-            crucible.crucibleStructure.setLevel(level);
-            boolean wasValid = state.getValue(CrucibleControllerBlock.LIT);
-            boolean valid = crucible.crucibleStructure.validateCrucibleStructure();
-            if (valid) {
-                crucible.onStructureEstablished();
-            }
-
-            if (wasValid != valid) {
-                level.setBlock(pos, state.setValue(CrucibleControllerBlock.LIT, valid), Block.UPDATE_ALL);
-            }
+    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CrucibleControllerBlockEntity pCrucible) {
+        if (pCrucible.crucibleStructure != null && pCrucible.crucibleStructure.isInvalid()) {
+            pCrucible.crucibleStructure = null;
+            pCrucible.setChanged();
             return;
         }
 
+        // Try forming structure
+        if (pCrucible.crucibleStructure == null) {
+            CrucibleStructure structure = CrucibleStructure.of(pCrucible.getLevel(), pCrucible.getBlockPos());
+            // Structure valid
+            boolean wasValid = pState.getValue(CrucibleControllerBlock.LIT);
+            boolean valid = structure != null;
+
+            if (valid) {
+                pCrucible.crucibleStructure = structure;
+                pCrucible.onStructureEstablished();
+            }
+
+            if (wasValid != valid) {
+                pLevel.setBlock(pPos, pState.setValue(CrucibleControllerBlock.LIT, valid), Block.UPDATE_ALL);
+            }
+
+            return;
+        }
+
+        if (pCrucible.crucibleStructure.isDirty()) {
+            pCrucible.onStructureEstablished();
+            pCrucible.crucibleStructure.markClean();
+        }
+
         // Tick recipes
-        if (crucible.inventory.getSlots() > 0) {
-            for (int slot = 0; slot < crucible.inventory.getSlots(); slot++) {
-                CrucibleRecipe.Active recipe = crucible.activeRecipes[slot];
+        if (pCrucible.inventory.getSlots() > 0) {
+            for (int slot = 0; slot < pCrucible.inventory.getSlots(); slot++) {
+                CrucibleRecipe.Active recipe = pCrucible.activeRecipes[slot];
                 if (recipe == null) {
                     recipe = new CrucibleRecipe.Active();
-                    crucible.activeRecipes[slot] = recipe;
-                    crucible.setChanged();
+                    pCrucible.activeRecipes[slot] = recipe;
+                    pCrucible.setChanged();
                 }
 
-                recipe.updateWith(level, crucible.inventory.getStackInSlot(slot));
+                recipe.updateWith(pLevel, pCrucible.inventory.getStackInSlot(slot));
                 if (recipe.isFinished()) {
                     // If there is enough space to insert fluid
                     FluidStack output = recipe.createOutput();
                     // Only finalize the recipe if there is EXACTLY enough space for fluid.
-                    if (crucible.fluidTank.fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
-                        crucible.fluidTank.fill(output, IFluidHandler.FluidAction.EXECUTE);
-                        crucible.inventory.setStackInSlot(slot, recipe.createByproduct());
+                    if (pCrucible.fluidTank.fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
+                        pCrucible.fluidTank.fill(output, IFluidHandler.FluidAction.EXECUTE);
+                        pCrucible.inventory.setStackInSlot(slot, recipe.createByproduct());
                         recipe.reset();
                     }
                 }
@@ -121,36 +127,53 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         }
     }
 
-    private ItemStackHandler createInventory(int size) {
-        this.activeRecipes = new CrucibleRecipe.Active[size];
-        return new ItemStackHandler(size) {
 
-            @Override
-            public boolean isItemValid(int slot, ItemStack stack) {
-                return this.getStackInSlot(slot).isEmpty();
-            }
+
+    private void setInventoryWithSize(int size) {
+        CrucibleRecipe.Active[] newRecipes = new CrucibleRecipe.Active[size];
+        if (this.activeRecipes != null) {
+            System.arraycopy(this.activeRecipes, 0, newRecipes, 0, Math.min(this.activeRecipes.length, size));
+        }
+        this.activeRecipes = newRecipes;
+
+
+        ItemStackHandler newInventory = new ItemStackHandler(size) {
 
             @Override
             public int getSlotLimit(int slot) {
                 return 1;
             }
         };
+
+        // Copy old inventory to new, up to the new size
+        // If the new inventory size has decreased, drop the items not able to be fitted in new inventory
+        if (this.inventory.getSlots() > 0) {
+            BlockPos dropItemsPos = this.worldPosition.relative(this.getBlockState().getValue(CrucibleControllerBlock.FACING));
+            for (int slot = 0; slot < this.inventory.getSlots(); slot++) {
+                if (this.getLevel() != null && slot >= size) {
+                    // If the inventory decreased in size, drop the overflowing items.
+                    Containers.dropItemStack(this.getLevel(), dropItemsPos.getX(), dropItemsPos.getY(), dropItemsPos.getZ(), this.inventory.getStackInSlot(slot));
+                    continue;
+                }
+
+                newInventory.setStackInSlot(slot, this.inventory.getStackInSlot(slot));
+            }
+        }
+
+        this.inventory = newInventory;
     }
 
-    private CrucibleFluidTank createTank(int size) {
-        return new CrucibleFluidTank(size) {
-            @Override
-            public void onContentsChanged() {
-                CrucibleControllerBlockEntity.this.setChanged();
-            }
-        };
+    private void setTankSize(int size) {
+        this.fluidTank.updateCapacity(size);
     }
 
     private void onStructureEstablished() {
-        int size = this.crucibleStructure.getVolume();
-        this.inventory = this.createInventory(size);
-        this.fluidTank = this.createTank(size);
+        int size = this.crucibleStructure.getInternalVolume();
+        this.setInventoryWithSize(size);
+        this.setTankSize(size);
         this.invalidateCapabilities();
+        CrucibleStructure.ALL_CRUCIBLES.put(this.worldPosition, this.crucibleStructure.getShape());
+        this.setChanged();
     }
 
     @Override
@@ -177,12 +200,23 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         return Container.stillValidBlockEntity(this, player);
     }
 
+    public ItemStackHandler getInventory() {
+        return this.inventory;
+    }
+
+    public CrucibleStructure getStructure() {
+        return this.crucibleStructure;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.saveAdditional(pTag, pRegistries);
-        CrucibleStructure.CODEC.encodeStart(NbtOps.INSTANCE, this.crucibleStructure)
-            .resultOrPartial(ModRef.LOGGER::error)
-            .ifPresent(nbt -> pTag.put("CrucibleStructure", nbt));
+
+        if (this.crucibleStructure != null) {
+            CrucibleStructure.CODEC.encodeStart(NbtOps.INSTANCE, this.crucibleStructure)
+                .resultOrPartial(ModRef.LOGGER::error)
+                .ifPresent(nbt -> pTag.put("CrucibleStructure", nbt));
+        }
 
         ListTag activeRecipes = new ListTag();
         for (int i = 0; i < this.activeRecipes.length; i++) {
@@ -194,6 +228,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                 activeRecipes.add(recipeTag);
             }
         }
+
         pTag.put("ActiveRecipes", activeRecipes);
         pTag.put("FluidTank", this.fluidTank.serializeNBT(pRegistries));
         pTag.put("Inventory", this.inventory.serializeNBT(pRegistries));
@@ -203,15 +238,14 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     public void loadAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
 
-        CrucibleStructure.CODEC.parse(NbtOps.INSTANCE, pTag.get("CrucibleStructure"))
-            .resultOrPartial(ModRef.LOGGER::error)
-            .ifPresent(structure -> CrucibleControllerBlockEntity.this.crucibleStructure = structure);
-
-        if (this.crucibleStructure.isStructureValid()) {
-            this.onStructureEstablished();
+        if (pTag.contains("CrucibleStructure")) {
+            CrucibleStructure.CODEC.parse(NbtOps.INSTANCE, pTag.get("CrucibleStructure"))
+                .resultOrPartial(ModRef.LOGGER::error)
+                .ifPresent(structure -> {
+                    CrucibleControllerBlockEntity.this.crucibleStructure = structure;
+                    this.onStructureEstablished();
+                });
         }
-
-        this.invalidateCapabilities();
 
         ListTag activeRecipesTag = pTag.getList("ActiveRecipes", Tag.TAG_COMPOUND);
         activeRecipesTag.stream().map(tag -> ((CompoundTag) tag)).forEach(recipeTag -> {
@@ -236,19 +270,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    // Getter methods
-    public boolean isStructureValid() {
-        return this.crucibleStructure.isStructureValid();
-    }
-
-    public void invalidate() {
-        this.crucibleStructure.invalidate();
-    }
-
-    public ItemStackHandler getInventory() {
-        return this.inventory;
     }
 
     @Override
