@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +37,7 @@ public class CrucibleFluidTank implements IFluidHandler {
 
     @Override
     public int fill(FluidStack pResource, @NotNull FluidAction pAction) {
-        if (pResource.isEmpty()) {
+        if (pResource.isEmpty() && this.getRemainingVolume() <= 0) {
             return 0;
         }
 
@@ -191,6 +190,20 @@ public class CrucibleFluidTank implements IFluidHandler {
         return this.fluids.get(pTank);
     }
 
+    public float getRelativeFluidAmountUpTo(int tank) {
+        float relativeAmount = 0;
+        for (int i = 0; i <= tank; i++) {
+            relativeAmount += this.getRelativeFluidAmount(i);
+        }
+
+        return relativeAmount;
+    }
+
+    public float getRelativeFluidAmount(int tank) {
+        FluidStack fluid = this.getFluidInTank(tank);
+        return fluid.getAmount() / (float) this.getVirtualCapacity();
+    }
+
     @Override
     public int getTankCapacity(int pTank) {
         if (pTank >= this.fluids.size()) return 0;
@@ -204,15 +217,19 @@ public class CrucibleFluidTank implements IFluidHandler {
     }
 
     public int getRemainingVolume() {
-        return Math.max(0, this.getCapacityMb() - this.currentStored);
+        return Math.max(0, this.getCapacity() - this.currentStored);
     }
 
     public int getStored() {
         return this.currentStored;
     }
 
-    public int getCapacityMb() {
-        return this.capacity * FluidType.BUCKET_VOLUME;
+    public int getCapacity() {
+        return this.capacity;
+    }
+
+    public int getVirtualCapacity() {
+        return Math.max(this.capacity, this.currentStored);
     }
 
     public void onContentsChanged() {

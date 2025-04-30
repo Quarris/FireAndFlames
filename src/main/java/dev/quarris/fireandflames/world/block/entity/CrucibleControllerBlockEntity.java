@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -170,7 +171,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     private void onStructureEstablished() {
         int size = this.crucibleStructure.getInternalVolume();
         this.setInventoryWithSize(size);
-        this.setTankSize(size);
+        this.setTankSize(size * FluidType.BUCKET_VOLUME);
         this.invalidateCapabilities();
         CrucibleStructure.ALL_CRUCIBLES.put(this.worldPosition, this.crucibleStructure.getShape());
         this.setChanged();
@@ -238,6 +239,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     public void loadAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
 
+        this.crucibleStructure = null;
         if (pTag.contains("CrucibleStructure")) {
             CrucibleStructure.CODEC.parse(NbtOps.INSTANCE, pTag.get("CrucibleStructure"))
                 .resultOrPartial(ModRef.LOGGER::error)

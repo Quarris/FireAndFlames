@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.datagen.client;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,6 +21,7 @@ public class BlockStateGen extends BlockStateProvider {
     protected void registerStatesAndModels() {
         this.simpleBlockWithItem(BlockSetup.FIRE_CLAY.get(), this.models().cubeAll("fire_clay", blockTexture(BlockSetup.FIRE_CLAY.get())));
         this.simpleBlockWithItem(BlockSetup.FIRE_BRICKS.get(), this.models().cubeAll("fire_bricks", blockTexture(BlockSetup.FIRE_BRICKS.get())));
+        this.simpleBlockWithItem(BlockSetup.CRUCIBLE_WINDOW.get(), this.models().cubeColumn("crucible_window", blockTexture(BlockSetup.CRUCIBLE_WINDOW.get()), blockTexture(BlockSetup.FIRE_BRICKS.get())).renderType(RenderType.cutout().name));
 
         BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
             this.getVariantBuilder(block).forAllStates(

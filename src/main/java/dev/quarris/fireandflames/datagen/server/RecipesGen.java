@@ -8,10 +8,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +32,7 @@ public class RecipesGen extends RecipeProvider {
         crucibleRecipes(pOutput);
     }
 
-    private void crucibleRecipes(RecipeOutput pOutput) {
+    private static void crucibleRecipes(RecipeOutput pOutput) {
         CrucibleRecipeBuilder.smelting(RecipeCategory.MISC, new FluidStack(Fluids.WATER, 1000), Ingredient.of(Items.ICE), 100)
             .byproduct(new ItemStack(Items.STICK))
             .group("crucible")
@@ -69,5 +71,22 @@ public class RecipesGen extends RecipeProvider {
             .define('B', ItemSetup.FIRE_BRICK.get())
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
             .save(pOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_WINDOW.get())
+            .pattern(" B ")
+            .pattern("BGB")
+            .pattern(" B ")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .define('G', Tags.Items.GLASS_BLOCKS)
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
+            .save(pOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_WINDOW.get())
+            .requires(BlockSetup.FIRE_BRICKS.get())
+            .requires(Tags.Items.GLASS_BLOCKS)
+            .unlockedBy("has_fire_bricks", has(BlockSetup.FIRE_BRICKS.get()))
+            .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
+            .save(pOutput, ModRef.res("crucible_window_shapeless"));
     }
 }

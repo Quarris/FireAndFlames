@@ -2,11 +2,17 @@ package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import dev.quarris.fireandflames.world.block.CrucibleWindowBlock;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -20,23 +26,31 @@ public class BlockSetup {
 
     public static final DeferredBlock<Block> FIRE_CLAY = registerBlock("fire_clay", Block::new,
         BlockBehaviour.Properties.of()
-            .mapColor(MapColor.TERRACOTTA_RED)
+            .mapColor(MapColor.COLOR_ORANGE)
             .strength(0.6F)
             .sound(SoundType.GRAVEL));
 
     public static final DeferredBlock<Block> FIRE_BRICKS = registerBlock("fire_bricks", Block::new,
         BlockBehaviour.Properties.of()
-            .mapColor(MapColor.TERRACOTTA_RED)
-            .strength(0.6F)
+            .mapColor(MapColor.COLOR_ORANGE)
+            .strength(1.0F)
             .sound(SoundType.STONE));
 
     public static final DeferredBlock<CrucibleControllerBlock> CRUCIBLE_CONTROLLER = registerBlock("crucible_controller", CrucibleControllerBlock::new,
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_ORANGE)
             .requiresCorrectToolForDrops()
-            .strength(3.0F, 9.0F)
+            .strength(1.0F, 2.0F)
             .lightLevel(state -> state.getValue(CrucibleControllerBlock.LIT) ? 15 : 0)
             .sound(SoundType.METAL));
+
+    public static final DeferredBlock<Block> CRUCIBLE_WINDOW = registerBlock("crucible_window", CrucibleWindowBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .strength(1.0F)
+            .sound(SoundType.GLASS)
+            .noOcclusion()
+            .isViewBlocking(((state, level, pos) -> false)));
 
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {

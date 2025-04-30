@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.*;
 
@@ -55,12 +56,10 @@ public class CrucibleStructure {
         int newHeight = validateLayersFrom(level, this.controllerPosition, this.getBaseSides(), this.shape, changeHeight);
         if (newHeight != this.shape.height) {
             if (newHeight < 2) {
-                ModRef.LOGGER.info("Structure invalid at height {}", newHeight);
                 this.invalid = true;
                 return;
             }
 
-            ModRef.LOGGER.info("Forming structure at height {}", newHeight);
             this.shape = this.shape.withHeight(newHeight);
             this.dirty = true;
         }
@@ -68,16 +67,6 @@ public class CrucibleStructure {
 
     public int getInternalVolume() {
         return this.shape.getInternalVolume();
-    }
-
-    public boolean isControllerWithinStructure(Level level) {
-        return level.getBlockEntity(this.controllerPosition, BlockEntitySetup.CRUCIBLE_CONTROLLER.get())
-            .map(CrucibleControllerBlockEntity::getStructure)
-            .filter(this::equals)
-            .map(structure -> {
-                int controllerHeight = this.controllerPosition.getY() - this.shape.position().getY();
-                return structure.getBaseSides(controllerHeight).contains(this.controllerPosition);
-            }).orElse(false);
     }
 
     public List<BlockPos> getBaseSides() {
@@ -114,8 +103,6 @@ public class CrucibleStructure {
         }
 
         calculatedShape = calculatedShape.withHeight(height);
-
-        ModRef.LOGGER.info("Crucible at {} Validated: {}", controllerPosition, calculatedShape);
         return new CrucibleStructure(controllerPosition, calculatedShape);
     }
 
@@ -162,16 +149,17 @@ public class CrucibleStructure {
                     return -1;
                 }
 
-                if (!isValidCrucibleBlock(level, wallPos)) {
-                    break heightCheck;
-                }
-
                 if (state.is(BlockSetup.CRUCIBLE_CONTROLLER.get())) {
                     if (!wallPos.equals(controllerPosition)) {
                         break heightCheck;
                     }
 
                     foundController = true;
+                    continue;
+                }
+
+                if (!isValidCrucibleBlock(level, wallPos)) {
+                    break heightCheck;
                 }
             }
 
@@ -382,6 +370,10 @@ public class CrucibleStructure {
         public boolean containsInternal(BlockPos pos) {
             return pos.getX() >= this.position.getX() + 1 && pos.getY() >= this.position.getY() + 1 && pos.getZ() >= this.position.getZ() + 1 &&
                 pos.getX() < this.position.getX() + this.width - 1 && pos.getY() < this.position.getY() + this.height && pos.getZ() < this.position.getZ() + this.depth - 1;
+        }
+
+        public BoundingBox toBoundingBox() {
+            return BoundingBox.fromCorners(this.position, this.position.offset(this.width() - 1, this.height() - 1, this.depth() - 1));
         }
     }
 }

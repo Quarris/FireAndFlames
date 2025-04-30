@@ -40,7 +40,7 @@ public class CrucibleFluidTankComponent {
         int pos = 0;
         for (int tank = 0; tank < this.fluidTankSupplier.get().getTanks(); tank++) {
             int height = this.getHeightForFluidSlot(tank);
-            if (pMouseY > this.y + this.height - pos - height && pMouseY < this.y + this.height - pos) {
+            if (pMouseY >= this.y + this.height - pos - height && pMouseY < this.y + this.height - pos) {
                 return tank;
             }
             pos += height;
@@ -61,11 +61,12 @@ public class CrucibleFluidTankComponent {
         for (int tank = 0; tank < tanks; tank++) {
             int drawHeight = this.getHeightForFluidSlot(tank);
             FluidStack fluid = fluidTank.getFluidInTank(tank);
-            this.renderFluidAt(pGraphics, pLevel, pPos, fluid, this.x, (this.y + this.height - drawY - drawHeight), this.width, drawHeight);
+            renderFluidAt(pGraphics, pLevel, pPos, fluid, this.x, (this.y + this.height - drawY - drawHeight), this.width, drawHeight);
             drawY += drawHeight;
         }
 
         // Render Tooltip
+        pGraphics.fill(pMouseX, pMouseY, pMouseX + 1, pMouseY + 1, 0xffff0000);
         int hoverTank = this.getHoveringFluidTank(pMouseX, pMouseY);
         if (hoverTank < 0) {
             return;
@@ -95,7 +96,7 @@ public class CrucibleFluidTankComponent {
 
     public int getMaxDrawHeight() {
         CrucibleFluidTank fluidTank = this.fluidTankSupplier.get();
-        return Mth.lerpInt((fluidTank.getCapacityMb() - fluidTank.getRemainingVolume()) / (float) fluidTank.getCapacityMb(), Math.max(9, fluidTank.getTanks()), this.height - 2);
+        return Mth.lerpInt((fluidTank.getCapacity() - fluidTank.getRemainingVolume()) / (float) fluidTank.getCapacity(), Math.max(9, fluidTank.getTanks()), this.height - 2);
     }
 
     private static void renderFluidAt(GuiGraphics pGraphics, Level pLevel, BlockPos pPos, FluidStack pFluid, int pX, int pY, int pWidth, int pHeight) {

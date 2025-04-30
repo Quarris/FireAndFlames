@@ -147,6 +147,11 @@ public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu>
     }
 
     @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return super.isMouseOver(mouseX, mouseY);
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         this.getMenu().scroll((int) scrollY);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);

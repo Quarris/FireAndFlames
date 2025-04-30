@@ -8,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -23,11 +24,22 @@ public class BlockTagGen extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
-        HolderLookup.RegistryLookup<Block> blocks = pLookup.lookupOrThrow(Registries.BLOCK);
         this.tag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS).add(
-            key(BlockSetup.FIRE_BRICKS.get()),
-            key(BlockSetup.CRUCIBLE_CONTROLLER.get())
+            BlockSetup.FIRE_BRICKS.get(),
+            BlockSetup.CRUCIBLE_WINDOW.get()
         );
+
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
+            .add(
+                BlockSetup.FIRE_BRICKS.get(),
+                BlockSetup.CRUCIBLE_CONTROLLER.get(),
+                BlockSetup.CRUCIBLE_WINDOW.get()
+            );
+
+        this.tag(BlockTags.MINEABLE_WITH_SHOVEL)
+            .add(
+                BlockSetup.FIRE_CLAY.get()
+            );
     }
 
     private static ResourceKey<Block> key(Block block) {

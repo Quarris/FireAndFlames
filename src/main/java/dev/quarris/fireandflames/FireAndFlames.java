@@ -15,5 +15,6 @@ public class FireAndFlames {
         BlockEntitySetup.init(modBus);
         MenuSetup.init(modBus);
         RecipeSetup.init(modBus);
+        CreativeTabSetup.init(modBus);
     }
 }
