@@ -2,13 +2,16 @@ package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
+import dev.quarris.fireandflames.data.recipes.EntityMeltingRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
+import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,6 +33,17 @@ public class RecipesGen extends RecipeProvider {
         smeltingRecipes(pOutput);
         blastingRecipes(pOutput);
         crucibleRecipes(pOutput);
+        meltingRecipes(pOutput);
+    }
+
+    private static void meltingRecipes(RecipeOutput pOutput) {
+        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.PLAYER), new FluidStack(Fluids.LAVA, 5))
+            .withChance(0.1f)
+            .save(pOutput, ModRef.res("melting/lava_from_player"));
+
+        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.SHEEP), FluidTags.WATER, 50)
+            .requiresNoFluid()
+            .save(pOutput, ModRef.res("melting/water_from_sheep"));
     }
 
     private static void crucibleRecipes(RecipeOutput pOutput) {

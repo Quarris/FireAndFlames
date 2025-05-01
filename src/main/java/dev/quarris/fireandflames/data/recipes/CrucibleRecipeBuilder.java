@@ -2,7 +2,9 @@ package dev.quarris.fireandflames.data.recipes;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import dev.quarris.fireandflames.world.item.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.IFluidRecipeOutput;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
@@ -33,7 +35,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final CookingBookCategory bookCategory;
     private final Ingredient ingredient;
-    private final Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult;
+    private final IFluidRecipeOutput result;
     private final int smeltingTime;
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
 
@@ -47,7 +49,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         FluidStack result,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, Either.left(result), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidRecipeOutput.Direct(result), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
@@ -58,20 +60,20 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         int resultAmount,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, Either.right(Pair.of(result, resultAmount)), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidRecipeOutput.Tag(result, resultAmount), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
         RecipeCategory category,
         CookingBookCategory bookCategory,
         Ingredient ingredient,
-        Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult,
+        IFluidRecipeOutput result,
         int smeltingTime
     ) {
         this.category = category;
         this.bookCategory = bookCategory;
         this.ingredient = ingredient;
-        this.eitherResult = eitherResult;
+        this.result = result;
         this.smeltingTime = smeltingTime;
     }
 
@@ -99,7 +101,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
     }
 
     public FluidStack getFluidResult() {
-        return this.eitherResult.map(Function.identity(), pair -> CrucibleRecipe.ofTag(pair.getFirst(), pair.getSecond()));
+        return this.result.createFluid();
     }
 
     @Override
@@ -109,7 +111,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(RecipeOutput recipeOutput) {
-        this.save(recipeOutput, getDefaultRecipeId(this.eitherResult));
+        this.save(recipeOutput, getDefaultRecipeId(this.result));
     }
 
     @Override
@@ -125,7 +127,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
             .rewards(AdvancementRewards.Builder.recipe(id))
             .requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(advancement$builder::addCriterion);
-        CrucibleRecipe recipe = new CrucibleRecipe(this.group, this.bookCategory, this.ingredient, this.byproduct, this.eitherResult, this.smeltingTime);
+        CrucibleRecipe recipe = new CrucibleRecipe(this.group, this.bookCategory, this.ingredient, this.byproduct, this.result, this.smeltingTime);
         recipeOutput.accept(id, recipe, advancement$builder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 
@@ -162,7 +164,16 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public static ResourceLocation getDefaultRecipeId(Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult) {
-        return eitherResult.map(stack -> BuiltInRegistries.FLUID.getKey(stack.getFluid()), pair -> pair.getFirst().location()).withPrefix("crucible/");
+    public static ResourceLocation getDefaultRecipeId(IFluidRecipeOutput result) {
+        ResourceLocation baseName;
+        if (result instanceof IFluidRecipeOutput.Tag tag) {
+            baseName = tag.tag().location();
+        } else if (result instanceof IFluidRecipeOutput.Direct direct) {
+            baseName = BuiltInRegistries.FLUID.getKey(direct.createFluid().getFluid());
+        } else {
+            throw new UnsupportedOperationException("Invalid fluid recipe output");
+        }
+
+        return baseName.withPrefix("crucible/");
     }
 }

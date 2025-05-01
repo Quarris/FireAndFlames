@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.datagen.client;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.BlockSetup;
+import dev.quarris.fireandflames.setup.DamageTypeSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -24,5 +25,7 @@ public class EnUsLanguageGen extends LanguageProvider {
 
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("creative_tabs.fireandflames.creative_tab", "Fire and Flames");
+        this.add("death.attack.crucible_melting", "%1$s was melted by the heat of the crucible");
+        this.add("death.attack.crucible_melting.player", "%1$s was thrown to the pits of the crucible by %2$s");
     }
 }

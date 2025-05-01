@@ -91,7 +91,7 @@ public class CrucibleFluidTankComponent {
         int totalStored = fluidTank.getStored();
         FluidStack fluid = fluidTank.getFluidInTank(tank);
         double ratio = fluid.getAmount() / (double) totalStored;
-        return (int) (maxHeight * ratio);
+        return (int) Math.ceil(maxHeight * ratio);
     }
 
     public int getMaxDrawHeight() {

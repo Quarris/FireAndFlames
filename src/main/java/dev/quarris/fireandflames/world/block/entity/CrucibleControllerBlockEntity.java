@@ -1,12 +1,16 @@
 package dev.quarris.fireandflames.world.block.entity;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.setup.DamageTypeSetup;
+import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
+import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.MeltingRecipeInput;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
-import dev.quarris.fireandflames.world.item.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -18,11 +22,14 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,6 +38,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+
+import java.util.List;
+import java.util.Optional;
 
 public class CrucibleControllerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -123,6 +133,20 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                         pCrucible.inventory.setStackInSlot(slot, recipe.createByproduct());
                         recipe.reset();
                     }
+                }
+            }
+        }
+
+        if (pLevel.getGameTime() % 20 == 0) {
+            List<Entity> meltingEntities = pLevel.getEntities(null, pCrucible.crucibleStructure.getInternalBounds());
+            for (Entity entity : meltingEntities) {
+                if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
+                    MeltingRecipeInput recipeInput = new MeltingRecipeInput(entity.getType(), pCrucible.fluidTank.getStored() > 0);
+                    pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
+                        EntityMeltingRecipe recipe = recipeHolder.value();
+                        pCrucible.fluidTank.fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
+                    });
+
                 }
             }
         }

@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.world.item.crafting;
+package dev.quarris.fireandflames.world.crucible.crafting;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
@@ -19,45 +19,35 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-import java.util.function.Function;
-
 public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
-
-    public static final Codec<Either<FluidStack, Pair<TagKey<Fluid>, Integer>>> RESULT_CODEC = Codec.either(
-        FluidStack.CODEC,
-        Codec.pair(
-            TagKey.codec(Registries.FLUID).fieldOf("tag").codec(),
-            Codec.INT.fieldOf("amount").codec()
-        )
-    );
 
     protected final RecipeType<?> type;
     protected final String group;
     protected final CookingBookCategory category;
     protected final Ingredient ingredient;
     protected final ItemStack byproduct;
-    protected final Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult;
+    protected final IFluidRecipeOutput result;
     protected final int smeltingTime;
 
-    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult, int smeltingTime) {
+    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidRecipeOutput eitherResult, int smeltingTime) {
         this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, eitherResult, smeltingTime);
     }
 
     public CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, TagKey<Fluid> resultTag, int resultAmount, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, Either.right(Pair.of(resultTag, resultAmount)), smeltingTime);
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidRecipeOutput.Tag(resultTag, resultAmount), smeltingTime);
     }
 
     public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, FluidStack result, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, Either.left(result), smeltingTime);
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidRecipeOutput.Direct(result), smeltingTime);
     }
 
-    protected CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, Either<FluidStack, Pair<TagKey<Fluid>, Integer>> eitherResult, int smeltingTime) {
+    protected CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidRecipeOutput eitherResult, int smeltingTime) {
         this.type = type;
         this.category = category;
         this.group = group;
         this.ingredient = ingredient;
         this.byproduct = byproduct;
-        this.eitherResult = eitherResult;
+        this.result = eitherResult;
         this.smeltingTime = smeltingTime;
     }
 
@@ -86,7 +76,7 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
     }
 
     public FluidStack getFluidResult() {
-        return this.eitherResult.map(Function.identity(), pair -> ofTag(pair.getFirst(), pair.getSecond()));
+        return this.result.createFluid();
     }
 
     public ItemStack getByproduct() {

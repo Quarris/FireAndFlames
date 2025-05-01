@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class CrucibleStructure {
     private boolean dirty;
 
     private List<BlockPos> baseSides;
+    private AABB internalBounds;
 
     public static CrucibleStructure of(Level level, BlockPos controllerPosition) {
         return formCrucibleStructure(level, controllerPosition);
@@ -334,6 +336,14 @@ public class CrucibleStructure {
     @Override
     public int hashCode() {
         return Objects.hash(controllerPosition, shape);
+    }
+
+    public AABB getInternalBounds() {
+        if (this.internalBounds == null) {
+            this.internalBounds = AABB.of(BoundingBox.fromCorners(this.shape.position.offset(1, 1, 1), this.shape.position.offset(this.shape.width - 2, this.shape.height - 1, this.shape.depth - 2)));
+        }
+
+        return this.internalBounds;
     }
 
     /**
