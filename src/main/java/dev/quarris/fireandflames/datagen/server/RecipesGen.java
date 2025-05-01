@@ -30,6 +30,7 @@ public class RecipesGen extends RecipeProvider {
     @Override
     public void buildRecipes(RecipeOutput pOutput) {
         shapedRecipes(pOutput);
+        shapelessRecipes(pOutput);
         smeltingRecipes(pOutput);
         blastingRecipes(pOutput);
         crucibleRecipes(pOutput);
@@ -96,6 +97,16 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
             .save(pOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_DRAIN.get())
+            .pattern("B B")
+            .pattern("B B")
+            .pattern("B B")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .save(pOutput);
+    }
+
+    public static void shapelessRecipes(RecipeOutput pOutput) {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_WINDOW.get())
             .requires(BlockSetup.FIRE_BRICKS.get())
             .requires(Tags.Items.GLASS_BLOCKS)

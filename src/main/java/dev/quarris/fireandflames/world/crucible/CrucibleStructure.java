@@ -1,5 +1,7 @@
 package dev.quarris.fireandflames.world.crucible;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.quarris.fireandflames.ModRef;
@@ -22,7 +24,8 @@ public class CrucibleStructure {
     public static final Map<BlockPos, CrucibleShape> ALL_CRUCIBLES = new HashMap<>();
 
     public static final Codec<CrucibleStructure> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        BlockPos.CODEC.fieldOf("controllerPosition").forGetter(CrucibleStructure::getControllerPosition),
+        BlockPos.CODEC.fieldOf("controller_position").forGetter(CrucibleStructure::getControllerPosition),
+        BlockPos.CODEC.listOf().fieldOf("drain_positions").forGetter(CrucibleStructure::getDrainPositions),
         CrucibleShape.CODEC.fieldOf("shape").forGetter(CrucibleStructure::getShape),
         Codec.BOOL.fieldOf("invalid").forGetter(CrucibleStructure::isInvalid),
         Codec.BOOL.fieldOf("dirty").forGetter(CrucibleStructure::isDirty)
@@ -31,6 +34,7 @@ public class CrucibleStructure {
     private static final int MAX_SIZE = 23; // Maximum width/depth
 
     private final BlockPos controllerPosition;
+    private final List<BlockPos> drainPositions = Lists.newArrayList();
     private CrucibleShape shape;
     private boolean invalid;
     private boolean dirty;
@@ -42,29 +46,42 @@ public class CrucibleStructure {
         return formCrucibleStructure(level, controllerPosition);
     }
 
-    private CrucibleStructure(BlockPos controllerPosition, CrucibleShape shape) {
+    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, CrucibleShape shape) {
         this.controllerPosition = controllerPosition;
         this.shape = shape;
+        this.drainPositions.addAll(drainPositions);
     }
 
-    private CrucibleStructure(BlockPos controllerPosition, CrucibleShape shape, boolean dirty, boolean invalid) {
-        this(controllerPosition, shape);
+    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, CrucibleShape shape, boolean dirty, boolean invalid) {
+        this(controllerPosition, drainPositions, shape);
         this.dirty = dirty;
         this.invalid = invalid;
     }
 
-    public void notifyChange(Level level, BlockPos pos, BlockState state) {
-        int changeHeight = pos.getY() - this.shape.position.getY();
-        int newHeight = validateLayersFrom(level, this.controllerPosition, this.getBaseSides(), this.shape, changeHeight);
+    public void notifyChange(Level pLevel, BlockPos pPos, BlockState pState) {
+        int changeHeight = pPos.getY() - this.shape.position.getY();
+        List<BlockPos> drains = this.getDrainPositions();
+        drains.removeIf(drainPos -> {
+            int drainHeight = drainPos.getY() - this.shape.position.getY();
+            return drainHeight >= changeHeight;
+        });
+        int newHeight = validateLayersFrom(drains, pLevel, this.controllerPosition, this.getBaseSides(), this.shape, changeHeight);
         if (newHeight != this.shape.height) {
             if (newHeight < 2) {
                 this.invalid = true;
                 return;
             }
 
+            this.drainPositions.forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
+            this.drainPositions.clear();
+            this.drainPositions.addAll(drains);
             this.shape = this.shape.withHeight(newHeight);
             this.dirty = true;
         }
+    }
+
+    public List<BlockPos> getDrainPositions() {
+        return Lists.newArrayList(this.drainPositions);
     }
 
     public int getInternalVolume() {
@@ -77,7 +94,11 @@ public class CrucibleStructure {
 
     public List<BlockPos> getBaseSides(int height) {
         if (this.baseSides == null) {
-            this.baseSides = computeBaseSides(this.shape.position(), this.shape.width(), this.shape.depth());
+            this.baseSides = ImmutableList.copyOf(computeBaseSides(this.shape.position(), this.shape.width(), this.shape.depth()));
+        }
+
+        if (height == 0) {
+            return this.baseSides;
         }
 
         return this.baseSides.stream().map(p -> p.above(height)).toList();
@@ -99,13 +120,14 @@ public class CrucibleStructure {
 
         // For each wall position, go up until any of the blocks are no longer crucible blocks
         // That indicates the height of the structure
-        int height = validateLayersFrom(level, controllerPosition, wallPositions, calculatedShape, 0);
+        List<BlockPos> drains = new ArrayList<>();
+        int height = validateLayersFrom(drains, level, controllerPosition, wallPositions, calculatedShape, 0);
         if (height < 2) {
             return null;
         }
 
         calculatedShape = calculatedShape.withHeight(height);
-        return new CrucibleStructure(controllerPosition, calculatedShape);
+        return new CrucibleStructure(controllerPosition, drains, calculatedShape);
     }
 
     /**
@@ -115,8 +137,10 @@ public class CrucibleStructure {
      * @param startHeight the height at which to start validating from.
      * @return the height at which the structure was validated at.
      */
-    private static int validateLayersFrom(Level level, BlockPos controllerPosition, List<BlockPos> baseSides, CrucibleShape shape, int startHeight) {
+    private static int validateLayersFrom(List<BlockPos> outputDrainPositions, Level level, BlockPos controllerPosition, List<BlockPos> baseSides, CrucibleShape shape, int startHeight) {
         int height = startHeight;
+
+        // Validate floor
         if (height == 0) {
             for (int x = 1; x < shape.width() - 1; x++) {
                 for (int z = 1; z < shape.depth() - 1; z++) {
@@ -144,6 +168,8 @@ public class CrucibleStructure {
             }
 
             // Check wall positions
+            boolean foundControllerInLayer = false;
+            List<BlockPos> drainPositionsInLayer = new ArrayList<>();
             for (BlockPos baseWallPos : baseSides) {
                 BlockPos wallPos = baseWallPos.above(height);
                 BlockState state = level.getBlockState(wallPos);
@@ -151,12 +177,17 @@ public class CrucibleStructure {
                     return -1;
                 }
 
+                if (state.is(BlockSetup.CRUCIBLE_DRAIN.get())) {
+                    drainPositionsInLayer.add(wallPos);
+                    continue;
+                }
+
                 if (state.is(BlockSetup.CRUCIBLE_CONTROLLER.get())) {
                     if (!wallPos.equals(controllerPosition)) {
                         break heightCheck;
                     }
 
-                    foundController = true;
+                    foundControllerInLayer = true;
                     continue;
                 }
 
@@ -165,7 +196,12 @@ public class CrucibleStructure {
                 }
             }
 
+            // Successfully validated the layer.
             height++;
+            outputDrainPositions.addAll(drainPositionsInLayer);
+            if (foundControllerInLayer) {
+                foundController = true;
+            }
         }
 
         if (!foundController) {

@@ -19,6 +19,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -83,14 +84,15 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CrucibleControllerBlockEntity pCrucible) {
-        if (pCrucible.crucibleStructure != null && pCrucible.crucibleStructure.isInvalid()) {
+        if (pCrucible.getStructure() != null && pCrucible.getStructure().isInvalid()) {
+            pCrucible.getStructure().getDrainPositions().forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
             pCrucible.crucibleStructure = null;
             pCrucible.setChanged();
             return;
         }
 
         // Try forming structure
-        if (pCrucible.crucibleStructure == null) {
+        if (pCrucible.getStructure() == null) {
             CrucibleStructure structure = CrucibleStructure.of(pCrucible.getLevel(), pCrucible.getBlockPos());
             // Structure valid
             boolean wasValid = pState.getValue(CrucibleControllerBlock.LIT);
@@ -108,14 +110,14 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             return;
         }
 
-        if (pCrucible.crucibleStructure.isDirty()) {
+        if (pCrucible.getStructure().isDirty()) {
             pCrucible.onStructureEstablished();
-            pCrucible.crucibleStructure.markClean();
+            pCrucible.getStructure().markClean();
         }
 
         // Tick recipes
-        if (pCrucible.inventory.getSlots() > 0) {
-            for (int slot = 0; slot < pCrucible.inventory.getSlots(); slot++) {
+        if (pCrucible.getInventory().getSlots() > 0) {
+            for (int slot = 0; slot < pCrucible.getInventory().getSlots(); slot++) {
                 CrucibleRecipe.Active recipe = pCrucible.activeRecipes[slot];
                 if (recipe == null) {
                     recipe = new CrucibleRecipe.Active();
@@ -123,14 +125,14 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                     pCrucible.setChanged();
                 }
 
-                recipe.updateWith(pLevel, pCrucible.inventory.getStackInSlot(slot));
+                recipe.updateWith(pLevel, pCrucible.getInventory().getStackInSlot(slot));
                 if (recipe.isFinished()) {
                     // If there is enough space to insert fluid
                     FluidStack output = recipe.createOutput();
                     // Only finalize the recipe if there is EXACTLY enough space for fluid.
-                    if (pCrucible.fluidTank.fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
-                        pCrucible.fluidTank.fill(output, IFluidHandler.FluidAction.EXECUTE);
-                        pCrucible.inventory.setStackInSlot(slot, recipe.createByproduct());
+                    if (pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
+                        pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.EXECUTE);
+                        pCrucible.getInventory().setStackInSlot(slot, recipe.createByproduct());
                         recipe.reset();
                     }
                 }
@@ -138,13 +140,13 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         }
 
         if (pLevel.getGameTime() % 20 == 0) {
-            List<Entity> meltingEntities = pLevel.getEntities(null, pCrucible.crucibleStructure.getInternalBounds());
+            List<Entity> meltingEntities = pLevel.getEntities(null, pCrucible.getStructure().getInternalBounds());
             for (Entity entity : meltingEntities) {
                 if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
-                    MeltingRecipeInput recipeInput = new MeltingRecipeInput(entity.getType(), pCrucible.fluidTank.getStored() > 0);
+                    MeltingRecipeInput recipeInput = new MeltingRecipeInput(entity.getType(), pCrucible.getFluidTank().getStored() > 0);
                     pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
                         EntityMeltingRecipe recipe = recipeHolder.value();
-                        pCrucible.fluidTank.fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
+                        pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
                     });
 
                 }
@@ -172,16 +174,16 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
         // Copy old inventory to new, up to the new size
         // If the new inventory size has decreased, drop the items not able to be fitted in new inventory
-        if (this.inventory.getSlots() > 0) {
-            BlockPos dropItemsPos = this.worldPosition.relative(this.getBlockState().getValue(CrucibleControllerBlock.FACING));
-            for (int slot = 0; slot < this.inventory.getSlots(); slot++) {
+        if (this.getInventory().getSlots() > 0) {
+            BlockPos dropItemsPos = this.getBlockPos().relative(this.getBlockState().getValue(CrucibleControllerBlock.FACING));
+            for (int slot = 0; slot < this.getInventory().getSlots(); slot++) {
                 if (this.getLevel() != null && slot >= size) {
                     // If the inventory decreased in size, drop the overflowing items.
-                    Containers.dropItemStack(this.getLevel(), dropItemsPos.getX(), dropItemsPos.getY(), dropItemsPos.getZ(), this.inventory.getStackInSlot(slot));
+                    Containers.dropItemStack(this.getLevel(), dropItemsPos.getX(), dropItemsPos.getY(), dropItemsPos.getZ(), this.getInventory().getStackInSlot(slot));
                     continue;
                 }
 
-                newInventory.setStackInSlot(slot, this.inventory.getStackInSlot(slot));
+                newInventory.setStackInSlot(slot, this.getInventory().getStackInSlot(slot));
             }
         }
 
@@ -189,15 +191,20 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     }
 
     private void setTankSize(int size) {
-        this.fluidTank.updateCapacity(size);
+        this.getFluidTank().updateCapacity(size);
     }
 
     private void onStructureEstablished() {
-        int size = this.crucibleStructure.getInternalVolume();
+        int size = this.getStructure().getInternalVolume();
         this.setInventoryWithSize(size);
         this.setTankSize(size * FluidType.BUCKET_VOLUME);
+        if (this.getLevel() instanceof ServerLevel) {
+            this.getStructure().getDrainPositions().forEach(drainPos -> {
+                this.getLevel().getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(this.getBlockPos()));
+            });
+        }
         this.invalidateCapabilities();
-        CrucibleStructure.ALL_CRUCIBLES.put(this.worldPosition, this.crucibleStructure.getShape());
+        CrucibleStructure.ALL_CRUCIBLES.put(this.getBlockPos(), this.getStructure().getShape());
         this.setChanged();
     }
 
@@ -211,14 +218,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
     public CrucibleFluidTank getFluidTank() {
         return this.fluidTank;
-    }
-
-    public CrucibleRecipe.Active getRecipeAt(int slot) {
-        if (slot >= 0 && slot < this.activeRecipes.length) {
-            return this.activeRecipes[slot];
-        }
-
-        return null;
     }
 
     public boolean stillValid(Player player) {

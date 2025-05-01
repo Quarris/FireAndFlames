@@ -104,19 +104,23 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        level.getBlockEntity(pos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
-            BlockPos dropPos = pos.relative(state.getValue(FACING));
-            ItemStackHandler inventory = crucible.getInventory();
-            for (int slot = 0; slot < inventory.getSlots(); slot++) {
-                Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), inventory.getStackInSlot(slot));
-            }
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if (!pState.is(pNewState.getBlock())) {
+            pLevel.getBlockEntity(pPos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
+                BlockPos dropPos = pPos.relative(pState.getValue(FACING));
+                ItemStackHandler inventory = crucible.getInventory();
+                for (int slot = 0; slot < inventory.getSlots(); slot++) {
+                    Containers.dropItemStack(pLevel, dropPos.getX(), dropPos.getY(), dropPos.getZ(), inventory.getStackInSlot(slot));
+                }
 
-            level.updateNeighbourForOutputSignal(pos, state.getBlock());
-            CrucibleStructure.ALL_CRUCIBLES.remove(pos);
-        });
+                pLevel.updateNeighbourForOutputSignal(pPos, pState.getBlock());
+                if (crucible.getStructure() != null) {
+                    crucible.getStructure().getDrainPositions().forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
+                }
+                CrucibleStructure.ALL_CRUCIBLES.remove(pPos);
+            });
+        }
 
-
-        super.onRemove(state, level, pos, newState, isMoving);
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 }

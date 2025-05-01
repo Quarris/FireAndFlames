@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import dev.quarris.fireandflames.world.block.CrucibleDrainBlock;
 import dev.quarris.fireandflames.world.block.CrucibleWindowBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
@@ -33,7 +34,8 @@ public class BlockSetup {
     public static final DeferredBlock<Block> FIRE_BRICKS = registerBlock("fire_bricks", Block::new,
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_ORANGE)
-            .strength(1.0F)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));
 
     public static final DeferredBlock<CrucibleControllerBlock> CRUCIBLE_CONTROLLER = registerBlock("crucible_controller", CrucibleControllerBlock::new,
@@ -47,10 +49,18 @@ public class BlockSetup {
     public static final DeferredBlock<Block> CRUCIBLE_WINDOW = registerBlock("crucible_window", CrucibleWindowBlock::new,
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
             .strength(1.0F)
             .sound(SoundType.GLASS)
             .noOcclusion()
             .isViewBlocking(((state, level, pos) -> false)));
+
+    public static final DeferredBlock<CrucibleDrainBlock> CRUCIBLE_DRAIN = registerBlock("crucible_drain", CrucibleDrainBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.METAL));
 
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {

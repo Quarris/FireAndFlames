@@ -129,6 +129,8 @@ repositories {
 dependencies {
     implementation "curse.maven:pretty-pipes-376737:$pp_version"
     implementation "curse.maven:pretty-pipes-fluids-479142:$ppf_version"
+    implementation "curse.maven:large-fluid-tank-291006:$tank_version"
+    implementation "curse.maven:scalable-cats-force-320926:$scala_version"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

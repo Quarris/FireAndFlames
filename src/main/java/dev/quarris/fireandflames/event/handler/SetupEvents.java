@@ -13,7 +13,7 @@ public class SetupEvents {
     @SubscribeEvent
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), (be, dir) -> be.getInventory());
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), (be, dir) -> be.getFluidTank());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CRUCIBLE_DRAIN.get(), (be, dir) -> be.getCrucibleTank().orElse(null));
     }
 
 }
