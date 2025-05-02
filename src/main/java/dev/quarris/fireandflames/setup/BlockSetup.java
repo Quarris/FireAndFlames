@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.setup;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.block.CrucibleDrainBlock;
+import dev.quarris.fireandflames.world.block.CrucibleFawsitBlock;
 import dev.quarris.fireandflames.world.block.CrucibleWindowBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
@@ -44,7 +45,7 @@ public class BlockSetup {
             .requiresCorrectToolForDrops()
             .strength(1.0F, 2.0F)
             .lightLevel(state -> state.getValue(CrucibleControllerBlock.LIT) ? 15 : 0)
-            .sound(SoundType.METAL));
+            .sound(SoundType.STONE));
 
     public static final DeferredBlock<Block> CRUCIBLE_WINDOW = registerBlock("crucible_window", CrucibleWindowBlock::new,
         BlockBehaviour.Properties.of()
@@ -60,7 +61,15 @@ public class BlockSetup {
             .mapColor(MapColor.COLOR_ORANGE)
             .requiresCorrectToolForDrops()
             .strength(1.0F, 2.0F)
-            .sound(SoundType.METAL));
+            .sound(SoundType.STONE));
+
+    public static final DeferredBlock<CrucibleFawsitBlock> CRUCIBLE_FAWSIT = registerBlock("crucible_faucet", CrucibleFawsitBlock::new,
+        BlockBehaviour.Properties.of()
+            .forceSolidOn()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.STONE));
 
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {

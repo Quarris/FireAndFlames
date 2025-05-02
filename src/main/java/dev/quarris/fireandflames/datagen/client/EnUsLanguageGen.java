@@ -23,6 +23,7 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add(BlockSetup.CRUCIBLE_CONTROLLER.get(), "Crucible Controller");
         this.add(BlockSetup.CRUCIBLE_WINDOW.get(), "Crucible Window");
         this.add(BlockSetup.CRUCIBLE_DRAIN.get(), "Crucible Drain");
+        this.add(BlockSetup.CRUCIBLE_FAWSIT.get(), "Crucible Fawsit (Faucet)");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("creative_tabs.fireandflames.creative_tab", "Fire and Flames");

@@ -2,8 +2,10 @@ package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.CrucibleDrainBlock;
+import dev.quarris.fireandflames.world.block.CrucibleFawsitBlock;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CrucibleDrainBlockEntity;
+import dev.quarris.fireandflames.world.block.entity.CrucibleFawsitBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -27,6 +29,13 @@ public class BlockEntitySetup {
             () -> BlockEntityType.Builder.of(
                 CrucibleDrainBlockEntity::new,
                 BlockSetup.CRUCIBLE_DRAIN.get()
+            ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrucibleFawsitBlockEntity>> CRUCIBLE_FAWSIT =
+        REGISTRY.register("crucible_fawsit",
+            () -> BlockEntityType.Builder.of(
+                CrucibleFawsitBlockEntity::new,
+                BlockSetup.CRUCIBLE_FAWSIT.get()
             ).build(null));
 
     public static void init(IEventBus modBus) {

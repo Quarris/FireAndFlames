@@ -5,14 +5,20 @@ import dev.quarris.fireandflames.datagen.client.BlockStateGen;
 import dev.quarris.fireandflames.datagen.client.EnUsLanguageGen;
 import dev.quarris.fireandflames.datagen.client.ItemModelGen;
 import dev.quarris.fireandflames.datagen.server.*;
+import dev.quarris.fireandflames.datagen.server.loot.BlockLoot;
+import dev.quarris.ppfluids.datagen.server.LootTableGen;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+import java.util.List;
 import java.util.Set;
 
 @EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
@@ -40,7 +46,9 @@ public class DataGenEvents {
         var blockTags = gen.addProvider(event.includeClient(), (DataProvider.Factory<BlockTagGen>) (packOutput -> new BlockTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<ItemTagGen>) (packOutput -> new ItemTagGen(packOutput, lookup, blockTags.contentsGetter(), existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<DamageTypeTagGen>) (packOutput -> new DamageTypeTagGen(packOutput, lookup, existingFiles)));
-
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<LootTableProvider>) output -> new LootTableProvider(output, Set.of(), List.of(
+            new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
+        ), lookup));
     }
 
 }

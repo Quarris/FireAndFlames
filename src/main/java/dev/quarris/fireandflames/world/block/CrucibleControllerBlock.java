@@ -107,6 +107,7 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (!pState.is(pNewState.getBlock())) {
             pLevel.getBlockEntity(pPos, BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
+                CrucibleStructure.ALL_CRUCIBLES.remove(pPos);
                 BlockPos dropPos = pPos.relative(pState.getValue(FACING));
                 ItemStackHandler inventory = crucible.getInventory();
                 for (int slot = 0; slot < inventory.getSlots(); slot++) {
@@ -117,7 +118,6 @@ public class CrucibleControllerBlock extends BaseEntityBlock {
                 if (crucible.getStructure() != null) {
                     crucible.getStructure().getDrainPositions().forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
                 }
-                CrucibleStructure.ALL_CRUCIBLES.remove(pPos);
             });
         }
 

@@ -26,6 +26,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -140,7 +142,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         }
 
         if (pLevel.getGameTime() % 20 == 0) {
-            List<Entity> meltingEntities = pLevel.getEntities(null, pCrucible.getStructure().getInternalBounds());
+            List<Entity> meltingEntities = pLevel.getEntities((Entity) null, pCrucible.getStructure().getInternalBounds(), e -> !(e instanceof ItemEntity));
             for (Entity entity : meltingEntities) {
                 if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
                     MeltingRecipeInput recipeInput = new MeltingRecipeInput(entity.getType(), pCrucible.getFluidTank().getStored() > 0);

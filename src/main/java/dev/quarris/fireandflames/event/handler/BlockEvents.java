@@ -20,7 +20,9 @@ public class BlockEvents {
         for (Map.Entry<BlockPos, CrucibleStructure.CrucibleShape> entry : CrucibleStructure.ALL_CRUCIBLES.entrySet()) {
             if (entry.getValue().containsAbove(event.getPos())) {
                 event.getLevel().getBlockEntity(entry.getKey(), BlockEntitySetup.CRUCIBLE_CONTROLLER.get()).ifPresent(crucible -> {
-                    crucible.getStructure().notifyChange((Level) event.getLevel(), event.getPos(), event.getState());
+                    if (crucible.getStructure() != null) {
+                        crucible.getStructure().notifyChange((Level) event.getLevel(), event.getPos(), event.getState());
+                    }
                 });
             }
         }

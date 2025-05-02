@@ -104,6 +104,13 @@ public class RecipesGen extends RecipeProvider {
             .define('B', ItemSetup.FIRE_BRICK.get())
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
             .save(pOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_FAWSIT.get())
+            .pattern("B B")
+            .pattern(" B ")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .save(pOutput);
     }
 
     public static void shapelessRecipes(RecipeOutput pOutput) {
