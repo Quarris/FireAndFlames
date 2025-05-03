@@ -56,13 +56,14 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
 
         // Test simulation
         FluidStack simulatedDrain = input.drain(FLOW_RATE, IFluidHandler.FluidAction.SIMULATE);
-        if (simulatedDrain.isEmpty() || output.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE) <= 0) {
+        int simulatedFill = output.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
+        if (simulatedDrain.isEmpty() || simulatedFill <= 0) {
             pFawsit.setToggled(false);
             return;
         }
 
         // Execute
-        FluidStack drained = input.drain(FLOW_RATE, IFluidHandler.FluidAction.EXECUTE);
+        FluidStack drained = input.drain(simulatedFill, IFluidHandler.FluidAction.EXECUTE);
         output.fill(drained, IFluidHandler.FluidAction.EXECUTE);
         pFawsit.setActive(drained);
     }

@@ -41,21 +41,21 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
-        CastingRecipeBuilder.basin(FluidIngredient.of(new FluidStack(Fluids.LAVA, 1000)), new ItemStack(Items.OBSIDIAN))
+        CastingRecipeBuilder.basin(new FluidStack(Fluids.LAVA, 1000), new ItemStack(Items.OBSIDIAN))
             .coolingTime(200)
             .save(pOutput, ModRef.res("casting/basin/obsidian_from_lava"));
 
-        CastingRecipeBuilder.basin(FluidIngredient.of(new FluidStack(Fluids.WATER, 1000)), new ItemStack(Items.ICE))
+        CastingRecipeBuilder.basin(FluidIngredient.tag(Tags.Fluids.LAVA), 1000, new ItemStack(Items.ICE))
             .withItemInput(Ingredient.of(Items.STICK))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/basin/ice_from_water_and_stick"));
 
-        CastingRecipeBuilder.table(FluidIngredient.of(new FluidStack(Fluids.WATER, 50)), new ItemStack(Items.BREAD))
+        CastingRecipeBuilder.table(new FluidStack(Fluids.WATER, 50), new ItemStack(Items.BREAD))
             .withItemInput(Ingredient.of(Items.WHEAT))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/table/bread_from_water_and_wheat"));
 
-        CastingRecipeBuilder.table(FluidIngredient.of(new FluidStack(Fluids.LAVA, 100)), new ItemStack(Items.REDSTONE))
+        CastingRecipeBuilder.table(new FluidStack(Fluids.LAVA, 100), new ItemStack(Items.REDSTONE))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/table/redstone_from_lava"));
     }

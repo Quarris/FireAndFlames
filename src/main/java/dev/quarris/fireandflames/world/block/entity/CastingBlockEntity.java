@@ -72,7 +72,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
             }
 
             // Update capacity
-            this.capacity = recipe.value().fluidInput.getStacks()[0].getAmount();
+            this.capacity = recipe.value().fluidInputAmount;
 
             int filled = super.fill(resource, action);
             if (action.simulate()) {
@@ -135,7 +135,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         }
 
         T recipe = pBasin.recipe.value();
-        if (pBasin.tank.getFluid().getAmount() < recipe.fluidInput.getStacks()[0].getAmount()) {
+        if (pBasin.tank.getFluid().getAmount() < recipe.fluidInputAmount) {
             pBasin.coolingTicks = 0;
             pBasin.recipe = null;
             return;

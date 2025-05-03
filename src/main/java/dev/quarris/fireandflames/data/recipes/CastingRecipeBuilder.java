@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,26 +21,34 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     private final RecipeType<?> type;
     private final FluidIngredient fluidInput;
+    private final int fluidInputAmount;
     private final ItemStack result;
 
     private int coolingTime = 100;
     private Ingredient itemInput = Ingredient.EMPTY;
     private boolean consumesItem;
 
-    private CastingRecipeBuilder(RecipeType<?> type, FluidIngredient fluidInput, ItemStack result) {
+    private CastingRecipeBuilder(RecipeType<?> type, FluidIngredient fluidInput, int fluidInputAmount, ItemStack result) {
         this.type = type;
         this.fluidInput = fluidInput;
+        this.fluidInputAmount = fluidInputAmount;
         this.result = result;
     }
 
-
-
-    public static CastingRecipeBuilder basin(FluidIngredient fluid, ItemStack result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), fluid, result).consumesItem(true);
+    public static CastingRecipeBuilder basin(FluidIngredient fluid, int amount, ItemStack result) {
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), fluid, amount, result).consumesItem(true);
     }
 
-    public static CastingRecipeBuilder table(FluidIngredient fluid, ItemStack result) {
-        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), fluid, result);
+    public static CastingRecipeBuilder basin(FluidStack fluid, ItemStack result) {
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), FluidIngredient.single(fluid), fluid.getAmount(), result).consumesItem(true);
+    }
+
+    public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, ItemStack result) {
+        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), fluid, amount, result);
+    }
+
+    public static CastingRecipeBuilder table(FluidStack fluid, ItemStack result) {
+        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), FluidIngredient.single(fluid), fluid.getAmount(), result);
     }
 
     public CastingRecipeBuilder coolingTime(int time) {
@@ -86,11 +95,11 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
         CastingRecipe recipe = null;
         if (this.type == RecipeSetup.BASIN_CASTING_TYPE.get()) {
-            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
+            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.fluidInputAmount, this.itemInput, this.coolingTime, this.consumesItem);
         }
 
         if (this.type == RecipeSetup.TABLE_CASTING_TYPE.get()) {
-            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
+            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.fluidInputAmount, this.itemInput, this.coolingTime, this.consumesItem);
         }
 
         if (recipe != null) {

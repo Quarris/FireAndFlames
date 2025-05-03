@@ -9,8 +9,8 @@ import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
 public class BasinCastingRecipe extends CastingRecipe {
 
-    public BasinCastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem) {
-        super(result, fluidInput, itemInput, coolingTime, consumeItem);
+    public BasinCastingRecipe(ItemStack result, FluidIngredient fluidInput, int fluidInputAmount, Ingredient itemInput, int coolingTime, boolean consumeItem) {
+        super(result, fluidInput, fluidInputAmount, itemInput, coolingTime, consumeItem);
     }
 
     @Override

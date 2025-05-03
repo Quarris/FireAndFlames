@@ -33,6 +33,7 @@ public class CastingTableRenderer implements BlockEntityRenderer<CastingTableBlo
         if (pTable.getRecipe() != null) {
             recipe = pTable.getRecipe().value();
         }
+
         float alpha = 1.0f;
         if (recipe != null) {
             alpha = pTable.getCoolingTicks() / (float) recipe.coolingTime;

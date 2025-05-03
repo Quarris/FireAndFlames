@@ -1,6 +1,5 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
-import dev.quarris.fireandflames.setup.RecipeSetup;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -13,14 +12,16 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
 
     public final ItemStack result;
     public final FluidIngredient fluidInput;
+    public final int fluidInputAmount;
     public final Ingredient itemInput;
     public final int coolingTime;
     private final boolean consumeItem;
     // private final boolean copyData; ?
 
-    protected CastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
+    protected CastingRecipe(ItemStack result, FluidIngredient fluidInput, int fluidInputAmount, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
         this.result = result;
         this.fluidInput = fluidInput;
+        this.fluidInputAmount = fluidInputAmount;
         this.itemInput = itemInput;
         this.coolingTime = coolingTime;
         this.consumeItem = consumeItem;
@@ -52,7 +53,11 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
     }
 
     public FluidIngredient getFluidInput() {
-        return fluidInput;
+        return this.fluidInput;
+    }
+
+    public int getFluidInputAmount() {
+        return this.fluidInputAmount;
     }
 
     public Ingredient getItemInput() {
