@@ -24,7 +24,7 @@ public class ItemTagGen extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
-        this.tag(TagSetup.ItemTags.VALID_CRUCIBLE_BLOCKS).add(key(BlockSetup.FIRE_BRICKS.get()), key(BlockSetup.CRUCIBLE_CONTROLLER.get()));
+
     }
 
     private static ResourceKey<Item> key(Block block) {

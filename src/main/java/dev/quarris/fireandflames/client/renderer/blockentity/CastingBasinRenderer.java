@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.quarris.fireandflames.client.util.FluidRenderer;
 import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
-import dev.quarris.fireandflames.world.block.entity.CastingBlockEntity;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -39,21 +38,21 @@ public class CastingBasinRenderer implements BlockEntityRenderer<CastingBasinBlo
 
         if (!pBasin.getTank().isEmpty()) {
             FluidStack stack = pBasin.getTank().getFluid();
-            double height = Mth.lerp(stack.getAmount() / (double) pBasin.getTank().getCapacity(), 2/16.0, 15/16.0);
+            double height = Mth.lerp(stack.getAmount() / (double) pBasin.getTank().getCapacity(), 2 / 16.0, 15 / 16.0);
             FluidState fluidState = stack.getFluid().defaultFluidState();
             VertexConsumer spriteBuffer = FluidRenderer.getFluidSpriteBuffer(pBasin.getLevel(), pBasin.getBlockPos(), stack, pBufferSource, RenderType.translucent(), FluidRenderer.FluidSpriteType.STILL).getRight();
             int color = FluidRenderer.getFluidColor(pBasin.getLevel(), pBasin.getBlockPos(), fluidState);
             color = color & ((int) ((1 - alpha) * 255) << 24 | 0x00ffffff);
             FluidRenderer.renderFluidFace(spriteBuffer, pPoseStack, new Vec3[]{
-                new Vec3(13/16f, height, 13/16f),
-                new Vec3(13/16f, height, 3/16f),
-                new Vec3(3/16f, height, 3/16f),
-                new Vec3(3/16f, height, 13/16f),
+                new Vec3(13 / 16f, height, 13 / 16f),
+                new Vec3(13 / 16f, height, 3 / 16f),
+                new Vec3(3 / 16f, height, 3 / 16f),
+                new Vec3(3 / 16f, height, 13 / 16f),
             }, color, pLight);
         }
 
-        int slot = pBasin.getSlotWithItem();
-        if (slot != -1) {
+        int slots = pBasin.getInventory().getSlots();
+        for (int slot = 0; slot < slots; slot++) {
             pPoseStack.pushPose();
             pPoseStack.translate(0.5, 0.7, 0.5);
             pPoseStack.scale(0.75f, 0.75f, 0.75f);

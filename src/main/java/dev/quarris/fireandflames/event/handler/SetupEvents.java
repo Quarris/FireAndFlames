@@ -15,10 +15,12 @@ public class SetupEvents {
         // Item Handler
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), (be, dir) -> be.getInventory());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, BlockEntitySetup.CASTING_BASIN.get(), (be, dir) -> be.getInventory());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, BlockEntitySetup.CASTING_TABLE.get(), (be, dir) -> be.getInventory());
 
         // Fluid Handler
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CRUCIBLE_DRAIN.get(), (be, dir) -> be.getCrucibleTank().orElse(null));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CASTING_BASIN.get(), (be, dir) -> be.getTank());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CASTING_TABLE.get(), (be, dir) -> be.getTank());
     }
 
 }

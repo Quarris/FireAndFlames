@@ -7,19 +7,19 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
-public class BasinCastingRecipe extends CastingRecipe {
+public class TableCastingRecipe extends CastingRecipe {
 
-    public BasinCastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem) {
+    public TableCastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem) {
         super(result, fluidInput, itemInput, coolingTime, consumeItem);
     }
 
     @Override
     public RecipeType<?> getType() {
-        return RecipeSetup.BASIN_CASTING_TYPE.get();
+        return RecipeSetup.TABLE_CASTING_TYPE.get();
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return RecipeSetup.BASIN_CASTING_SERIALIZER.get();
+        return RecipeSetup.TABLE_CASTING_SERIALIZER.get();
     }
 }

@@ -15,13 +15,15 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
     public final FluidIngredient fluidInput;
     public final Ingredient itemInput;
     public final int coolingTime;
+    private final boolean consumeItem;
     // private final boolean copyData; ?
 
-    protected CastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime/*, boolean copyData*/) {
+    protected CastingRecipe(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
         this.result = result;
         this.fluidInput = fluidInput;
         this.itemInput = itemInput;
         this.coolingTime = coolingTime;
+        this.consumeItem = consumeItem;
         //this.copyData = copyData;
     }
 
@@ -59,6 +61,10 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
 
     public int getCoolingTime() {
         return this.coolingTime;
+    }
+
+    public boolean consumesItem() {
+        return this.consumeItem;
     }
 
     @Override

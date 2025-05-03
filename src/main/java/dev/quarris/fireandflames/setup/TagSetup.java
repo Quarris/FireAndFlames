@@ -21,8 +21,6 @@ public class TagSetup {
 
     public static class ItemTags {
 
-        public static TagKey<Item> VALID_CRUCIBLE_BLOCKS = create(ModRef.res("valid_crucible_blocks"));
-
         private static TagKey<Item> create(ResourceLocation id) {
             return TagKey.create(Registries.ITEM, id);
         }

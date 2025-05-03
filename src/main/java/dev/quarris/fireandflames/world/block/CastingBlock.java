@@ -8,30 +8,17 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public abstract class CastingBlock extends BaseEntityBlock {
-
-    private static final VoxelShape SHAPE = Shapes.or(
-        Block.box(1, 2, 1, 15, 16, 15),
-        Block.box(1, 0, 1, 3, 2, 3),
-        Block.box(1, 0, 12, 3, 2, 15),
-        Block.box(12, 0, 1, 15, 2, 3),
-        Block.box(12, 0, 12, 15, 2, 15)
-    );
 
     public CastingBlock(Properties properties) {
         super(properties);
@@ -72,11 +59,6 @@ public abstract class CastingBlock extends BaseEntityBlock {
             pPlayer.setItemInHand(pHand, remainder);
             return ItemInteractionResult.CONSUME;
         }).orElse(ItemInteractionResult.FAIL);
-    }
-
-    @Override
-    protected VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return SHAPE;
     }
 
     @Override

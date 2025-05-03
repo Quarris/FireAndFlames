@@ -15,18 +15,21 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
     private final MapCodec<T> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
-    public CastingRecipeSerializer(Factory<T> factory) {
+    public CastingRecipeSerializer(Factory<T> factory, boolean consumesInput) {
         this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
-            FluidIngredient.CODEC_NON_EMPTY.fieldOf("fluid").forGetter(recipe -> recipe.fluidInput),
-            Ingredient.CODEC.optionalFieldOf("ingredient", Ingredient.EMPTY).forGetter(recipe -> recipe.itemInput),
-            Codec.INT.optionalFieldOf("cooling_time", 100).forGetter(recipe -> recipe.coolingTime)
+            ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(CastingRecipe::getResult),
+            FluidIngredient.CODEC_NON_EMPTY.fieldOf("fluid").forGetter(CastingRecipe::getFluidInput),
+            Ingredient.CODEC.optionalFieldOf("ingredient", Ingredient.EMPTY).forGetter(CastingRecipe::getItemInput),
+            Codec.INT.optionalFieldOf("cooling_time", 100).forGetter(CastingRecipe::getCoolingTime),
+            Codec.BOOL.optionalFieldOf("consumes_item", consumesInput).forGetter(CastingRecipe::consumesItem)
         ).apply(instance, factory::create));
+
         this.streamCodec = StreamCodec.composite(
             ItemStack.STREAM_CODEC, CastingRecipe::getResult,
             FluidIngredient.STREAM_CODEC, CastingRecipe::getFluidInput,
             Ingredient.CONTENTS_STREAM_CODEC, CastingRecipe::getItemInput,
             ByteBufCodecs.INT, CastingRecipe::getCoolingTime,
+            ByteBufCodecs.BOOL, CastingRecipe::consumesItem,
             factory::create);
     }
 
@@ -42,6 +45,6 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
 
     @FunctionalInterface
     public interface Factory<T extends CastingRecipe> {
-        T create(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime/*, boolean copyData*/);
+        T create(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/);
     }
 }

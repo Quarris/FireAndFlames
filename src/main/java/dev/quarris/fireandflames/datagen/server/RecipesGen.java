@@ -49,6 +49,15 @@ public class RecipesGen extends RecipeProvider {
             .withItemInput(Ingredient.of(Items.STICK))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/basin/ice_from_water_and_stick"));
+
+        CastingRecipeBuilder.table(FluidIngredient.of(new FluidStack(Fluids.WATER, 50)), new ItemStack(Items.BREAD))
+            .withItemInput(Ingredient.of(Items.WHEAT))
+            .coolingTime(40)
+            .save(pOutput, ModRef.res("casting/table/bread_from_water_and_wheat"));
+
+        CastingRecipeBuilder.table(FluidIngredient.of(new FluidStack(Fluids.LAVA, 100)), new ItemStack(Items.REDSTONE))
+            .coolingTime(40)
+            .save(pOutput, ModRef.res("casting/table/redstone_from_lava"));
     }
 
     private static void meltingRecipes(RecipeOutput pOutput) {
@@ -123,6 +132,14 @@ public class RecipesGen extends RecipeProvider {
             .pattern("B B")
             .pattern("B B")
             .pattern("BBB")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .save(pOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CASTING_TABLE.get())
+            .pattern("BBB")
+            .pattern("B B")
+            .pattern("B B")
             .define('B', ItemSetup.FIRE_BRICK.get())
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
             .save(pOutput);

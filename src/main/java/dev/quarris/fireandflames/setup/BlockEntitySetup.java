@@ -39,6 +39,13 @@ public class BlockEntitySetup {
                 BlockSetup.CASTING_BASIN.get()
             ).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CastingTableBlockEntity>> CASTING_TABLE =
+        REGISTRY.register("casting_table",
+            () -> BlockEntityType.Builder.of(
+                CastingTableBlockEntity::new,
+                BlockSetup.CASTING_TABLE.get()
+            ).build(null));
+
     public static void init(IEventBus modBus) {
         REGISTRY.register(modBus);
     }

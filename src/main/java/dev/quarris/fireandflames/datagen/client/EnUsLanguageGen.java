@@ -25,6 +25,7 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add(BlockSetup.CRUCIBLE_DRAIN.get(), "Crucible Drain");
         this.add(BlockSetup.CRUCIBLE_FAWSIT.get(), "Crucible Fawsit (Faucet)");
         this.add(BlockSetup.CASTING_BASIN.get(), "Casting Basin");
+        this.add(BlockSetup.CASTING_TABLE.get(), "Casting Table");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("creative_tabs.fireandflames.creative_tab", "Fire and Flames");

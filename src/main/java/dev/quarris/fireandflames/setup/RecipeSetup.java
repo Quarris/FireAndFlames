@@ -18,11 +18,13 @@ public class RecipeSetup {
     public static final DeferredHolder<RecipeType<?>, RecipeType<CrucibleRecipe>> CRUCIBLE_TYPE = RECIPE_TYPES.register("crucible", () -> RecipeType.simple(ModRef.res("crucible")));
     public static final DeferredHolder<RecipeType<?>, RecipeType<EntityMeltingRecipe>> ENTITY_MELTING_TYPE = RECIPE_TYPES.register("entity_melting", () -> RecipeType.simple(ModRef.res("entity_melting")));
     public static final DeferredHolder<RecipeType<?>, RecipeType<BasinCastingRecipe>> BASIN_CASTING_TYPE = RECIPE_TYPES.register("basin_casting", () -> RecipeType.simple(ModRef.res("basin_casting")));
+    public static final DeferredHolder<RecipeType<?>, RecipeType<TableCastingRecipe>> TABLE_CASTING_TYPE = RECIPE_TYPES.register("table_casting", () -> RecipeType.simple(ModRef.res("table_casting")));
 
     // Recipe Serializers
     public static final DeferredHolder<RecipeSerializer<?>, CrucibleRecipeSerializer> CRUCIBLE_SERIALIZER = RECIPE_SERIALIZERS.register("crucible", CrucibleRecipeSerializer::new);
     public static final DeferredHolder<RecipeSerializer<?>, EntityMeltingRecipeSerializer> ENTITY_MELTING_SERIALIZER = RECIPE_SERIALIZERS.register("entity_melting", EntityMeltingRecipeSerializer::new);
-    public static final DeferredHolder<RecipeSerializer<?>, CastingRecipeSerializer<?>> BASIN_CASTING_SERIALIZER = RECIPE_SERIALIZERS.register("basin_casting", () -> new CastingRecipeSerializer<>(BasinCastingRecipe::new));
+    public static final DeferredHolder<RecipeSerializer<?>, CastingRecipeSerializer<?>> BASIN_CASTING_SERIALIZER = RECIPE_SERIALIZERS.register("basin_casting", () -> new CastingRecipeSerializer<>(BasinCastingRecipe::new, true));
+    public static final DeferredHolder<RecipeSerializer<?>, CastingRecipeSerializer<?>> TABLE_CASTING_SERIALIZER = RECIPE_SERIALIZERS.register("table_casting", () -> new CastingRecipeSerializer<>(TableCastingRecipe::new, false));
 
 
     public static void init(IEventBus modBus) {

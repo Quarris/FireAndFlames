@@ -70,6 +70,13 @@ public class BlockSetup {
             .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));
 
+    public static final DeferredBlock<CastingBlock> CASTING_TABLE = registerBlock("casting_table", CastingTableBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.STONE));
+
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {
         return registerBlock(name, blockSupplier, blockProps, new Item.Properties());

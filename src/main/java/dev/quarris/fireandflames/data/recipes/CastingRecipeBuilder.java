@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.data.recipes;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -23,6 +24,7 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     private int coolingTime = 100;
     private Ingredient itemInput = Ingredient.EMPTY;
+    private boolean consumesItem;
 
     private CastingRecipeBuilder(RecipeType<?> type, FluidIngredient fluidInput, ItemStack result) {
         this.type = type;
@@ -33,7 +35,11 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
 
     public static CastingRecipeBuilder basin(FluidIngredient fluid, ItemStack result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), fluid, result);
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), fluid, result).consumesItem(true);
+    }
+
+    public static CastingRecipeBuilder table(FluidIngredient fluid, ItemStack result) {
+        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), fluid, result);
     }
 
     public CastingRecipeBuilder coolingTime(int time) {
@@ -43,6 +49,11 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     public CastingRecipeBuilder withItemInput(Ingredient input) {
         this.itemInput = input;
+        return this;
+    }
+
+    public CastingRecipeBuilder consumesItem(boolean consumesItem) {
+        this.consumesItem = consumesItem;
         return this;
     }
 
@@ -75,7 +86,11 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
         CastingRecipe recipe = null;
         if (this.type == RecipeSetup.BASIN_CASTING_TYPE.get()) {
-            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime);
+            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
+        }
+
+        if (this.type == RecipeSetup.TABLE_CASTING_TYPE.get()) {
+            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
         }
 
         if (recipe != null) {
