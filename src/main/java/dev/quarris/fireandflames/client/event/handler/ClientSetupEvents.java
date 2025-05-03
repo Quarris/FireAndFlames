@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.client.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.client.renderer.blockentity.CastingBasinRenderer;
 import dev.quarris.fireandflames.client.renderer.blockentity.CrucibleControllerRenderer;
 import dev.quarris.fireandflames.client.renderer.blockentity.CrucibleFawsitRenderer;
 import dev.quarris.fireandflames.client.screen.CrucibleScreen;
@@ -23,6 +24,7 @@ public class ClientSetupEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), CrucibleControllerRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitySetup.CRUCIBLE_FAWSIT.get(), CrucibleFawsitRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitySetup.CASTING_BASIN.get(), CastingBasinRenderer::new);
     }
 
 }

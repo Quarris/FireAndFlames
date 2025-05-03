@@ -17,11 +17,12 @@ public class BlockLoot extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
+        this.dropSelf(BlockSetup.FIRE_BRICKS.get());
         this.dropSelf(BlockSetup.CRUCIBLE_CONTROLLER.get());
         this.dropSelf(BlockSetup.CRUCIBLE_DRAIN.get());
         this.dropSelf(BlockSetup.CRUCIBLE_WINDOW.get());
         this.dropSelf(BlockSetup.CRUCIBLE_FAWSIT.get());
-        this.dropSelf(BlockSetup.FIRE_BRICKS.get());
+        this.dropSelf(BlockSetup.CASTING_BASIN.get());
 
         this.add(BlockSetup.FIRE_CLAY.get(), block -> this.createSingleItemTableWithSilkTouch(block, ItemSetup.FIRE_CLAY_BALL, ConstantValue.exactly(4.0F)));
     }

@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.recipes.CastingRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.EntityMeltingRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -35,6 +37,18 @@ public class RecipesGen extends RecipeProvider {
         blastingRecipes(pOutput);
         crucibleRecipes(pOutput);
         meltingRecipes(pOutput);
+        castingRecipes(pOutput);
+    }
+
+    private static void castingRecipes(RecipeOutput pOutput) {
+        CastingRecipeBuilder.basin(FluidIngredient.of(new FluidStack(Fluids.LAVA, 1000)), new ItemStack(Items.OBSIDIAN))
+            .coolingTime(200)
+            .save(pOutput, ModRef.res("casting/basin/obsidian_from_lava"));
+
+        CastingRecipeBuilder.basin(FluidIngredient.of(new FluidStack(Fluids.WATER, 1000)), new ItemStack(Items.ICE))
+            .withItemInput(Ingredient.of(Items.STICK))
+            .coolingTime(40)
+            .save(pOutput, ModRef.res("casting/basin/ice_from_water_and_stick"));
     }
 
     private static void meltingRecipes(RecipeOutput pOutput) {
@@ -101,6 +115,14 @@ public class RecipesGen extends RecipeProvider {
             .pattern("B B")
             .pattern("B B")
             .pattern("B B")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .save(pOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CASTING_BASIN.get())
+            .pattern("B B")
+            .pattern("B B")
+            .pattern("BBB")
             .define('B', ItemSetup.FIRE_BRICK.get())
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
             .save(pOutput);

@@ -1,10 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
-import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.IFluidRecipeOutput;
+import dev.quarris.fireandflames.world.crucible.crafting.IFluidStackProvider;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
@@ -28,14 +25,13 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class CrucibleRecipeBuilder implements RecipeBuilder {
 
     private final RecipeCategory category;
     private final CookingBookCategory bookCategory;
     private final Ingredient ingredient;
-    private final IFluidRecipeOutput result;
+    private final IFluidStackProvider result;
     private final int smeltingTime;
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
 
@@ -49,7 +45,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         FluidStack result,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, new IFluidRecipeOutput.Direct(result), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidStackProvider.Direct(result), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
@@ -60,14 +56,14 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         int resultAmount,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, new IFluidRecipeOutput.Tag(result, resultAmount), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidStackProvider.Tag(result, resultAmount), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
         RecipeCategory category,
         CookingBookCategory bookCategory,
         Ingredient ingredient,
-        IFluidRecipeOutput result,
+        IFluidStackProvider result,
         int smeltingTime
     ) {
         this.category = category;
@@ -164,11 +160,11 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public static ResourceLocation getDefaultRecipeId(IFluidRecipeOutput result) {
+    public static ResourceLocation getDefaultRecipeId(IFluidStackProvider result) {
         ResourceLocation baseName;
-        if (result instanceof IFluidRecipeOutput.Tag tag) {
+        if (result instanceof IFluidStackProvider.Tag tag) {
             baseName = tag.tag().location();
-        } else if (result instanceof IFluidRecipeOutput.Direct direct) {
+        } else if (result instanceof IFluidStackProvider.Direct direct) {
             baseName = BuiltInRegistries.FLUID.getKey(direct.createFluid().getFluid());
         } else {
             throw new UnsupportedOperationException("Invalid fluid recipe output");

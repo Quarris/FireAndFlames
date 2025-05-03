@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.IFluidRecipeOutput;
+import dev.quarris.fireandflames.world.crucible.crafting.IFluidStackProvider;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -9,7 +9,6 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class EntityMeltingRecipeBuilder implements RecipeBuilder {
 
     private final EntityTypePredicate entityPredicate;
-    private final IFluidRecipeOutput result;
+    private final IFluidStackProvider result;
 
     private boolean requiresFluid = true;
     private float chance = 1.0f;
@@ -28,7 +27,7 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         EntityTypePredicate entityPredicate,
         FluidStack result
     ) {
-        this(entityPredicate, new IFluidRecipeOutput.Direct(result));
+        this(entityPredicate, new IFluidStackProvider.Direct(result));
     }
 
     private EntityMeltingRecipeBuilder(
@@ -36,12 +35,12 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         TagKey<Fluid> result,
         int amount
     ) {
-        this(entityPredicate, new IFluidRecipeOutput.Tag(result, amount));
+        this(entityPredicate, new IFluidStackProvider.Tag(result, amount));
     }
 
     private EntityMeltingRecipeBuilder(
         EntityTypePredicate entityPredicate,
-        IFluidRecipeOutput result
+        IFluidStackProvider result
     ) {
         this.entityPredicate = entityPredicate;
         this.result = result;
@@ -100,11 +99,11 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         recipeOutput.accept(id, recipe, null);
     }
 
-    public static ResourceLocation getDefaultRecipeId(IFluidRecipeOutput result) {
+    public static ResourceLocation getDefaultRecipeId(IFluidStackProvider result) {
         ResourceLocation baseName;
-        if (result instanceof IFluidRecipeOutput.Tag tag) {
+        if (result instanceof IFluidStackProvider.Tag tag) {
             baseName = tag.tag().location();
-        } else if (result instanceof IFluidRecipeOutput.Direct direct) {
+        } else if (result instanceof IFluidStackProvider.Direct direct) {
             baseName = BuiltInRegistries.FLUID.getKey(direct.createFluid().getFluid());
         } else {
             throw new UnsupportedOperationException("Invalid fluid recipe output");

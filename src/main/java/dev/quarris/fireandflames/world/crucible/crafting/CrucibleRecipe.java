@@ -1,8 +1,5 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import net.minecraft.core.HolderLookup;
@@ -26,22 +23,22 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
     protected final CookingBookCategory category;
     protected final Ingredient ingredient;
     protected final ItemStack byproduct;
-    protected final IFluidRecipeOutput result;
+    protected final IFluidStackProvider result;
     protected final int smeltingTime;
 
-    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidRecipeOutput eitherResult, int smeltingTime) {
+    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidStackProvider eitherResult, int smeltingTime) {
         this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, eitherResult, smeltingTime);
     }
 
     public CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, TagKey<Fluid> resultTag, int resultAmount, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidRecipeOutput.Tag(resultTag, resultAmount), smeltingTime);
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidStackProvider.Tag(resultTag, resultAmount), smeltingTime);
     }
 
     public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, FluidStack result, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidRecipeOutput.Direct(result), smeltingTime);
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidStackProvider.Direct(result), smeltingTime);
     }
 
-    protected CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidRecipeOutput eitherResult, int smeltingTime) {
+    protected CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidStackProvider eitherResult, int smeltingTime) {
         this.type = type;
         this.category = category;
         this.group = group;

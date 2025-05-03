@@ -11,9 +11,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.function.Function;
 
-public interface IFluidRecipeOutput {
+public interface IFluidStackProvider {
 
-    Codec<IFluidRecipeOutput> CODEC = Codec.xor(Direct.CODEC, Tag.CODEC)
+    Codec<IFluidStackProvider> CODEC = Codec.xor(Direct.CODEC, Tag.CODEC)
         .xmap(either -> either.map(Function.identity(), Function.identity()),
             output -> {
                 if (output instanceof Direct direct) {
@@ -29,7 +29,9 @@ public interface IFluidRecipeOutput {
 
     FluidStack createFluid();
 
-    record Direct(FluidStack stack) implements IFluidRecipeOutput {
+    boolean matches(FluidStack stack);
+
+    record Direct(FluidStack stack) implements IFluidStackProvider {
 
         public static final Codec<Direct> CODEC = FluidStack.CODEC.xmap(Direct::new, Direct::createFluid);
 
@@ -37,9 +39,14 @@ public interface IFluidRecipeOutput {
         public FluidStack createFluid() {
             return this.stack.copy();
         }
+
+        @Override
+        public boolean matches(FluidStack stack) {
+            return this.stack.is(stack.getFluid());
+        }
     }
 
-    record Tag(TagKey<Fluid> tag, int amount) implements IFluidRecipeOutput {
+    record Tag(TagKey<Fluid> tag, int amount) implements IFluidStackProvider {
 
         public static final Codec<Tag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TagKey.codec(Registries.FLUID).fieldOf("tag").forGetter(Tag::tag),
@@ -49,6 +56,11 @@ public interface IFluidRecipeOutput {
         @Override
         public FluidStack createFluid() {
             return BuiltInRegistries.FLUID.getTag(this.tag).map(tags -> new FluidStack(tags.get(0), this.amount)).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
+        }
+
+        @Override
+        public boolean matches(FluidStack stack) {
+            return stack.is(this.tag);
         }
     }
 }

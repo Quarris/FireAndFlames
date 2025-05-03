@@ -72,7 +72,10 @@ public class CrucibleStructure {
                 return;
             }
 
-            this.drainPositions.forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
+            for (BlockPos drainPos : this.drainPositions) {
+                pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null));
+            }
+
             this.drainPositions.clear();
             this.drainPositions.addAll(drains);
             this.shape = this.shape.withHeight(newHeight);

@@ -35,7 +35,8 @@ public class BlockTagGen extends BlockTagsProvider {
                 BlockSetup.CRUCIBLE_CONTROLLER.get(),
                 BlockSetup.CRUCIBLE_WINDOW.get(),
                 BlockSetup.CRUCIBLE_DRAIN.get(),
-                BlockSetup.CRUCIBLE_FAWSIT.get()
+                BlockSetup.CRUCIBLE_FAWSIT.get(),
+                BlockSetup.CASTING_BASIN.get()
             );
 
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL)

@@ -1,20 +1,12 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
-import dev.quarris.fireandflames.world.block.CrucibleDrainBlock;
-import dev.quarris.fireandflames.world.block.CrucibleFawsitBlock;
-import dev.quarris.fireandflames.world.block.CrucibleWindowBlock;
-import net.minecraft.core.BlockPos;
+import dev.quarris.fireandflames.world.block.*;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -66,6 +58,13 @@ public class BlockSetup {
     public static final DeferredBlock<CrucibleFawsitBlock> CRUCIBLE_FAWSIT = registerBlock("crucible_faucet", CrucibleFawsitBlock::new,
         BlockBehaviour.Properties.of()
             .forceSolidOn()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.STONE));
+
+    public static final DeferredBlock<CastingBlock> CASTING_BASIN = registerBlock("casting_basin", CastingBasinBlock::new,
+        BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_ORANGE)
             .requiresCorrectToolForDrops()
             .strength(1.0F, 2.0F)

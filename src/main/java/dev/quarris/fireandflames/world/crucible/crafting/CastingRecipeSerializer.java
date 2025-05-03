@@ -1,0 +1,47 @@
+package dev.quarris.fireandflames.world.crucible.crafting;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+
+public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeSerializer<T> {
+
+    private final MapCodec<T> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
+
+    public CastingRecipeSerializer(Factory<T> factory) {
+        this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
+            FluidIngredient.CODEC_NON_EMPTY.fieldOf("fluid").forGetter(recipe -> recipe.fluidInput),
+            Ingredient.CODEC.optionalFieldOf("ingredient", Ingredient.EMPTY).forGetter(recipe -> recipe.itemInput),
+            Codec.INT.optionalFieldOf("cooling_time", 100).forGetter(recipe -> recipe.coolingTime)
+        ).apply(instance, factory::create));
+        this.streamCodec = StreamCodec.composite(
+            ItemStack.STREAM_CODEC, CastingRecipe::getResult,
+            FluidIngredient.STREAM_CODEC, CastingRecipe::getFluidInput,
+            Ingredient.CONTENTS_STREAM_CODEC, CastingRecipe::getItemInput,
+            ByteBufCodecs.INT, CastingRecipe::getCoolingTime,
+            factory::create);
+    }
+
+    @Override
+    public MapCodec<T> codec() {
+        return this.codec;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
+        return this.streamCodec;
+    }
+
+    @FunctionalInterface
+    public interface Factory<T extends CastingRecipe> {
+        T create(ItemStack result, FluidIngredient fluidInput, Ingredient itemInput, int coolingTime/*, boolean copyData*/);
+    }
+}

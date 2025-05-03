@@ -17,13 +17,17 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class FluidRenderer {
 
-    public static Pair<TextureAtlasSprite, VertexConsumer> getFluidSpriteBuffer(Level pLevel, BlockPos pPos, FluidStack pStack, MultiBufferSource pBufferSource, RenderType pRenderType, FluidSpriteType type, FluidSpriteType backup) {
+    public static Pair<TextureAtlasSprite, VertexConsumer> getFluidSpriteBuffer(Level pLevel, BlockPos pPos, FluidStack pStack, MultiBufferSource pBufferSource, RenderType pRenderType, FluidSpriteType pType) {
+        return getFluidSpriteBuffer(pLevel, pPos, pStack, pBufferSource, pRenderType, pType, null);
+    }
+
+    public static Pair<TextureAtlasSprite, VertexConsumer> getFluidSpriteBuffer(Level pLevel, BlockPos pPos, FluidStack pStack, MultiBufferSource pBufferSource, RenderType pRenderType, FluidSpriteType pType, FluidSpriteType pBackup) {
         FluidState state = pStack.getFluid().defaultFluidState();
         VertexConsumer buffer = pBufferSource.getBuffer(pRenderType);
         TextureAtlasSprite[] sprites = FluidSpriteCache.getFluidSprites(pLevel, pPos, state);
-        TextureAtlasSprite sprite = sprites[type.typeIndex];
-        if (sprite == null) {
-            sprite = sprites[backup.typeIndex];
+        TextureAtlasSprite sprite = sprites[pType.typeIndex];
+        if (pBackup != null && sprite == null) {
+            sprite = sprites[pBackup.typeIndex];
         }
         return Pair.of(sprite, sprite.wrap(buffer));
     }

@@ -33,8 +33,7 @@ public class CrucibleFawsitRenderer implements BlockEntityRenderer<CrucibleFawsi
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 0, 0.5);
         pPoseStack.rotateAround(Axis.YP.rotationDegrees(-facing.toYRot() - 90), 0, -1, 0);
-        pPoseStack.translate(0, 0.5, 0);
-        pPoseStack.translate(-0.5, 0, -0.5);
+        pPoseStack.translate(-0.5, 0.5, -0.5);
         VertexConsumer flowingBuffer = FluidRenderer.getFluidSpriteBuffer(pFawsit.getLevel(), pFawsit.getBlockPos(), activeFluid, pBufferSource, RenderType.translucent(), FluidRenderer.FluidSpriteType.FLOWING, FluidRenderer.FluidSpriteType.STILL).getRight();
         int color = FluidRenderer.getFluidColor(pFawsit.getLevel(), pFawsit.getBlockPos(), activeFluid.getFluid().defaultFluidState());
         // Top

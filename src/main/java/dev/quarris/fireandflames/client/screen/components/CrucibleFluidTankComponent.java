@@ -66,7 +66,6 @@ public class CrucibleFluidTankComponent {
         }
 
         // Render Tooltip
-        pGraphics.fill(pMouseX, pMouseY, pMouseX + 1, pMouseY + 1, 0xffff0000);
         int hoverTank = this.getHoveringFluidTank(pMouseX, pMouseY);
         if (hoverTank < 0) {
             return;

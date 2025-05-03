@@ -1,10 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipeSerializer;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipeSerializer;
+import dev.quarris.fireandflames.world.crucible.crafting.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -20,10 +17,12 @@ public class RecipeSetup {
     // Recipe Types
     public static final DeferredHolder<RecipeType<?>, RecipeType<CrucibleRecipe>> CRUCIBLE_TYPE = RECIPE_TYPES.register("crucible", () -> RecipeType.simple(ModRef.res("crucible")));
     public static final DeferredHolder<RecipeType<?>, RecipeType<EntityMeltingRecipe>> ENTITY_MELTING_TYPE = RECIPE_TYPES.register("entity_melting", () -> RecipeType.simple(ModRef.res("entity_melting")));
+    public static final DeferredHolder<RecipeType<?>, RecipeType<BasinCastingRecipe>> BASIN_CASTING_TYPE = RECIPE_TYPES.register("basin_casting", () -> RecipeType.simple(ModRef.res("basin_casting")));
 
     // Recipe Serializers
     public static final DeferredHolder<RecipeSerializer<?>, CrucibleRecipeSerializer> CRUCIBLE_SERIALIZER = RECIPE_SERIALIZERS.register("crucible", CrucibleRecipeSerializer::new);
     public static final DeferredHolder<RecipeSerializer<?>, EntityMeltingRecipeSerializer> ENTITY_MELTING_SERIALIZER = RECIPE_SERIALIZERS.register("entity_melting", EntityMeltingRecipeSerializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, CastingRecipeSerializer<?>> BASIN_CASTING_SERIALIZER = RECIPE_SERIALIZERS.register("basin_casting", () -> new CastingRecipeSerializer<>(BasinCastingRecipe::new));
 
 
     public static void init(IEventBus modBus) {

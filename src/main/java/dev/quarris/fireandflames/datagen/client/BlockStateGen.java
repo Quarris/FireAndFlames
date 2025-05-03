@@ -28,6 +28,9 @@ public class BlockStateGen extends BlockStateProvider {
         this.horizontalBlock(BlockSetup.CRUCIBLE_FAWSIT.get(), faucetModel);
         this.simpleBlockItem(BlockSetup.CRUCIBLE_FAWSIT.get(), faucetModel);
 
+        var basinModel = this.models().withExistingParent("casting_basin", ModRef.res("block/casting_basin_base")).texture("texture", blockTexture(BlockSetup.FIRE_BRICKS.get()));
+        this.simpleBlockWithItem(BlockSetup.CASTING_BASIN.get(), basinModel);
+
         BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
             this.getVariantBuilder(block).forAllStates(
                 (state) -> {

@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 public record EntityMeltingRecipe(
     EntityTypePredicate entityPredicate,
     boolean requiresFluid,
-    IFluidRecipeOutput result,
+    IFluidStackProvider result,
     float chance
 ) implements Recipe<MeltingRecipeInput> {
 
