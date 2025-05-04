@@ -3,11 +3,12 @@ package dev.quarris.fireandflames.world.block.entity;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.DamageTypeSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.util.IFluidOutput;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
+import dev.quarris.fireandflames.world.crucible.crafting.AlloyingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.MeltingRecipeInput;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
@@ -23,8 +24,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -36,14 +35,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class CrucibleControllerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -54,6 +52,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     private CrucibleFluidTank fluidTank;
     private ItemStackHandler inventory;
     private CrucibleRecipe.Active[] activeRecipes;
+
     private ContainerData dataAccess = new ContainerData() {
         @Override
         public int get(int index) {
@@ -86,16 +85,17 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CrucibleControllerBlockEntity pCrucible) {
-        if (pCrucible.getStructure() != null && pCrucible.getStructure().isInvalid()) {
-            pCrucible.getStructure().getDrainPositions().forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
+        CrucibleStructure structure = pCrucible.getStructure();
+        if (structure != null && structure.isInvalid()) {
+            structure.getDrainPositions().forEach(drainPos -> pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null)));
             pCrucible.crucibleStructure = null;
             pCrucible.setChanged();
             return;
         }
 
         // Try forming structure
-        if (pCrucible.getStructure() == null) {
-            CrucibleStructure structure = CrucibleStructure.of(pCrucible.getLevel(), pCrucible.getBlockPos());
+        if (structure == null) {
+            structure = CrucibleStructure.of(pLevel, pPos);
             // Structure valid
             boolean wasValid = pState.getValue(CrucibleControllerBlock.LIT);
             boolean valid = structure != null;
@@ -112,14 +112,15 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             return;
         }
 
-        if (pCrucible.getStructure().isDirty()) {
+        if (structure.isDirty()) {
             pCrucible.onStructureEstablished();
-            pCrucible.getStructure().markClean();
+            structure.markClean();
         }
 
-        // Tick recipes
-        if (pCrucible.getInventory().getSlots() > 0) {
-            for (int slot = 0; slot < pCrucible.getInventory().getSlots(); slot++) {
+        // Smelting recipes
+        ItemStackHandler inventory = pCrucible.getInventory();
+        if (inventory.getSlots() > 0) {
+            for (int slot = 0; slot < inventory.getSlots(); slot++) {
                 CrucibleRecipe.Active recipe = pCrucible.activeRecipes[slot];
                 if (recipe == null) {
                     recipe = new CrucibleRecipe.Active();
@@ -127,30 +128,51 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                     pCrucible.setChanged();
                 }
 
-                recipe.updateWith(pLevel, pCrucible.getInventory().getStackInSlot(slot));
+                recipe.updateWith(pLevel, inventory.getStackInSlot(slot));
                 if (recipe.isFinished()) {
                     // If there is enough space to insert fluid
                     FluidStack output = recipe.createOutput();
                     // Only finalize the recipe if there is EXACTLY enough space for fluid.
                     if (pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
                         pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.EXECUTE);
-                        pCrucible.getInventory().setStackInSlot(slot, recipe.createByproduct());
+                        inventory.setStackInSlot(slot, recipe.createByproduct());
                         recipe.reset();
                     }
                 }
             }
         }
 
+        // Entity Melting
         if (pLevel.getGameTime() % 20 == 0) {
-            List<Entity> meltingEntities = pLevel.getEntities((Entity) null, pCrucible.getStructure().getInternalBounds(), e -> !(e instanceof ItemEntity));
+            List<Entity> meltingEntities = pLevel.getEntities((Entity) null, structure.getInternalBounds(), e -> !(e instanceof ItemEntity));
             for (Entity entity : meltingEntities) {
                 if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
-                    MeltingRecipeInput recipeInput = new MeltingRecipeInput(entity.getType(), pCrucible.getFluidTank().getStored() > 0);
+                    EntityMeltingRecipe.Input recipeInput = new EntityMeltingRecipe.Input(entity.getType(), pCrucible.getFluidTank().getStored() > 0);
                     pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
                         EntityMeltingRecipe recipe = recipeHolder.value();
                         pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
                     });
+                }
+            }
+        }
 
+        // Alloying Recipes
+        if (pCrucible.fluidTank.getTanks() > 1) {
+            AlloyingRecipe.Input recipeInput = new AlloyingRecipe.Input(pCrucible.fluidTank.getFluids());
+            List<RecipeHolder<AlloyingRecipe>> recipes = pLevel.getRecipeManager().getRecipesFor(RecipeSetup.ALLOYING_TYPE.get(), recipeInput, pLevel);
+            recipes.sort(Comparator.comparingInt(r -> r.value().ingredients().size()));
+            if (!recipes.isEmpty()) {
+                AlloyingRecipe recipe = recipes.getFirst().value();
+                List<FluidStack> resultantAlloys = recipe.results().stream().map(IFluidOutput::createFluid).toList();
+                List<FluidStack> drainStacks = pCrucible.fluidTank.canAlloy(resultantAlloys, recipe.ingredients());
+                if (!drainStacks.isEmpty()) {
+                    for (FluidStack drainStack : drainStacks) {
+                        pCrucible.fluidTank.drain(drainStack, IFluidHandler.FluidAction.EXECUTE);
+                    }
+
+                    for (FluidStack resultantAlloy : resultantAlloys) {
+                        pCrucible.fluidTank.fill(resultantAlloy, IFluidHandler.FluidAction.EXECUTE);
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.IFluidStackProvider;
+import dev.quarris.fireandflames.util.IFluidOutput;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class EntityMeltingRecipeBuilder implements RecipeBuilder {
 
     private final EntityTypePredicate entityPredicate;
-    private final IFluidStackProvider result;
+    private final IFluidOutput result;
 
     private boolean requiresFluid = true;
     private float chance = 1.0f;
@@ -27,7 +27,7 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         EntityTypePredicate entityPredicate,
         FluidStack result
     ) {
-        this(entityPredicate, new IFluidStackProvider.Direct(result));
+        this(entityPredicate, new IFluidOutput.Stack(result));
     }
 
     private EntityMeltingRecipeBuilder(
@@ -35,12 +35,12 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         TagKey<Fluid> result,
         int amount
     ) {
-        this(entityPredicate, new IFluidStackProvider.Tag(result, amount));
+        this(entityPredicate, new IFluidOutput.Tag(result, amount));
     }
 
     private EntityMeltingRecipeBuilder(
         EntityTypePredicate entityPredicate,
-        IFluidStackProvider result
+        IFluidOutput result
     ) {
         this.entityPredicate = entityPredicate;
         this.result = result;
@@ -99,12 +99,12 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         recipeOutput.accept(id, recipe, null);
     }
 
-    public static ResourceLocation getDefaultRecipeId(IFluidStackProvider result) {
+    public static ResourceLocation getDefaultRecipeId(IFluidOutput result) {
         ResourceLocation baseName;
-        if (result instanceof IFluidStackProvider.Tag tag) {
+        if (result instanceof IFluidOutput.Tag tag) {
             baseName = tag.tag().location();
-        } else if (result instanceof IFluidStackProvider.Direct direct) {
-            baseName = BuiltInRegistries.FLUID.getKey(direct.createFluid().getFluid());
+        } else if (result instanceof IFluidOutput.Stack stack) {
+            baseName = BuiltInRegistries.FLUID.getKey(stack.createFluid().getFluid());
         } else {
             throw new UnsupportedOperationException("Invalid fluid recipe output");
         }

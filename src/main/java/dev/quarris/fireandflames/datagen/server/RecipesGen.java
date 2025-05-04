@@ -1,22 +1,25 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.recipes.AlloyingRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.CastingRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.EntityMeltingRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
+import dev.quarris.fireandflames.util.FluidInput;
+import dev.quarris.fireandflames.util.IFluidOutput;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
@@ -38,6 +41,14 @@ public class RecipesGen extends RecipeProvider {
         crucibleRecipes(pOutput);
         meltingRecipes(pOutput);
         castingRecipes(pOutput);
+        alloyingRecipes(pOutput);
+    }
+
+    private static void alloyingRecipes(RecipeOutput pOutput) {
+        AlloyingRecipeBuilder.alloy(new IFluidOutput.Stack(NeoForgeMod.MILK.get(), 10))
+            .requires(new FluidInput(Tags.Fluids.LAVA, 10))
+            .requires(new FluidInput(Fluids.WATER, 2))
+            .save(pOutput, ModRef.res("crucible/alloying/milk_from_lava_and_water"));
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
@@ -45,7 +56,7 @@ public class RecipesGen extends RecipeProvider {
             .coolingTime(200)
             .save(pOutput, ModRef.res("casting/basin/obsidian_from_lava"));
 
-        CastingRecipeBuilder.basin(FluidIngredient.tag(Tags.Fluids.LAVA), 1000, new ItemStack(Items.ICE))
+        CastingRecipeBuilder.basin(FluidIngredient.tag(Tags.Fluids.WATER), 1000, new ItemStack(Items.ICE))
             .withItemInput(Ingredient.of(Items.STICK))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/basin/ice_from_water_and_stick"));
@@ -63,11 +74,11 @@ public class RecipesGen extends RecipeProvider {
     private static void meltingRecipes(RecipeOutput pOutput) {
         EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.PLAYER), new FluidStack(Fluids.LAVA, 5))
             .withChance(0.1f)
-            .save(pOutput, ModRef.res("melting/lava_from_player"));
+            .save(pOutput, ModRef.res("crucible/melting/lava_from_player"));
 
         EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.SHEEP), FluidTags.WATER, 50)
             .requiresNoFluid()
-            .save(pOutput, ModRef.res("melting/water_from_sheep"));
+            .save(pOutput, ModRef.res("crucible/melting/water_from_sheep"));
     }
 
     private static void crucibleRecipes(RecipeOutput pOutput) {

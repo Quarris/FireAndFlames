@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.world.crucible;
 
+import dev.quarris.fireandflames.util.FluidInput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +11,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CrucibleFluidTank implements IFluidHandler {
@@ -35,9 +37,61 @@ public class CrucibleFluidTank implements IFluidHandler {
         this.contentsChangedListener = listener;
     }
 
+    /**
+     * Simulates the removal and insertion of inputs and alloys to see if the tank has enough space for the alloying operation
+     * @param pAlloys The resultant alloys to simulate insertion
+     * @param pInputs The inputs to simulated draining with
+     * @return The copy stacks of the fluids that resulted in successful alloying, or {@link Collections#emptyList()} if failed.
+     */
+    public List<FluidStack> canAlloy(List<FluidStack> pAlloys, List<FluidInput> pInputs) {
+        int amountDrained = 0;
+        int stacksRemoved = 0;
+        List<FluidStack> finalInputsToDrain = new ArrayList<>();
+
+        List<FluidStack> contents = this.getFluids();
+        for (FluidInput input : pInputs) {
+            FluidStack testStack = FluidStack.EMPTY;
+            for (FluidStack content : contents) {
+                if (input.matchesAmount(content)) {
+                    testStack = content;
+                    break;
+                }
+            }
+
+            if (testStack.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            finalInputsToDrain.add(testStack.copyWithAmount(input.amount()));
+            testStack.shrink(input.amount());
+            amountDrained += input.amount();
+
+            if (testStack.isEmpty()) {
+                stacksRemoved++;
+            }
+        }
+
+        int toFill = pAlloys.stream().mapToInt(FluidStack::getAmount).sum();
+        int alloysAdded = pAlloys.size();
+        for (FluidStack alloy : pAlloys) {
+            for (FluidStack content : contents) {
+                if (FluidStack.isSameFluidSameComponents(alloy, content)) {
+                    alloysAdded--;
+                    break;
+                }
+            }
+        }
+
+        if (this.getTanks() - stacksRemoved + alloysAdded <= MAX_FLUID_COUNT && this.getRemainingVolume() - amountDrained + toFill <= this.getCapacity()) {
+            return finalInputsToDrain;
+        }
+
+        return Collections.emptyList();
+    }
+
     @Override
     public int fill(FluidStack pResource, @NotNull FluidAction pAction) {
-        if (pResource.isEmpty() && this.getRemainingVolume() <= 0) {
+        if (this.fluids.size() >= MAX_FLUID_COUNT || pResource.isEmpty() || this.getRemainingVolume() <= 0) {
             return 0;
         }
 
@@ -214,6 +268,10 @@ public class CrucibleFluidTank implements IFluidHandler {
     @Override
     public int getTanks() {
         return this.fluids.size();
+    }
+
+    public List<FluidStack> getFluids() {
+        return this.fluids.stream().map(FluidStack::copy).toList();
     }
 
     public int getRemainingVolume() {

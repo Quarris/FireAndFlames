@@ -1,6 +1,5 @@
 package dev.quarris.fireandflames.world.block.entity;
 
-import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.world.block.CrucibleFawsitBlock;
 import net.minecraft.core.BlockPos;
@@ -25,7 +24,7 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
     private BlockCapabilityCache<IFluidHandler, Direction> inputCache;
     private BlockCapabilityCache<IFluidHandler, Direction> outputCache;
 
-    private boolean toggled;
+    private boolean manuallyToggled;
     private FluidStack activeFluid = FluidStack.EMPTY;
 
     public CrucibleFawsitBlockEntity(BlockPos pPos, BlockState pState) {
@@ -43,6 +42,9 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
         }
 
         if (!pFawsit.isToggled()) {
+            if (pFawsit.isActive()) {
+                pFawsit.setActive(FluidStack.EMPTY);
+            }
             return;
         }
 
@@ -50,7 +52,7 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
         IFluidHandler output = pFawsit.outputCache.getCapability();
 
         if (input == null || output == null) {
-            pFawsit.setToggled(false);
+            pFawsit.setManuallyToggled(false);
             return;
         }
 
@@ -58,7 +60,7 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
         FluidStack simulatedDrain = input.drain(FLOW_RATE, IFluidHandler.FluidAction.SIMULATE);
         int simulatedFill = output.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
         if (simulatedDrain.isEmpty() || simulatedFill <= 0) {
-            pFawsit.setToggled(false);
+            pFawsit.setManuallyToggled(false);
             return;
         }
 
@@ -68,11 +70,12 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
         pFawsit.setActive(drained);
     }
 
-    private void setToggled(boolean toggledOn) {
-        this.toggled = toggledOn;
+    private void setManuallyToggled(boolean toggledOn) {
+        this.manuallyToggled = toggledOn;
         if (!toggledOn) {
             this.activeFluid = FluidStack.EMPTY;
         }
+
         this.setChanged();
         if (this.getLevel() != null) {
             this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 0);
@@ -96,17 +99,21 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
     }
 
     public boolean isToggled() {
-        return this.toggled;
+        return this.manuallyToggled || this.getLevel().hasNeighborSignal(this.getBlockPos());
+    }
+
+    public void toggleOff() {
+        this.setManuallyToggled(false);
     }
 
     public void toggle() {
-        this.setToggled(!this.toggled);
+        this.setManuallyToggled(!this.manuallyToggled);
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.saveAdditional(pTag, pRegistries);
-        pTag.putBoolean("Toggled", this.toggled);
+        pTag.putBoolean("Toggled", this.manuallyToggled);
         if (!this.activeFluid.isEmpty()) {
             pTag.put("ActiveFluid", this.activeFluid.save(pRegistries));
         }
@@ -115,7 +122,7 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
-        this.toggled = pTag.getBoolean("Toggled");
+        this.manuallyToggled = pTag.getBoolean("Toggled");
         this.activeFluid = FluidStack.EMPTY;
         if (pTag.contains("ActiveFluid")) {
             this.activeFluid = FluidStack.parse(pRegistries, pTag.getCompound("ActiveFluid")).orElse(FluidStack.EMPTY);

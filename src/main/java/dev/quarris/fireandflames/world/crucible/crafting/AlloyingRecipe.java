@@ -1,27 +1,44 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
 import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.util.FluidInput;
 import dev.quarris.fireandflames.util.IFluidOutput;
-import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
 
-public record EntityMeltingRecipe(
-    EntityTypePredicate entityPredicate,
-    boolean requiresFluid,
-    IFluidOutput result,
-    float chance
-) implements Recipe<EntityMeltingRecipe.Input> {
+import java.util.List;
+
+public record AlloyingRecipe(
+    List<FluidInput> ingredients,
+    List<IFluidOutput> results
+) implements Recipe<AlloyingRecipe.Input> {
 
     @Override
-    public boolean matches(Input input, Level level) {
-        return level.getRandom().nextFloat() <= this.chance && this.entityPredicate.matches(input.entity()) && (!this.requiresFluid || input.hasFluid());
+    public boolean matches(Input recipeInput, Level level) {
+        List<FluidStack> inputs = recipeInput.inputs().stream().map(FluidStack::copy).toList();
+
+        for (FluidInput ingredient : this.ingredients) {
+            boolean matched = false;
+            for (FluidStack input : inputs) {
+                if (ingredient.matchesAmount(input)) {
+                    input.shrink(ingredient.amount());
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -46,19 +63,19 @@ public record EntityMeltingRecipe(
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return RecipeSetup.ENTITY_MELTING_SERIALIZER.get();
+        return RecipeSetup.ALLOYING_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return RecipeSetup.ENTITY_MELTING_TYPE.get();
+        return RecipeSetup.ALLOYING_TYPE.get();
     }
 
-    public record Input(EntityType<?> entity, boolean hasFluid) implements RecipeInput {
+    public record Input(List<FluidStack> inputs) implements RecipeInput {
 
         @Override
-        public ItemStack getItem(int pIndex) {
-            throw new IllegalArgumentException("Melting Recipes don't take items");
+        public ItemStack getItem(int index) {
+            throw new UnsupportedOperationException("No item ingredients for Alloying Recipes");
         }
 
         @Override
@@ -68,7 +85,7 @@ public record EntityMeltingRecipe(
 
         @Override
         public boolean isEmpty() {
-            return false;
+            return this.inputs.isEmpty();
         }
     }
 }

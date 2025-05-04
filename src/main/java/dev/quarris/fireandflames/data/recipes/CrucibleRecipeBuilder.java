@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.IFluidStackProvider;
+import dev.quarris.fireandflames.util.IFluidOutput;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
@@ -31,7 +31,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category;
     private final CookingBookCategory bookCategory;
     private final Ingredient ingredient;
-    private final IFluidStackProvider result;
+    private final IFluidOutput result;
     private final int smeltingTime;
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
 
@@ -45,7 +45,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         FluidStack result,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, new IFluidStackProvider.Direct(result), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidOutput.Stack(result), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
@@ -56,14 +56,14 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         int resultAmount,
         int smeltingTime
     ) {
-        this(category, bookCategory, ingredient, new IFluidStackProvider.Tag(result, resultAmount), smeltingTime);
+        this(category, bookCategory, ingredient, new IFluidOutput.Tag(result, resultAmount), smeltingTime);
     }
 
     private CrucibleRecipeBuilder(
         RecipeCategory category,
         CookingBookCategory bookCategory,
         Ingredient ingredient,
-        IFluidStackProvider result,
+        IFluidOutput result,
         int smeltingTime
     ) {
         this.category = category;
@@ -160,12 +160,12 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public static ResourceLocation getDefaultRecipeId(IFluidStackProvider result) {
+    public static ResourceLocation getDefaultRecipeId(IFluidOutput result) {
         ResourceLocation baseName;
-        if (result instanceof IFluidStackProvider.Tag tag) {
+        if (result instanceof IFluidOutput.Tag tag) {
             baseName = tag.tag().location();
-        } else if (result instanceof IFluidStackProvider.Direct direct) {
-            baseName = BuiltInRegistries.FLUID.getKey(direct.createFluid().getFluid());
+        } else if (result instanceof IFluidOutput.Stack stack) {
+            baseName = BuiltInRegistries.FLUID.getKey(stack.createFluid().getFluid());
         } else {
             throw new UnsupportedOperationException("Invalid fluid recipe output");
         }

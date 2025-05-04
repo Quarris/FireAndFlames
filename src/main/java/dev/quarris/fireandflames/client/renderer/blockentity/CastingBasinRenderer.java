@@ -30,7 +30,7 @@ public class CastingBasinRenderer implements BlockEntityRenderer<CastingBasinBlo
         if (pBasin.getRecipe() != null) {
             recipe = pBasin.getRecipe().value();
         }
-        float alpha = 1.0f;
+        float alpha = 0.0f;
         if (recipe != null) {
             alpha = pBasin.getCoolingTicks() / (float) recipe.coolingTime;
         }
@@ -38,7 +38,7 @@ public class CastingBasinRenderer implements BlockEntityRenderer<CastingBasinBlo
 
         if (!pBasin.getTank().isEmpty()) {
             FluidStack stack = pBasin.getTank().getFluid();
-            double height = Mth.lerp(stack.getAmount() / (double) pBasin.getTank().getCapacity(), 2 / 16.0, 15 / 16.0);
+            double height = Mth.lerp(stack.getAmount() / (double) pBasin.getTank().getCapacity(), 4 / 16.0, 15 / 16.0);
             FluidState fluidState = stack.getFluid().defaultFluidState();
             VertexConsumer spriteBuffer = FluidRenderer.getFluidSpriteBuffer(pBasin.getLevel(), pBasin.getBlockPos(), stack, pBufferSource, RenderType.translucent(), FluidRenderer.FluidSpriteType.STILL).getRight();
             int color = FluidRenderer.getFluidColor(pBasin.getLevel(), pBasin.getBlockPos(), fluidState);
