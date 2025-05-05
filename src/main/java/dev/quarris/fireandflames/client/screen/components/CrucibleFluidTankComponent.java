@@ -1,10 +1,14 @@
 package dev.quarris.fireandflames.client.screen.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -12,6 +16,9 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import net.neoforged.neoforge.client.textures.FluidSpriteCache;
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CrucibleFluidTankComponent {
@@ -51,10 +58,6 @@ public class CrucibleFluidTankComponent {
 
     public void render(GuiGraphics pGraphics, Level pLevel, BlockPos pPos, int pMouseX, int pMouseY, float pPartialTick) {
         CrucibleFluidTank fluidTank = this.fluidTankSupplier.get();
-        if (fluidTank.getTanks() <= 0) {
-            return;
-        }
-
         int tanks = fluidTank.getTanks();
         int drawY = 0;
 
@@ -68,20 +71,55 @@ public class CrucibleFluidTankComponent {
         // Render Tooltip
         int hoverTank = this.getHoveringFluidTank(pMouseX, pMouseY);
         if (hoverTank < 0) {
+            if (this.isHovering(pMouseX, pMouseY)) {
+                pGraphics.renderTooltip(Minecraft.getInstance().font, List.of(
+                    Component.translatable("container.fireandflames.crucible.fluid_tank.empty"),
+                    Component.literal(this.fluidTankSupplier.get().getRemainingVolume() + "mb").withStyle(ChatFormatting.GRAY)
+                ), Optional.empty(), pMouseX, pMouseY);
+            }
             return;
         }
 
         FluidStack fluid = fluidTank.getFluidInTank(hoverTank);
-        pGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal(fluid.toString()), pMouseX, pMouseY);
-    }
+        List<Component> fluidTextComponents = new ArrayList<>();
+        fluidTextComponents.add(fluid.getHoverName());
+        int amount = fluid.getAmount();
 
-    public int getFluidPositionInTank(int tank) {
-        int pos = 0;
-        for (int i = 0; i < tank; i++) {
-            pos += this.getHeightForFluidSlot(i);
+        if (Screen.hasShiftDown()) {
+            int buckets = amount / 1000;
+            int mb = amount % 1000;
+
+            if (buckets > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(buckets)).append(" B").withStyle(ChatFormatting.GRAY));
+            }
+
+            if (mb > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(mb)).append(" mb").withStyle(ChatFormatting.GRAY));
+            }
+        } else {
+            int blocks = amount / (144 * 9);
+            int ingots = (amount % (144 * 9)) / 144;
+            int nuggets = (amount % (144 * 9)) % 144 / 16;
+            int mb = (amount % (144 * 9)) % 144 % 16;
+
+            if (blocks > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(blocks)).append(" Blocks").withStyle(ChatFormatting.GRAY));
+            }
+
+            if (ingots > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(ingots)).append(" Ingots").withStyle(ChatFormatting.GRAY));
+            }
+
+            if (nuggets > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(nuggets)).append(" Nuggets").withStyle(ChatFormatting.GRAY));
+            }
+
+            if (mb > 0) {
+                fluidTextComponents.add(Component.literal(String.valueOf(mb)).append(" mb").withStyle(ChatFormatting.GRAY));
+            }
         }
 
-        return pos;
+        pGraphics.renderTooltip(Minecraft.getInstance().font, fluidTextComponents, Optional.empty(), pMouseX, pMouseY);
     }
 
     public int getHeightForFluidSlot(int tank) {

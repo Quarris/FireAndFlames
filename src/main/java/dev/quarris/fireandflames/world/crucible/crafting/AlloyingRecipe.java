@@ -1,8 +1,8 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.FluidInput;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;

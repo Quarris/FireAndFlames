@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.world.crucible;
 
-import dev.quarris.fireandflames.util.FluidInput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;

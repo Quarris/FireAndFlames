@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -1,7 +1,9 @@
 package dev.quarris.fireandflames.data.recipes;
 
+import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.FluidInput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
@@ -10,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -22,31 +25,31 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     private final RecipeType<?> type;
     private final FluidInput fluidInput;
-    private final ItemStack result;
+    private final IItemOutput result;
 
     private int coolingTime = 100;
     private Ingredient itemInput = Ingredient.EMPTY;
     private boolean consumesItem;
 
-    private CastingRecipeBuilder(RecipeType<?> type, FluidInput fluidInput, ItemStack result) {
+    private CastingRecipeBuilder(RecipeType<?> type, FluidInput fluidInput, IItemOutput result) {
         this.type = type;
         this.fluidInput = fluidInput;
         this.result = result;
     }
 
-    public static CastingRecipeBuilder basin(FluidIngredient fluid, int amount, ItemStack result) {
+    public static CastingRecipeBuilder basin(FluidIngredient fluid, int amount, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesItem(true);
     }
 
-    public static CastingRecipeBuilder basin(FluidStack fluid, ItemStack result) {
+    public static CastingRecipeBuilder basin(FluidStack fluid, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result).consumesItem(true);
     }
 
-    public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, ItemStack result) {
+    public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(fluid, amount), result);
     }
 
-    public static CastingRecipeBuilder table(FluidStack fluid, ItemStack result) {
+    public static CastingRecipeBuilder table(FluidStack fluid, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result);
     }
 
@@ -77,7 +80,7 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     @Override
     public Item getResult() {
-        return this.result.getItem();
+        return this.result.createItemStack().getItem();
     }
 
     @Override
@@ -106,7 +109,21 @@ public class CastingRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    static ResourceLocation getDefaultRecipeId(ItemStack itemLike) {
-        return BuiltInRegistries.ITEM.getKey(itemLike.getItem());
+    public void saveFnf(RecipeOutput pOutput) {
+        this.save(pOutput, this.getModdedRecipeId(this.result));
+    }
+
+    private ResourceLocation getModdedRecipeId(IItemOutput item) {
+        return ModRef.res(getDefaultRecipeId(item).getPath()).withPrefix("casting/" + (this.type == RecipeSetup.BASIN_CASTING_TYPE.get() ? "basin/" : "table/"));
+    }
+
+    static ResourceLocation getDefaultRecipeId(IItemOutput output) {
+        if (output instanceof IItemOutput.Stack(ItemStack stack)) {
+            return BuiltInRegistries.ITEM.getKey(stack.getItem());
+        } else if (output instanceof IItemOutput.Tag tagOutput) {
+            return tagOutput.tag().location();
+        }
+
+        throw new IllegalArgumentException("Invalid IItemOutput type. Not Stack nor Tag");
     }
 }

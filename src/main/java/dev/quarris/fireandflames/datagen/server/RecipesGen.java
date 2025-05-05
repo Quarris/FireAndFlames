@@ -7,13 +7,16 @@ import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.EntityMeltingRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
-import dev.quarris.fireandflames.util.FluidInput;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.setup.TagSetup;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -52,21 +55,20 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
-        CastingRecipeBuilder.basin(new FluidStack(Fluids.LAVA, 1000), new ItemStack(Items.OBSIDIAN))
-            .coolingTime(200)
-            .save(pOutput, ModRef.res("casting/basin/obsidian_from_lava"));
+        CastingRecipeBuilder.basin(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_IRON), 144 * 9, new IItemOutput.Tag(Tags.Items.STORAGE_BLOCKS_IRON))
+            .coolingTime(20 * 3 * 5)
+            .saveFnf(pOutput);
 
-        CastingRecipeBuilder.basin(FluidIngredient.tag(Tags.Fluids.WATER), 1000, new ItemStack(Items.ICE))
-            .withItemInput(Ingredient.of(Items.STICK))
-            .coolingTime(40)
-            .save(pOutput, ModRef.res("casting/basin/ice_from_water_and_stick"));
+        CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_IRON), 144, new IItemOutput.Tag(Tags.Items.INGOTS_IRON))
+            .coolingTime(20 * 3)
+            .saveFnf(pOutput);
 
-        CastingRecipeBuilder.table(new FluidStack(Fluids.WATER, 50), new ItemStack(Items.BREAD))
+        CastingRecipeBuilder.table(new FluidStack(Fluids.WATER, 50), new IItemOutput.Stack(Items.BREAD))
             .withItemInput(Ingredient.of(Items.WHEAT))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/table/bread_from_water_and_wheat"));
 
-        CastingRecipeBuilder.table(new FluidStack(Fluids.LAVA, 100), new ItemStack(Items.REDSTONE))
+        CastingRecipeBuilder.table(new FluidStack(Fluids.LAVA, 100), new IItemOutput.Stack(Items.REDSTONE))
             .coolingTime(40)
             .save(pOutput, ModRef.res("casting/table/redstone_from_lava"));
     }
@@ -82,16 +84,18 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void crucibleRecipes(RecipeOutput pOutput) {
-        CrucibleRecipeBuilder.smelting(RecipeCategory.MISC, new FluidStack(Fluids.WATER, 1000), Ingredient.of(Items.ICE), 100)
+        CrucibleRecipeBuilder.smelting(new FluidStack(Fluids.WATER, 1000), Ingredient.of(Items.ICE), 100)
             .byproduct(new ItemStack(Items.STICK))
-            .group("crucible")
-            .unlockedBy("has_ice", has(Items.ICE))
             .save(pOutput, ModRef.res("crucible/water_from_ice"));
 
-        CrucibleRecipeBuilder.smelting(RecipeCategory.MISC, FluidTags.LAVA, 1000, Ingredient.of(Items.OBSIDIAN), 200)
-            .group("crucible")
-            .unlockedBy("has_ice", has(Items.ICE))
+        CrucibleRecipeBuilder.smelting(FluidTags.LAVA, 1000, Ingredient.of(Items.OBSIDIAN), 200)
             .save(pOutput, ModRef.res("crucible/lava_from_obsidian"));
+
+        CrucibleRecipeBuilder.smelting(TagSetup.FluidTags.MOLTEN_IRON, 144 * 2, Ingredient.of(Tags.Items.RAW_MATERIALS_IRON), 100)
+            .save(pOutput, ModRef.res("crucible/iron_from_raw"));
+
+        CrucibleRecipeBuilder.smelting(TagSetup.FluidTags.MOLTEN_IRON, 144 * 9, Ingredient.of(Tags.Items.STORAGE_BLOCKS_RAW_IRON), 900)
+            .save(pOutput, ModRef.res("crucible/iron_from_raw_block"));
     }
 
     public static void smeltingRecipes(RecipeOutput pOutput) {

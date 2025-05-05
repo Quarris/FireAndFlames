@@ -45,6 +45,7 @@ public class DataGenEvents {
         gen.addProvider(event.includeServer(), (DataProvider.Factory<RecipesGen>) (packOutput -> new RecipesGen(packOutput, lookup)));
         var blockTags = gen.addProvider(event.includeClient(), (DataProvider.Factory<BlockTagGen>) (packOutput -> new BlockTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<ItemTagGen>) (packOutput -> new ItemTagGen(packOutput, lookup, blockTags.contentsGetter(), existingFiles)));
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<FluidTagGen>) (packOutput -> new FluidTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<DamageTypeTagGen>) (packOutput -> new DamageTypeTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<LootTableProvider>) output -> new LootTableProvider(output, Set.of(), List.of(
             new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)

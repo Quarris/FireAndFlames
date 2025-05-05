@@ -2,7 +2,7 @@ package dev.quarris.fireandflames.world.crucible.crafting;
 
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,36 +17,25 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
+public record CrucibleRecipe(
+    RecipeType<?> type,
+    String group,
+    Ingredient ingredient,
+    ItemStack byproduct,
+    IFluidOutput result,
+    int smeltingTime
+) implements Recipe<SingleRecipeInput> {
 
-    protected final RecipeType<?> type;
-    protected final String group;
-    protected final CookingBookCategory category;
-    protected final Ingredient ingredient;
-    protected final ItemStack byproduct;
-    protected final IFluidOutput result;
-    protected final int smeltingTime;
-
-    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidOutput eitherResult, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, eitherResult, smeltingTime);
+    public CrucibleRecipe(String group, Ingredient ingredient, ItemStack byproduct, IFluidOutput eitherResult, int smeltingTime) {
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, ingredient, byproduct, eitherResult, smeltingTime);
     }
 
-    public CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, TagKey<Fluid> resultTag, int resultAmount, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidOutput.Tag(resultTag, resultAmount), smeltingTime);
+    public CrucibleRecipe(RecipeType<?> type, String group, Ingredient ingredient, ItemStack byproduct, TagKey<Fluid> resultTag, int resultAmount, int smeltingTime) {
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, ingredient, byproduct, new IFluidOutput.Tag(resultTag, resultAmount), smeltingTime);
     }
 
-    public CrucibleRecipe(String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, FluidStack result, int smeltingTime) {
-        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, category, ingredient, byproduct, new IFluidOutput.Stack(result), smeltingTime);
-    }
-
-    protected CrucibleRecipe(RecipeType<?> type, String group, CookingBookCategory category, Ingredient ingredient, ItemStack byproduct, IFluidOutput eitherResult, int smeltingTime) {
-        this.type = type;
-        this.category = category;
-        this.group = group;
-        this.ingredient = ingredient;
-        this.byproduct = byproduct;
-        this.result = eitherResult;
-        this.smeltingTime = smeltingTime;
+    public CrucibleRecipe(String group, Ingredient ingredient, ItemStack byproduct, FluidStack result, int smeltingTime) {
+        this(RecipeSetup.CRUCIBLE_TYPE.get(), group, ingredient, byproduct, new IFluidOutput.Stack(result), smeltingTime);
     }
 
     @Override
@@ -82,9 +71,6 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
         return this.result.createFluid();
     }
 
-    public ItemStack getByproduct() {
-        return this.byproduct;
-    }
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
@@ -178,7 +164,7 @@ public class CrucibleRecipe implements Recipe<SingleRecipeInput> {
         }
 
         public ItemStack createByproduct() {
-            return this.recipe.value().getByproduct().copy();
+            return this.recipe.value().byproduct().copy();
         }
 
         public int getTicks() {

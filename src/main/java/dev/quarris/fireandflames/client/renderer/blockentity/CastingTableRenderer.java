@@ -34,11 +34,10 @@ public class CastingTableRenderer implements BlockEntityRenderer<CastingTableBlo
             recipe = pTable.getRecipe().value();
         }
 
-        float alpha = 1.0f;
+        float alpha = 0.0f;
         if (recipe != null) {
             alpha = pTable.getCoolingTicks() / (float) recipe.coolingTime;
         }
-
 
         if (!pTable.getTank().isEmpty()) {
             FluidStack stack = pTable.getTank().getFluid();

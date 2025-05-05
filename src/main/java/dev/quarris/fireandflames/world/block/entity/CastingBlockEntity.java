@@ -148,7 +148,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
                 pBasin.getInventory().setStackInSlot(0, ItemStack.EMPTY);
             }
 
-            pBasin.getInventory().setStackInSlot(1, recipe.getResult().copy());
+            pBasin.getInventory().setStackInSlot(1, recipe.getOutput().createItemStack());
             pBasin.tank.setFluid(FluidStack.EMPTY);
             pBasin.recipe = null;
         }

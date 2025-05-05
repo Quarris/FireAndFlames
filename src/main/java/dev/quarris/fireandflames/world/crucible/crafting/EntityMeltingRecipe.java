@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.advancements.critereon.EntityTypePredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.EntityType;

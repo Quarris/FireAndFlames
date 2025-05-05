@@ -1,11 +1,12 @@
 package dev.quarris.fireandflames.datagen.client;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.setup.DamageTypeSetup;
-import dev.quarris.fireandflames.setup.ItemSetup;
+import dev.quarris.fireandflames.setup.*;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.fluids.FluidType;
+
+import java.util.function.Supplier;
 
 public class EnUsLanguageGen extends LanguageProvider {
 
@@ -15,21 +16,35 @@ public class EnUsLanguageGen extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        this.add(ItemSetup.FIRE_CLAY_BALL.get(), "Fire Clay Ball");
-        this.add(ItemSetup.FIRE_BRICK.get(), "Fire Brick");
+        this.addItem(ItemSetup.FIRE_CLAY_BALL, "Fire Clay Ball");
+        this.addItem(ItemSetup.FIRE_BRICK, "Fire Brick");
+        this.addItem(ItemSetup.MOLTEN_IRON_BUCKET, "Molten Iron Bucket");
 
-        this.add(BlockSetup.FIRE_CLAY.get(), "Fire Clay");
-        this.add(BlockSetup.FIRE_BRICKS.get(), "Fire Bricks");
-        this.add(BlockSetup.CRUCIBLE_CONTROLLER.get(), "Crucible Controller");
-        this.add(BlockSetup.CRUCIBLE_WINDOW.get(), "Crucible Window");
-        this.add(BlockSetup.CRUCIBLE_DRAIN.get(), "Crucible Drain");
-        this.add(BlockSetup.CRUCIBLE_FAWSIT.get(), "Crucible Fawsit (Faucet)");
-        this.add(BlockSetup.CASTING_BASIN.get(), "Casting Basin");
-        this.add(BlockSetup.CASTING_TABLE.get(), "Casting Table");
+        this.addBlock(BlockSetup.FIRE_CLAY, "Fire Clay");
+        this.addBlock(BlockSetup.FIRE_BRICKS, "Fire Bricks");
+        this.addBlock(BlockSetup.CRUCIBLE_CONTROLLER, "Crucible Controller");
+        this.addBlock(BlockSetup.CRUCIBLE_WINDOW, "Crucible Window");
+        this.addBlock(BlockSetup.CRUCIBLE_DRAIN, "Crucible Drain");
+        this.addBlock(BlockSetup.CRUCIBLE_FAWSIT, "Crucible Fawsit (Faucet)");
+        this.addBlock(BlockSetup.CASTING_BASIN, "Casting Basin");
+        this.addBlock(BlockSetup.CASTING_TABLE, "Casting Table");
+
+        this.addFluid(FluidSetup.MOLTEN_IRON_TYPE, "Molten Iron");
+
+        this.add(TagSetup.FluidTags.MOLTEN_IRON, "Molten Iron");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
+        this.add("container.fireandflames.crucible.fluid_tank.empty", "Empty");
         this.add("creative_tabs.fireandflames.creative_tab", "Fire and Flames");
         this.add("death.attack.crucible_melting", "%1$s was melted by the heat of the crucible");
         this.add("death.attack.crucible_melting.player", "%1$s was thrown to the pits of the crucible by %2$s");
+    }
+
+    private void addFluid(Supplier<? extends FluidType> fluid, String name) {
+        this.add(fluid.get().getDescriptionId(), name);
+    }
+
+    private void add(FluidType fluid, String name) {
+        this.add(fluid.getDescriptionId(), name);
     }
 }

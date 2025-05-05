@@ -5,9 +5,11 @@ import dev.quarris.fireandflames.world.block.*;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -76,6 +78,18 @@ public class BlockSetup {
             .requiresCorrectToolForDrops()
             .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));
+
+    public static final DeferredBlock<LiquidBlock> MOLTEN_IRON = registerBlock("molten_iron", props -> new LiquidBlock(FluidSetup.MOLTEN_IRON.get(), props),
+        BlockBehaviour.Properties.of().mapColor(MapColor.FIRE)
+            .replaceable()
+            .noCollission()
+            .randomTicks()
+            .strength(100.0F)
+            .lightLevel(state -> 10)
+            .pushReaction(PushReaction.DESTROY)
+            .noLootTable()
+            .liquid()
+            .sound(SoundType.EMPTY));
 
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {

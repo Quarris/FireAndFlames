@@ -3,7 +3,7 @@ package dev.quarris.fireandflames.world.block.entity;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.DamageTypeSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;

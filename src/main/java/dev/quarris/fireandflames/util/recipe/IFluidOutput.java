@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.util;
+package dev.quarris.fireandflames.util.recipe;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -63,7 +63,7 @@ public interface IFluidOutput {
 
         public static final Codec<Tag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TagKey.codec(Registries.FLUID).fieldOf("tag").forGetter(Tag::tag),
-            Codec.INT.fieldOf("amount").forGetter(Tag::amount)
+            Codec.INT.fieldOf("count").forGetter(Tag::amount)
         ).apply(instance, Tag::new));
 
         @Override

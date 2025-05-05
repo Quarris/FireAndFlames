@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.util;
+package dev.quarris.fireandflames.util.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -17,7 +17,7 @@ public record FluidInput(FluidIngredient ingredient, int amount) {
 
     public static final Codec<FluidInput> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         FluidIngredient.MAP_CODEC_NONEMPTY.forGetter(FluidInput::ingredient),
-        Codec.INT.fieldOf("amount").forGetter(FluidInput::amount)
+        Codec.INT.fieldOf("count").forGetter(FluidInput::amount)
     ).apply(instance, FluidInput::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, FluidInput> STREAM_CODEC = StreamCodec.composite(

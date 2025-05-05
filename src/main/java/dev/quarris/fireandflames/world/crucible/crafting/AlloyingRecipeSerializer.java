@@ -2,8 +2,8 @@ package dev.quarris.fireandflames.world.crucible.crafting;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.quarris.fireandflames.util.FluidInput;
-import dev.quarris.fireandflames.util.IFluidOutput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.RecipeSerializer;

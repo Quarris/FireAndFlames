@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 public class TagSetup {
 
@@ -23,6 +24,15 @@ public class TagSetup {
 
         private static TagKey<Item> create(ResourceLocation id) {
             return TagKey.create(Registries.ITEM, id);
+        }
+    }
+
+    public static class FluidTags {
+
+        public static final TagKey<Fluid> MOLTEN_IRON = common("molten_iron");
+
+        private static TagKey<Fluid> common(String name) {
+            return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath("c", name));
         }
     }
 }

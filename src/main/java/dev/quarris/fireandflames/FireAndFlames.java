@@ -12,6 +12,7 @@ public class FireAndFlames {
     public FireAndFlames(ModContainer container, IEventBus modBus) {
         BlockSetup.init(modBus);
         ItemSetup.init(modBus);
+        FluidSetup.init(modBus);
         BlockEntitySetup.init(modBus);
         MenuSetup.init(modBus);
         RecipeSetup.init(modBus);

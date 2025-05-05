@@ -31,6 +31,8 @@ public class BlockStateGen extends BlockStateProvider {
         this.simpleBlockWithItem(BlockSetup.CASTING_BASIN.get(), this.models().withExistingParent("casting_basin", ModRef.res("block/casting_basin_base")).texture("texture", blockTexture(BlockSetup.FIRE_BRICKS.get())));
         this.simpleBlockWithItem(BlockSetup.CASTING_TABLE.get(), this.models().withExistingParent("casting_table", ModRef.res("block/casting_table_base")).texture("texture", blockTexture(BlockSetup.FIRE_BRICKS.get())));
 
+        this.simpleBlockWithItem(BlockSetup.MOLTEN_IRON.get(), this.models().getBuilder("molten_iron").texture("particle", ModRef.res("block/molten_iron")));
+
         BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
             this.getVariantBuilder(block).forAllStates(
                 (state) -> {

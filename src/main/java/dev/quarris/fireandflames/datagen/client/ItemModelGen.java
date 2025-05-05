@@ -16,5 +16,6 @@ public class ItemModelGen extends ItemModelProvider {
     protected void registerModels() {
         this.basicItem(ItemSetup.FIRE_CLAY_BALL.get());
         this.basicItem(ItemSetup.FIRE_BRICK.get());
+        this.basicItem(ItemSetup.MOLTEN_IRON_BUCKET.get());
     }
 }

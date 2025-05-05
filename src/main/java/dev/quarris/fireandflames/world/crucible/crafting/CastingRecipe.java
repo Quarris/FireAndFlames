@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
-import dev.quarris.fireandflames.util.FluidInput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -10,14 +11,14 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
 
-    public final ItemStack result;
+    public final IItemOutput result;
     public final FluidInput fluidInput;
     public final Ingredient itemInput;
     public final int coolingTime;
     private final boolean consumeItem;
     // private final boolean copyData; ?
 
-    protected CastingRecipe(ItemStack result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
+    protected CastingRecipe(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
         this.result = result;
         this.fluidInput = fluidInput;
         this.itemInput = itemInput;
@@ -33,7 +34,7 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
 
     @Override
     public ItemStack assemble(Input input, HolderLookup.Provider registries) {
-        return this.result.copy();
+        return this.result.createItemStack();
     }
 
     @Override
@@ -43,11 +44,11 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return this.result.copy();
+        return this.result.createItemStack();
     }
 
-    public ItemStack getResult() {
-        return result.copy();
+    public IItemOutput getOutput() {
+        return this.result;
     }
 
     public FluidInput getFluidInput() {
@@ -60,7 +61,7 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
     }
 
     public Ingredient getItemInput() {
-        return itemInput;
+        return this.itemInput;
     }
 
     public int getCoolingTime() {

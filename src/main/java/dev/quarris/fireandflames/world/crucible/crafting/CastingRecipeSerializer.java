@@ -3,7 +3,8 @@ package dev.quarris.fireandflames.world.crucible.crafting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.quarris.fireandflames.util.FluidInput;
+import dev.quarris.fireandflames.util.recipe.FluidInput;
+import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,7 +19,7 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
 
     public CastingRecipeSerializer(Factory<T> factory, boolean consumesInput) {
         this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(CastingRecipe::getResult),
+            IItemOutput.CODEC.fieldOf("result").forGetter(CastingRecipe::getOutput),
             FluidInput.CODEC.fieldOf("fluid").forGetter(CastingRecipe::getFluidInput),
             Ingredient.CODEC.optionalFieldOf("ingredient", Ingredient.EMPTY).forGetter(CastingRecipe::getItemInput),
             Codec.INT.optionalFieldOf("cooling_time", 100).forGetter(CastingRecipe::getCoolingTime),
@@ -27,7 +28,7 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
         ));
 
         this.streamCodec = StreamCodec.composite(
-            ItemStack.STREAM_CODEC, CastingRecipe::getResult,
+            IItemOutput.STREAM_CODEC, CastingRecipe::getOutput,
             FluidInput.STREAM_CODEC, CastingRecipe::getFluidInput,
             Ingredient.CONTENTS_STREAM_CODEC, CastingRecipe::getItemInput,
             ByteBufCodecs.INT, CastingRecipe::getCoolingTime,
@@ -47,6 +48,6 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
 
     @FunctionalInterface
     public interface Factory<T extends CastingRecipe> {
-        T create(ItemStack result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/);
+        T create(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/);
     }
 }
