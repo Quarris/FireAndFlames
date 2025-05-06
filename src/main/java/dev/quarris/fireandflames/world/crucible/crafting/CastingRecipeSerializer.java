@@ -24,8 +24,7 @@ public class CastingRecipeSerializer<T extends CastingRecipe> implements RecipeS
             Ingredient.CODEC.optionalFieldOf("ingredient", Ingredient.EMPTY).forGetter(CastingRecipe::getItemInput),
             Codec.INT.optionalFieldOf("cooling_time", 100).forGetter(CastingRecipe::getCoolingTime),
             Codec.BOOL.optionalFieldOf("consumes_item", consumesInput).forGetter(CastingRecipe::consumesItem)
-        ).apply(instance, factory::create
-        ));
+        ).apply(instance, factory::create));
 
         this.streamCodec = StreamCodec.composite(
             IItemOutput.STREAM_CODEC, CastingRecipe::getOutput,

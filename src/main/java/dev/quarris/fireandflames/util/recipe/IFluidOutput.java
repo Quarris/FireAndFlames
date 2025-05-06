@@ -42,7 +42,7 @@ public interface IFluidOutput {
 
     record Stack(FluidStack stack) implements IFluidOutput {
 
-        public static final Codec<Stack> CODEC = FluidStack.CODEC.xmap(Stack::new, Stack::createFluid);
+        public static final Codec<Stack> CODEC = FluidStack.CODEC.xmap(Stack::new, Stack::stack);
 
         public Stack(Fluid fluid, int amount) {
             this(new FluidStack(fluid, amount));
@@ -63,7 +63,7 @@ public interface IFluidOutput {
 
         public static final Codec<Tag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TagKey.codec(Registries.FLUID).fieldOf("tag").forGetter(Tag::tag),
-            Codec.INT.fieldOf("count").forGetter(Tag::amount)
+            Codec.INT.fieldOf("amount").forGetter(Tag::amount)
         ).apply(instance, Tag::new));
 
         @Override

@@ -10,6 +10,7 @@ import net.neoforged.fml.common.Mod;
 public class FireAndFlames {
 
     public FireAndFlames(ModContainer container, IEventBus modBus) {
+        DataComponentSetup.init(modBus);
         BlockSetup.init(modBus);
         ItemSetup.init(modBus);
         FluidSetup.init(modBus);

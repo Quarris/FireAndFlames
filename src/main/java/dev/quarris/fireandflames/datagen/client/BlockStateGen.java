@@ -23,6 +23,7 @@ public class BlockStateGen extends BlockStateProvider {
         this.simpleBlockWithItem(BlockSetup.FIRE_BRICKS.get(), this.models().cubeAll("fire_bricks", blockTexture(BlockSetup.FIRE_BRICKS.get())));
         this.simpleBlockWithItem(BlockSetup.CRUCIBLE_WINDOW.get(), this.models().cubeColumn("crucible_window", blockTexture(BlockSetup.CRUCIBLE_WINDOW.get()), blockTexture(BlockSetup.FIRE_BRICKS.get())).renderType(RenderType.cutout().name));
         this.simpleBlockWithItem(BlockSetup.CRUCIBLE_DRAIN.get(), this.models().cubeAll("crucible_drain", blockTexture(BlockSetup.CRUCIBLE_DRAIN.get())));
+        this.simpleBlockWithItem(BlockSetup.CRUCIBLE_TANK.get(), this.models().cubeColumn("crucible_tank", blockTexture(BlockSetup.CRUCIBLE_TANK.get()), blockTexture(BlockSetup.FIRE_BRICKS.get())).renderType(RenderType.cutout().name));
 
         var faucetModel = this.models().withExistingParent("crucible_faucet", ModRef.res("block/crucible_faucet_base")).texture("texture", blockTexture(BlockSetup.FIRE_BRICKS.get()));
         this.horizontalBlock(BlockSetup.CRUCIBLE_FAWSIT.get(), faucetModel);

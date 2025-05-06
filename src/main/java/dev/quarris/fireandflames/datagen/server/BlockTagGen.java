@@ -26,7 +26,8 @@ public class BlockTagGen extends BlockTagsProvider {
     protected void addTags(HolderLookup.Provider pLookup) {
         this.tag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS).add(
             BlockSetup.FIRE_BRICKS.get(),
-            BlockSetup.CRUCIBLE_WINDOW.get()
+            BlockSetup.CRUCIBLE_WINDOW.get(),
+            BlockSetup.CRUCIBLE_TANK.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -35,6 +36,7 @@ public class BlockTagGen extends BlockTagsProvider {
                 BlockSetup.CRUCIBLE_CONTROLLER.get(),
                 BlockSetup.CRUCIBLE_WINDOW.get(),
                 BlockSetup.CRUCIBLE_DRAIN.get(),
+                BlockSetup.CRUCIBLE_TANK.get(),
                 BlockSetup.CRUCIBLE_FAWSIT.get(),
                 BlockSetup.CASTING_BASIN.get(),
                 BlockSetup.CASTING_TABLE.get()

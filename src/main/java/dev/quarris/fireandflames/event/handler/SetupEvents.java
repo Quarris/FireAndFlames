@@ -21,6 +21,7 @@ public class SetupEvents {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CRUCIBLE_DRAIN.get(), (be, dir) -> be.getCrucibleTank().orElse(null));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CASTING_BASIN.get(), (be, dir) -> be.getTank());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CASTING_TABLE.get(), (be, dir) -> be.getTank());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockEntitySetup.CRUCIBLE_TANK.get(), (be, dir) -> be.getFluidTank());
     }
 
 }

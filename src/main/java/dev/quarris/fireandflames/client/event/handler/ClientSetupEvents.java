@@ -1,10 +1,7 @@
 package dev.quarris.fireandflames.client.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.client.renderer.blockentity.CastingBasinRenderer;
-import dev.quarris.fireandflames.client.renderer.blockentity.CastingTableRenderer;
-import dev.quarris.fireandflames.client.renderer.blockentity.CrucibleControllerRenderer;
-import dev.quarris.fireandflames.client.renderer.blockentity.CrucibleFawsitRenderer;
+import dev.quarris.fireandflames.client.renderer.blockentity.*;
 import dev.quarris.fireandflames.client.screen.CrucibleScreen;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.FluidSetup;
@@ -12,12 +9,10 @@ import dev.quarris.fireandflames.setup.MenuSetup;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.common.NeoForgeMod;
 
 @EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientSetupEvents {
@@ -51,6 +46,7 @@ public class ClientSetupEvents {
         event.registerBlockEntityRenderer(BlockEntitySetup.CRUCIBLE_FAWSIT.get(), CrucibleFawsitRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitySetup.CASTING_BASIN.get(), CastingBasinRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitySetup.CASTING_TABLE.get(), CastingTableRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitySetup.CRUCIBLE_TANK.get(), FluidStorageRenderer::new);
     }
 
 }

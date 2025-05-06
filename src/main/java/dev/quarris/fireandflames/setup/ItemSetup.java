@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ItemSetup {
     public static final DeferredRegister.Items REGISTRY = DeferredRegister.Items.createItems(ModRef.ID);
@@ -20,6 +21,10 @@ public class ItemSetup {
     public static final DeferredItem<BucketItem> MOLTEN_IRON_BUCKET = registerItem("molten_iron_bucket", props -> new BucketItem(FluidSetup.MOLTEN_IRON.get(), props), bucketProperties());
 
     // Helper method
+    public static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> itemSupplier) {
+        return REGISTRY.register(name, itemSupplier);
+    }
+
     public static <T extends Item> DeferredItem<T> registerItem(String name, Function<Item.Properties, T> itemSupplier) {
         return REGISTRY.registerItem(name, itemSupplier);
     }

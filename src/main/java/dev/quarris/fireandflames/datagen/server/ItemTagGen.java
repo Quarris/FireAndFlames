@@ -1,8 +1,6 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.setup.TagSetup;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
