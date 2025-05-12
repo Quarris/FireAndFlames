@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.world.crucible.crafting;
 
+import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
@@ -133,13 +134,14 @@ public record CrucibleRecipe(
                 // Check current recipe is its still valid
                 if (this.recipe.value().matches(input, level)) {
                     if (this.isFinished() || input.heat < this.recipe.value().heat) {
-                        // The recipe is still valid but has finished or fuel has ran out, no need to update.
+                        // The recipe is still valid but has finished or fuel has ran out; no need to update.
                         return false;
                     }
 
                     // Progress the recipe.
                     if (this.isActive()) {
-                        this.progress += 1.0f / this.recipe.value().smeltingTime;
+                        float heatBonusMultiplier = (input.heat / (float) this.recipe.value().heat) * ServerConfigs.getSmeltingHeatBonusMultiplier();
+                        this.progress += (1.0f / this.recipe.value().smeltingTime) * heatBonusMultiplier;
                     }
 
                     return true;

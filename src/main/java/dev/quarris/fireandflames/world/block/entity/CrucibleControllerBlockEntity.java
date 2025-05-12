@@ -220,16 +220,14 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                 List<FluidStack> drainStacks = new ArrayList<>();
                 int iterations = pCrucible.fluidTank.canAlloy(resultantAlloys, recipe.ingredients(), drainStacks);
                 if (iterations > 0) {
-                    iterations = Math.min(iterations, 10);
-                    ModRef.LOGGER.info("Alloying recipe {} at {} iterations", holder.id(), iterations);
+                    float heatBonusMultiplier = (pCrucible.heat / (float) recipe.heat()) * ServerConfigs.getAlloyingHeatBonusMultiplier();
+                    iterations = Math.min(iterations, (int) heatBonusMultiplier);
                     for (FluidStack drainStack : drainStacks) {
-                        ModRef.LOGGER.info("Base drain {}, actual {}", drainStack, drainStack.getAmount() * iterations);
                         drainStack.setAmount(drainStack.getAmount() * iterations);
                         pCrucible.fluidTank.drain(drainStack, IFluidHandler.FluidAction.EXECUTE);
                     }
 
                     for (FluidStack resultantAlloy : resultantAlloys) {
-                        ModRef.LOGGER.info("Base alloy {}, actual {}", resultantAlloy, resultantAlloy.getAmount() * iterations);
                         resultantAlloy.setAmount(resultantAlloy.getAmount() * iterations);
                         pCrucible.fluidTank.fill(resultantAlloy, IFluidHandler.FluidAction.EXECUTE);
                     }
