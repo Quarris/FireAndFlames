@@ -10,9 +10,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class CrucibleFluidTank implements IFluidHandler {
 
@@ -26,7 +24,7 @@ public class CrucibleFluidTank implements IFluidHandler {
 
     public CrucibleFluidTank(int capacity) {
         this.capacity = capacity;
-        this.fluids = new ArrayList<>(MAX_FLUID_COUNT);
+        this.fluids = new ArrayList<>(8);
     }
 
     public void updateCapacity(int newCapacity) {
@@ -41,34 +39,52 @@ public class CrucibleFluidTank implements IFluidHandler {
      * Simulates the removal and insertion of inputs and alloys to see if the tank has enough space for the alloying operation
      * @param pAlloys The resultant alloys to simulate insertion
      * @param pInputs The inputs to simulated draining with
-     * @return The copy stacks of the fluids that resulted in successful alloying, or {@link Collections#emptyList()} if failed.
+     * @param pInputsToDrain The list of final stacks to drain from this tank. Passed empty to be filled by this method.
+     * @return The number of iterations that can occur for alloying. 0 if the recipe is invalid.
      */
-    public List<FluidStack> canAlloy(List<FluidStack> pAlloys, List<FluidInput> pInputs) {
+    public int canAlloy(List<FluidStack> pAlloys, List<FluidInput> pInputs, List<FluidStack> pInputsToDrain) {
         int amountDrained = 0;
         int stacksRemoved = 0;
-        List<FluidStack> finalInputsToDrain = new ArrayList<>();
+        Map<Integer, FluidStack> finalInputsToDrain = new HashMap<>();
 
         List<FluidStack> contents = this.getFluids();
         for (FluidInput input : pInputs) {
             FluidStack testStack = FluidStack.EMPTY;
-            for (FluidStack content : contents) {
-                if (input.matchesAmount(content)) {
+            int testIndex = -1;
+            for (int i = 0; i < contents.size(); i++) {
+                FluidStack content = contents.get(i);
+                testIndex = i;
+                if (input.matchesWithAmount(content)) {
                     testStack = content;
                     break;
                 }
             }
 
             if (testStack.isEmpty()) {
-                return Collections.emptyList();
+                return 0;
             }
 
-            finalInputsToDrain.add(testStack.copyWithAmount(input.amount()));
+            var inputStack = testStack;
+            finalInputsToDrain.compute(testIndex, (id, stack) -> {
+                if (stack == null) {
+                    return inputStack.copyWithAmount(input.amount());
+                }
+
+                stack.grow(input.amount());
+                return stack;
+            });
             testStack.shrink(input.amount());
             amountDrained += input.amount();
 
             if (testStack.isEmpty()) {
                 stacksRemoved++;
             }
+        }
+
+        int iterations = finalInputsToDrain.entrySet().stream().mapToInt(entry -> this.getFluids().get(entry.getKey()).getAmount() / entry.getValue().getAmount()).min().orElse(0);
+
+        if (iterations == 0) {
+            return 0;
         }
 
         int toFill = pAlloys.stream().mapToInt(FluidStack::getAmount).sum();
@@ -83,10 +99,12 @@ public class CrucibleFluidTank implements IFluidHandler {
         }
 
         if (this.getTanks() - stacksRemoved + alloysAdded <= MAX_FLUID_COUNT && this.getRemainingVolume() - amountDrained + toFill <= this.getCapacity()) {
-            return finalInputsToDrain;
+            iterations = Math.min(iterations, (int) Math.floor((float) (this.getRemainingVolume() - amountDrained) / toFill));
+            pInputsToDrain.addAll(finalInputsToDrain.values());
+            return iterations;
         }
 
-        return Collections.emptyList();
+        return 0;
     }
 
     @Override

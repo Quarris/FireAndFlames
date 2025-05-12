@@ -45,7 +45,7 @@ public record FluidInput(FluidIngredient ingredient, int amount) {
         this(FluidIngredient.tag(fluidTag), amount);
     }
 
-    public boolean matchesAmount(FluidStack input) {
+    public boolean matchesWithAmount(FluidStack input) {
         return this.test(input) && input.getAmount() >= amount;
     }
 

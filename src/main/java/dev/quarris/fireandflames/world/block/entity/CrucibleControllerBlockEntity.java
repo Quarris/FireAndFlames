@@ -214,15 +214,23 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             List<RecipeHolder<AlloyingRecipe>> recipes = pLevel.getRecipeManager().getRecipesFor(RecipeSetup.ALLOYING_TYPE.get(), recipeInput, pLevel);
             recipes.sort(Comparator.comparingInt(r -> r.value().ingredients().size()));
             if (!recipes.isEmpty()) {
-                AlloyingRecipe recipe = recipes.getFirst().value();
+                RecipeHolder<AlloyingRecipe> holder = recipes.getFirst();
+                AlloyingRecipe recipe = holder.value();
                 List<FluidStack> resultantAlloys = recipe.results().stream().map(IFluidOutput::createFluid).toList();
-                List<FluidStack> drainStacks = pCrucible.fluidTank.canAlloy(resultantAlloys, recipe.ingredients());
-                if (!drainStacks.isEmpty()) {
+                List<FluidStack> drainStacks = new ArrayList<>();
+                int iterations = pCrucible.fluidTank.canAlloy(resultantAlloys, recipe.ingredients(), drainStacks);
+                if (iterations > 0) {
+                    iterations = Math.min(iterations, 10);
+                    ModRef.LOGGER.info("Alloying recipe {} at {} iterations", holder.id(), iterations);
                     for (FluidStack drainStack : drainStacks) {
+                        ModRef.LOGGER.info("Base drain {}, actual {}", drainStack, drainStack.getAmount() * iterations);
+                        drainStack.setAmount(drainStack.getAmount() * iterations);
                         pCrucible.fluidTank.drain(drainStack, IFluidHandler.FluidAction.EXECUTE);
                     }
 
                     for (FluidStack resultantAlloy : resultantAlloys) {
+                        ModRef.LOGGER.info("Base alloy {}, actual {}", resultantAlloy, resultantAlloy.getAmount() * iterations);
+                        resultantAlloy.setAmount(resultantAlloy.getAmount() * iterations);
                         pCrucible.fluidTank.fill(resultantAlloy, IFluidHandler.FluidAction.EXECUTE);
                     }
                     pCrucible.burnTicks -= 10;

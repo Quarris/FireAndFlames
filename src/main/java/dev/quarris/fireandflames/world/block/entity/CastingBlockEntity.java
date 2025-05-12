@@ -61,6 +61,8 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
+            if (!CastingBlockEntity.this.inventory.getStackInSlot(1).isEmpty()) return 0;
+
             RecipeHolder<T> recipe = CastingBlockEntity.this.recipe;
             if (recipe == null) {
                 // Set recipe based on input

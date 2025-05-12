@@ -30,6 +30,8 @@ public class FluidTagGen extends FluidTagsProvider {
         this.tag(TagSetup.FluidTags.MOLTEN_IRON).add(FluidSetup.MOLTEN_IRON.getSource().get());
         this.tag(TagSetup.FluidTags.MOLTEN_GOLD).add(FluidSetup.MOLTEN_GOLD.getSource().get());
         this.tag(TagSetup.FluidTags.MOLTEN_COPPER).add(FluidSetup.MOLTEN_COPPER.getSource().get());
+        this.tag(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS).add(FluidSetup.MOLTEN_ANCIENT_DEBRIS.getSource().get());
+        this.tag(TagSetup.FluidTags.MOLTEN_NETHERITE).add(FluidSetup.MOLTEN_NETHERITE.getSource().get());
     }
 
     private static ResourceKey<Fluid> key(Fluid block) {

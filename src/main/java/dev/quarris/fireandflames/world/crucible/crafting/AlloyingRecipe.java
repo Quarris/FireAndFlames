@@ -29,7 +29,7 @@ public record AlloyingRecipe(
         for (FluidInput ingredient : this.ingredients) {
             boolean matched = false;
             for (FluidStack input : inputs) {
-                if (ingredient.matchesAmount(input)) {
+                if (ingredient.matchesWithAmount(input)) {
                     input.shrink(ingredient.amount());
                     matched = true;
                     break;

@@ -59,7 +59,7 @@ public class AlloyingRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(RecipeOutput recipeOutput) {
-        this.save(recipeOutput, getDefaultRecipeId(this.results.get(0).createFluid()));
+        this.save(recipeOutput, getDefaultRecipeId(this.results.getFirst().createFluid()));
     }
 
     @Override

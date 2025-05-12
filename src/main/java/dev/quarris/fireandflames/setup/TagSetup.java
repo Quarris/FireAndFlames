@@ -32,6 +32,8 @@ public class TagSetup {
         public static final TagKey<Fluid> MOLTEN_IRON = common("molten_iron");
         public static final TagKey<Fluid> MOLTEN_GOLD = common("molten_gold");
         public static final TagKey<Fluid> MOLTEN_COPPER = common("molten_copper");
+        public static final TagKey<Fluid> MOLTEN_ANCIENT_DEBRIS = common("molten_ancient_debris");
+        public static final TagKey<Fluid> MOLTEN_NETHERITE = common("molten_netherite");
 
         private static TagKey<Fluid> common(String name) {
             return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath("c", name));

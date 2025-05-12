@@ -58,6 +58,8 @@ public class RecipesGen extends RecipeProvider {
         metalRecipe(output, "iron", TagSetup.FluidTags.MOLTEN_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON, Tags.Items.RAW_MATERIALS_IRON, Tags.Items.STORAGE_BLOCKS_IRON, Tags.Items.INGOTS_IRON);
         metalRecipe(output, "gold", TagSetup.FluidTags.MOLTEN_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD, Tags.Items.INGOTS_GOLD);
         metalRecipe(output, "copper", TagSetup.FluidTags.MOLTEN_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER, Tags.Items.INGOTS_COPPER);
+        metalRecipe(output, "ancient_debris", TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, null, Tags.Items.ORES_NETHERITE_SCRAP, null, null);
+        metalRecipe(output, "netherite", TagSetup.FluidTags.MOLTEN_NETHERITE, null, null, Tags.Items.STORAGE_BLOCKS_NETHERITE, Tags.Items.INGOTS_NETHERITE);
     }
 
     private static void alloyingRecipes(RecipeOutput pOutput) {
@@ -65,6 +67,11 @@ public class RecipesGen extends RecipeProvider {
             .requires(new FluidInput(Tags.Fluids.LAVA, 10))
             .requires(new FluidInput(Fluids.WATER, 2))
             .save(pOutput, ModRef.res("crucible/alloying/milk_from_lava_and_water"));
+
+        AlloyingRecipeBuilder.alloy(new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_NETHERITE, 1))
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 4))
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_GOLD, 4))
+            .save(pOutput, ModRef.res("crucible/alloying/netherite_from_scrap_and_gold"));
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
@@ -196,26 +203,37 @@ public class RecipesGen extends RecipeProvider {
     }
 
     public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag) {
-        CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), 144 * 9, new IItemOutput.Tag(blockTag))
-            .coolingTime(20 * 3 * 5)
-            .saveFnf(output);
+        if (blockTag != null) {
+            CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), 144 * 9, new IItemOutput.Tag(blockTag))
+                .coolingTime(20 * 3 * 5)
+                .saveFnf(output);
 
-        CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), 144, new IItemOutput.Tag(ingotTag))
-            .coolingTime(20 * 3)
-            .saveFnf(output);
+            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 9, Ingredient.of(blockTag), 900)
+                .heat(1100)
+                .save(output, ModRef.res("crucible/" + name + "_from_block"));
+        }
 
-        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2, Ingredient.of(rawItemTag), 100)
-            .save(output, ModRef.res("crucible/" + name + "_from_raw"));
+        if (ingotTag != null) {
+            CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), 144, new IItemOutput.Tag(ingotTag))
+                .coolingTime(20 * 3)
+                .saveFnf(output);
 
-        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2 * 9, Ingredient.of(rawBlockTag), 900)
-            .heat(1100)
-            .save(output, ModRef.res("crucible/" + name + "_from_raw_block"));
+            CrucibleRecipeBuilder.smelting(fluidTag, 144, Ingredient.of(ingotTag), 100)
+                .save(output, ModRef.res("crucible/" + name + "_from_ingot"));
+        }
 
-        CrucibleRecipeBuilder.smelting(fluidTag, 144, Ingredient.of(ingotTag), 100)
-            .save(output, ModRef.res("crucible/" + name + "_from_ingot"));
 
-        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 9, Ingredient.of(blockTag), 900)
-            .heat(1100)
-            .save(output, ModRef.res("crucible/" + name + "_from_block"));
+        if (rawItemTag != null) {
+            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2, Ingredient.of(rawItemTag), 100)
+                .save(output, ModRef.res("crucible/" + name + "_from_raw"));
+        }
+
+        if (rawBlockTag != null) {
+            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2 * 9, Ingredient.of(rawBlockTag), 900)
+                .heat(1100)
+                .save(output, ModRef.res("crucible/" + name + "_from_raw_block"));
+        }
+
+
     }
 }

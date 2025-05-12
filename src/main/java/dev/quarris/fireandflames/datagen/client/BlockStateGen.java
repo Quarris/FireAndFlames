@@ -38,6 +38,8 @@ public class BlockStateGen extends BlockStateProvider {
         this.simpleFluid(FluidSetup.MOLTEN_IRON);
         this.simpleFluid(FluidSetup.MOLTEN_GOLD);
         this.simpleFluid(FluidSetup.MOLTEN_COPPER);
+        this.simpleFluid(FluidSetup.MOLTEN_ANCIENT_DEBRIS);
+        this.simpleFluid(FluidSetup.MOLTEN_NETHERITE);
 
         BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
             this.getVariantBuilder(block).forAllStates(

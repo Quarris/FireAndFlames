@@ -62,6 +62,38 @@ public class FluidSetup {
             ))
         .customBlockProperties(props -> props.mapColor(MapColor.FIRE).lightLevel(state -> 10)));
 
+    public static final CustomFluidHolder MOLTEN_ANCIENT_DEBRIS = REGISTRY.register("molten_ancient_debris", CustomFluidHolder.builder(() ->
+            new FluidType(
+                FluidType.Properties.create()
+                    .pathType(PathType.LAVA)
+                    .adjacentPathType(null)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
+                    .canDrown(false)
+                    .canSwim(false)
+                    .lightLevel(10)
+                    .density(3000)
+                    .viscosity(6000)
+                    .temperature(1100)
+            ))
+        .customBlockProperties(props -> props.mapColor(MapColor.FIRE).lightLevel(state -> 10)));
+
+    public static final CustomFluidHolder MOLTEN_NETHERITE = REGISTRY.register("molten_netherite", CustomFluidHolder.builder(() ->
+            new FluidType(
+                FluidType.Properties.create()
+                    .pathType(PathType.LAVA)
+                    .adjacentPathType(null)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
+                    .canDrown(false)
+                    .canSwim(false)
+                    .lightLevel(10)
+                    .density(3000)
+                    .viscosity(6000)
+                    .temperature(1100)
+            ))
+        .customBlockProperties(props -> props.mapColor(MapColor.FIRE).lightLevel(state -> 10)));
+
     public static void init(IEventBus modBus) {
         REGISTRY.register(modBus);
     }

@@ -36,6 +36,8 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addFluidHolder(FluidSetup.MOLTEN_IRON, "Molten Iron");
         this.addFluidHolder(FluidSetup.MOLTEN_GOLD, "Molten Gold");
         this.addFluidHolder(FluidSetup.MOLTEN_COPPER, "Molten Copper");
+        this.addFluidHolder(FluidSetup.MOLTEN_ANCIENT_DEBRIS, "Molten Ancient Debris");
+        this.addFluidHolder(FluidSetup.MOLTEN_NETHERITE, "Molten Netherite");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("container.fireandflames.crucible_burner.title", "Crucible Fuel Burner");
