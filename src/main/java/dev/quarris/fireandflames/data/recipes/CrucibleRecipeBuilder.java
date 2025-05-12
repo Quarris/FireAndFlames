@@ -1,5 +1,8 @@
 package dev.quarris.fireandflames.data.recipes;
 
+import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.advancements.Criterion;

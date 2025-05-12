@@ -99,18 +99,6 @@ public class BlockSetup {
             .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));
 
-    public static final DeferredBlock<LiquidBlock> MOLTEN_IRON = registerBlock("molten_iron", props -> new LiquidBlock(FluidSetup.MOLTEN_IRON.get(), props),
-        BlockBehaviour.Properties.of().mapColor(MapColor.FIRE)
-            .replaceable()
-            .noCollission()
-            .randomTicks()
-            .strength(100.0F)
-            .lightLevel(state -> 10)
-            .pushReaction(PushReaction.DESTROY)
-            .noLootTable()
-            .liquid()
-            .sound(SoundType.EMPTY));
-
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {
         return registerBlock(name, blockSupplier, blockProps, new Item.Properties());

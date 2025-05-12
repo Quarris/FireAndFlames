@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.datagen.client;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.setup.*;
+import dev.quarris.fireandflames.util.fluid.CustomFluidHolder;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -18,7 +19,6 @@ public class EnUsLanguageGen extends LanguageProvider {
     protected void addTranslations() {
         this.addItem(ItemSetup.FIRE_CLAY_BALL, "Fire Clay Ball");
         this.addItem(ItemSetup.FIRE_BRICK, "Fire Brick");
-        this.addItem(ItemSetup.MOLTEN_IRON_BUCKET, "Molten Iron Bucket");
 
         this.addBlock(BlockSetup.FIRE_CLAY, "Fire Clay");
         this.addBlock(BlockSetup.FIRE_BRICKS, "Fire Bricks");
@@ -31,9 +31,11 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addBlock(BlockSetup.CASTING_BASIN, "Casting Basin");
         this.addBlock(BlockSetup.CASTING_TABLE, "Casting Table");
 
-        this.addFluid(FluidSetup.MOLTEN_IRON_TYPE, "Molten Iron");
-
         this.add(TagSetup.FluidTags.MOLTEN_IRON, "Molten Iron");
+
+        this.addFluidHolder(FluidSetup.MOLTEN_IRON, "Molten Iron");
+        this.addFluidHolder(FluidSetup.MOLTEN_GOLD, "Molten Gold");
+        this.addFluidHolder(FluidSetup.MOLTEN_COPPER, "Molten Copper");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("container.fireandflames.crucible_burner.title", "Crucible Fuel Burner");
@@ -51,5 +53,10 @@ public class EnUsLanguageGen extends LanguageProvider {
 
     private void add(FluidType fluid, String name) {
         this.add(fluid.getDescriptionId(), name);
+    }
+
+    private void addFluidHolder(CustomFluidHolder fluidHolder, String name) {
+        this.addFluid(fluidHolder.getFluidType(), name);
+        this.addItem(fluidHolder.getBucket(), name + " Bucket");
     }
 }

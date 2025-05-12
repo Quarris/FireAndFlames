@@ -14,7 +14,10 @@ public class CreativeTabSetup {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = REGISTRY.register("creative_tab", () -> CreativeModeTab.builder()
         .title(Component.translatable("creative_tabs.fireandflames.creative_tab"))
         .icon(() -> new ItemStack(BlockSetup.CRUCIBLE_CONTROLLER))
-        .displayItems((pParams, pOutput) -> ItemSetup.REGISTRY.getEntries().forEach(entry -> pOutput.accept(entry.get())))
+        .displayItems((pParams, pOutput) -> {
+            ItemSetup.REGISTRY.getEntries().forEach(entry -> pOutput.accept(entry.get()));
+            FluidSetup.REGISTRY.getBucketEntries().forEach(entry -> pOutput.accept(entry.get()));
+        })
         .build());
 
 

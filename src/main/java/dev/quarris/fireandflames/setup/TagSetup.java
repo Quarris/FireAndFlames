@@ -30,6 +30,8 @@ public class TagSetup {
     public static class FluidTags {
 
         public static final TagKey<Fluid> MOLTEN_IRON = common("molten_iron");
+        public static final TagKey<Fluid> MOLTEN_GOLD = common("molten_gold");
+        public static final TagKey<Fluid> MOLTEN_COPPER = common("molten_copper");
 
         private static TagKey<Fluid> common(String name) {
             return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath("c", name));

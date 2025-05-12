@@ -17,9 +17,6 @@ public class ItemSetup {
 
     public static final DeferredItem<Item> FIRE_BRICK = registerItem("fire_brick", Item::new);
 
-    // Molten Buckets
-    public static final DeferredItem<BucketItem> MOLTEN_IRON_BUCKET = registerItem("molten_iron_bucket", props -> new BucketItem(FluidSetup.MOLTEN_IRON.get(), props), bucketProperties());
-
     // Helper method
     public static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> itemSupplier) {
         return REGISTRY.register(name, itemSupplier);
@@ -31,10 +28,6 @@ public class ItemSetup {
 
     public static <T extends Item> DeferredItem<T> registerItem(String name, Function<Item.Properties, T> itemSupplier, Item.Properties props) {
         return REGISTRY.registerItem(name, itemSupplier, props);
-    }
-
-    public static Item.Properties bucketProperties() {
-        return new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1);
     }
 
     public static void init(IEventBus modBus) {

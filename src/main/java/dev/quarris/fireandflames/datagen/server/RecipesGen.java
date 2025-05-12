@@ -17,13 +17,19 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.NotCondition;
+import net.neoforged.neoforge.common.conditions.TagEmptyCondition;
+import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
@@ -45,6 +51,13 @@ public class RecipesGen extends RecipeProvider {
         meltingRecipes(pOutput);
         castingRecipes(pOutput);
         alloyingRecipes(pOutput);
+        metalRecipes(pOutput);
+    }
+
+    private static void metalRecipes(RecipeOutput output) {
+        metalRecipe(output, "iron", TagSetup.FluidTags.MOLTEN_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON, Tags.Items.RAW_MATERIALS_IRON, Tags.Items.STORAGE_BLOCKS_IRON, Tags.Items.INGOTS_IRON);
+        metalRecipe(output, "gold", TagSetup.FluidTags.MOLTEN_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD, Tags.Items.INGOTS_GOLD);
+        metalRecipe(output, "copper", TagSetup.FluidTags.MOLTEN_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER, Tags.Items.INGOTS_COPPER);
     }
 
     private static void alloyingRecipes(RecipeOutput pOutput) {
@@ -55,14 +68,6 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
-        CastingRecipeBuilder.basin(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_IRON), 144 * 9, new IItemOutput.Tag(Tags.Items.STORAGE_BLOCKS_IRON))
-            .coolingTime(20 * 3 * 5)
-            .saveFnf(pOutput);
-
-        CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_IRON), 144, new IItemOutput.Tag(Tags.Items.INGOTS_IRON))
-            .coolingTime(20 * 3)
-            .saveFnf(pOutput);
-
         CastingRecipeBuilder.table(new FluidStack(Fluids.WATER, 50), new IItemOutput.Stack(Items.BREAD))
             .withItemInput(Ingredient.of(Items.WHEAT))
             .coolingTime(40)
@@ -90,12 +95,6 @@ public class RecipesGen extends RecipeProvider {
 
         CrucibleRecipeBuilder.smelting(FluidTags.LAVA, 1000, Ingredient.of(Items.OBSIDIAN), 200)
             .save(pOutput, ModRef.res("crucible/lava_from_obsidian"));
-
-        CrucibleRecipeBuilder.smelting(TagSetup.FluidTags.MOLTEN_IRON, 144 * 2, Ingredient.of(Tags.Items.RAW_MATERIALS_IRON), 100)
-            .save(pOutput, ModRef.res("crucible/iron_from_raw"));
-
-        CrucibleRecipeBuilder.smelting(TagSetup.FluidTags.MOLTEN_IRON, 144 * 9, Ingredient.of(Tags.Items.STORAGE_BLOCKS_RAW_IRON), 900)
-            .save(pOutput, ModRef.res("crucible/iron_from_raw_block"));
     }
 
     public static void smeltingRecipes(RecipeOutput pOutput) {
@@ -194,5 +193,29 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_fire_bricks", has(BlockSetup.FIRE_BRICKS.get()))
             .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
             .save(pOutput, ModRef.res("crucible_window_shapeless"));
+    }
+
+    public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag) {
+        CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), 144 * 9, new IItemOutput.Tag(blockTag))
+            .coolingTime(20 * 3 * 5)
+            .saveFnf(output);
+
+        CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), 144, new IItemOutput.Tag(ingotTag))
+            .coolingTime(20 * 3)
+            .saveFnf(output);
+
+        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2, Ingredient.of(rawItemTag), 100)
+            .save(output, ModRef.res("crucible/" + name + "_from_raw"));
+
+        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2 * 9, Ingredient.of(rawBlockTag), 900)
+            .heat(1100)
+            .save(output, ModRef.res("crucible/" + name + "_from_raw_block"));
+
+        CrucibleRecipeBuilder.smelting(fluidTag, 144, Ingredient.of(ingotTag), 100)
+            .save(output, ModRef.res("crucible/" + name + "_from_ingot"));
+
+        CrucibleRecipeBuilder.smelting(fluidTag, 144 * 9, Ingredient.of(blockTag), 900)
+            .heat(1100)
+            .save(output, ModRef.res("crucible/" + name + "_from_block"));
     }
 }

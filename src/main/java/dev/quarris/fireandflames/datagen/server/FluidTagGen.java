@@ -27,7 +27,9 @@ public class FluidTagGen extends FluidTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
-        this.tag(TagSetup.FluidTags.MOLTEN_IRON).add(FluidSetup.MOLTEN_IRON.get());
+        this.tag(TagSetup.FluidTags.MOLTEN_IRON).add(FluidSetup.MOLTEN_IRON.getSource().get());
+        this.tag(TagSetup.FluidTags.MOLTEN_GOLD).add(FluidSetup.MOLTEN_GOLD.getSource().get());
+        this.tag(TagSetup.FluidTags.MOLTEN_COPPER).add(FluidSetup.MOLTEN_COPPER.getSource().get());
     }
 
     private static ResourceKey<Fluid> key(Fluid block) {
