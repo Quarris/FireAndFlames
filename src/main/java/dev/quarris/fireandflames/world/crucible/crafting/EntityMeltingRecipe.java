@@ -16,12 +16,13 @@ public record EntityMeltingRecipe(
     EntityTypePredicate entityPredicate,
     boolean requiresFluid,
     IFluidOutput result,
-    float chance
+    float chance,
+    int heat
 ) implements Recipe<EntityMeltingRecipe.Input> {
 
     @Override
     public boolean matches(Input input, Level level) {
-        return level.getRandom().nextFloat() <= this.chance && this.entityPredicate.matches(input.entity()) && (!this.requiresFluid || input.hasFluid());
+        return input.heat >= this.heat && level.getRandom().nextFloat() <= this.chance && this.entityPredicate.matches(input.entity()) && (!this.requiresFluid || input.hasFluid());
     }
 
     @Override
@@ -54,7 +55,7 @@ public record EntityMeltingRecipe(
         return RecipeSetup.ENTITY_MELTING_TYPE.get();
     }
 
-    public record Input(EntityType<?> entity, boolean hasFluid) implements RecipeInput {
+    public record Input(EntityType<?> entity, boolean hasFluid, int heat) implements RecipeInput {
 
         @Override
         public ItemStack getItem(int pIndex) {

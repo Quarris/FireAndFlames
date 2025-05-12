@@ -21,6 +21,7 @@ public class BlockStateGen extends BlockStateProvider {
     protected void registerStatesAndModels() {
         this.simpleBlockWithItem(BlockSetup.FIRE_CLAY.get(), this.models().cubeAll("fire_clay", blockTexture(BlockSetup.FIRE_CLAY.get())));
         this.simpleBlockWithItem(BlockSetup.FIRE_BRICKS.get(), this.models().cubeAll("fire_bricks", blockTexture(BlockSetup.FIRE_BRICKS.get())));
+        this.simpleBlockWithItem(BlockSetup.CRUCIBLE_BURNER.get(), this.models().cubeAll("crucible_burner", blockTexture(BlockSetup.CRUCIBLE_BURNER.get())));
         this.simpleBlockWithItem(BlockSetup.CRUCIBLE_WINDOW.get(), this.models().cubeColumn("crucible_window", blockTexture(BlockSetup.CRUCIBLE_WINDOW.get()), blockTexture(BlockSetup.FIRE_BRICKS.get())).renderType(RenderType.cutout().name));
         this.simpleBlockWithItem(BlockSetup.CRUCIBLE_DRAIN.get(), this.models().cubeAll("crucible_drain", blockTexture(BlockSetup.CRUCIBLE_DRAIN.get())));
         this.simpleBlockWithItem(BlockSetup.CRUCIBLE_TANK.get(), this.models().cubeColumn("crucible_tank", blockTexture(BlockSetup.CRUCIBLE_TANK.get()), blockTexture(BlockSetup.FIRE_BRICKS.get())).renderType(RenderType.cutout().name));

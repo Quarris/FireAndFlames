@@ -32,6 +32,13 @@ public class BlockEntitySetup {
                 BlockSetup.CRUCIBLE_TANK.get()
             ).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrucibleBurnerBlockEntity>> CRUCIBLE_BURNER =
+        REGISTRY.register("crucible_burner",
+            () -> BlockEntityType.Builder.of(
+                CrucibleBurnerBlockEntity::new,
+                BlockSetup.CRUCIBLE_BURNER.get()
+            ).build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrucibleFawsitBlockEntity>> CRUCIBLE_FAWSIT =
         REGISTRY.register("crucible_fawsit",
             () -> BlockEntityType.Builder.of(

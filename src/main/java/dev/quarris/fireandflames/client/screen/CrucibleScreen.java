@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.client.screen;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.screen.components.CrucibleFluidTankComponent;
+import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,6 +22,8 @@ public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu>
     private static final ResourceLocation SLOT_SPRITE = ModRef.res("container/crucible/slot");
     private static final ResourceLocation SCROLLER_SPRITE = ModRef.res("container/crucible/scroller");
     private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ModRef.res("container/crucible/scroller_disabled");
+    private static final ResourceLocation TANK_MARKING_SPRITE = ModRef.res("container/crucible/tank_marking");
+    private static final ResourceLocation HEAT_BAR_SPRITE = ModRef.res("container/crucible/heat_bar");
 
     private CrucibleFluidTankComponent fluidTankComponent;
 
@@ -39,14 +42,29 @@ public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu>
     }
 
     @Override
-    protected void containerTick() {
-    }
-
-    @Override
     public void render(GuiGraphics pGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGraphics, pMouseX, pMouseY, pPartialTick);
         CrucibleControllerBlockEntity crucible = this.getMenu().crucible;
         this.fluidTankComponent.render(pGraphics, crucible.getLevel(), crucible.getBlockPos(), pMouseX, pMouseY, pPartialTick);
+
+        pGraphics.blitSprite(TANK_MARKING_SPRITE, this.leftPos + 8, this.topPos + 18, 48, 79);
+
+        int defaultHeat = ServerConfigs.getBaseTemperature();
+        int heat = this.menu.crucible.getHeat();
+        int clampedHeat = Math.clamp(heat, defaultHeat - 800, defaultHeat + 1600);
+        int pixelWidth = (int) Math.ceil(((clampedHeat - (defaultHeat - 800)) / 2400.0) * 48);
+
+        pGraphics.blitSprite(HEAT_BAR_SPRITE, 48, 6, 0, 0, this.leftPos + 8, this.topPos + 100, pixelWidth, 6);
+
+        if (pMouseX >= this.leftPos + 7 && pMouseX < this.leftPos + 57 && pMouseY >= this.topPos + 99 && pMouseY < this.topPos + 107) {
+            Component heatTooltip = Component.literal("Heat: " + crucible.getHeat());
+            if (!ServerConfigs.isHeatEnabled()) {
+                heatTooltip = Component.literal("AS HOT AS THE SUN");
+            }
+            pGraphics.renderTooltip(this.font, heatTooltip, pMouseX, pMouseY);
+        }
+
+        this.renderTooltip(pGraphics, pMouseX, pMouseY);
     }
 
     @Override
@@ -62,33 +80,6 @@ public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu>
         int scrollPos = (int) (this.getMenu().getScrollBarPosition() * (90 - 15)); // ... * (scrollBarHeight - scrollHeight)
 
         pGuiGraphics.blitSprite(scrollerSprite, this.leftPos + 156, this.topPos + 18 + scrollPos, 12, 15);
-        /*
-        SpriteContents contents = sprite.contents();
-        int drawX, drawY;
-        int drawWidth = (tankWidth / contents.width()) * contents.width();
-        int drawHeight = (tankHeight / contents.height()) * contents.height();
-        for (drawX = 0; drawX < drawWidth; drawX += contents.width()) {
-            for (drawY = 0; drawY < drawHeight; drawY += contents.height()) {
-                pGuiGraphics.blit(tankPosX + drawX, tankPosY + drawY, 0, contents.width(), contents.height(), sprite, red, green, blue, 1.0f);
-            }
-        }
-
-        if (drawWidth < tankWidth) {
-            for (drawY = 0; drawY < drawHeight; drawY += contents.height()) {
-                pGuiGraphics.blit(tankPosX + drawWidth, tankPosY + drawY, 0, tankWidth - drawWidth, contents.height(), sprite, red, green, blue, 1.0f);
-            }
-        }
-
-        if (drawHeight < tankHeight) {
-            for (drawX = 0; drawX < drawWidth; drawX += contents.width()) {
-                pGuiGraphics.blit(tankPosX + drawX, tankPosY + drawHeight, 0, contents.width(), tankHeight - drawHeight, sprite, red, green, blue, 1.0f);
-            }
-        }
-
-        if (drawHeight < tankHeight && drawWidth < tankWidth) {
-            pGuiGraphics.blit(tankPosX + drawWidth, tankPosY + drawHeight, 0, tankWidth - drawWidth, tankHeight - drawHeight, sprite, red, green, blue, 1.0f);
-        }
-        */
     }
 
     @Override

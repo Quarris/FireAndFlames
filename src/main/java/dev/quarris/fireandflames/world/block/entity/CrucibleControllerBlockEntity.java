@@ -1,6 +1,9 @@
 package dev.quarris.fireandflames.world.block.entity;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.config.ServerConfigs;
+import dev.quarris.fireandflames.setup.BlockEntitySetup;
+import dev.quarris.fireandflames.setup.CapabilitySetup;
 import dev.quarris.fireandflames.setup.DamageTypeSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
@@ -8,11 +11,13 @@ import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
 import dev.quarris.fireandflames.world.crucible.crafting.AlloyingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
-import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
-import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
+import dev.quarris.fireandflames.world.crucible.fuel.ActiveFuel;
+import dev.quarris.fireandflames.world.crucible.fuel.IFuelProvider;
+import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -32,31 +37,35 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class CrucibleControllerBlockEntity extends BlockEntity implements MenuProvider {
 
     public static final Component TITLE = Component.translatable("container.fireandflames.crucible.title");
 
-    private CrucibleStructure crucibleStructure;
 
-    private CrucibleFluidTank fluidTank;
+    private CrucibleStructure crucibleStructure;
+    private final CrucibleFluidTank fluidTank;
     private ItemStackHandler inventory;
     private CrucibleRecipe.Active[] activeRecipes;
 
-    private ContainerData dataAccess = new ContainerData() {
+    private final ContainerData recipeDataAccess = new ContainerData() {
         @Override
         public int get(int index) {
-            return CrucibleControllerBlockEntity.this.activeRecipes[index].getTicks();
+            return CrucibleControllerBlockEntity.this.activeRecipes[index].getProgressPercent();
         }
 
         @Override
@@ -70,11 +79,10 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         }
     };
 
-    // Crucible state
-    private int currentHeat = 0;
-    private int maxHeat = 800; // Base maximum heat level
-
-    // Fluid storage information will be added later
+    private final Lazy<List<BlockCapabilityCache<IFuelProvider, Direction>>> fuelProviders = Lazy.of(() -> this.getStructure().getFuelPositions().stream().map(pos -> BlockCapabilityCache.create(CapabilitySetup.FUEL_PROVIDER, ((ServerLevel) this.getLevel()), pos, null)).toList());
+    private final List<ActiveFuel> activeFuels = new ArrayList<>();
+    private int burnTicks;
+    private int heat;
 
     public CrucibleControllerBlockEntity(BlockPos pPos, BlockState pState) {
         super(BlockEntitySetup.CRUCIBLE_CONTROLLER.get(), pPos, pState);
@@ -117,26 +125,56 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             structure.markClean();
         }
 
+        // Fuel consumption
+        int baseTemp = getBaseBiomeTemperature(pLevel.getBiome(pPos).value(), pLevel.dimensionType().ultraWarm());
+        int maxHeat = pCrucible.burnTicks > 0 ? Math.max(pCrucible.heat, baseTemp) : baseTemp;
+
+        if (!ServerConfigs.isHeatEnabled()) {
+            maxHeat = Integer.MAX_VALUE; // Set the crucible to the heat of the sun if heat is disabled
+        }
+
+        if (pCrucible.burnTicks <= 0) {
+            pCrucible.activeFuels.clear();
+            var fuelProviders = pCrucible.fuelProviders.get().stream().map(BlockCapabilityCache::getCapability).filter(Objects::nonNull).toList();
+            int burnTicks = 0;
+            for (IFuelProvider fuelProvider : fuelProviders) {
+                ActiveFuel activeFuel = fuelProvider.burn(baseTemp, pCrucible.activeFuels::contains);
+                if (activeFuel.isEmpty()) continue;
+                burnTicks += activeFuel.burnValue();
+                int heat = activeFuel.heat();
+                if (heat > maxHeat) {
+                    maxHeat = heat;
+                }
+
+                pCrucible.activeFuels.add(activeFuel);
+            }
+
+            pCrucible.burnTicks = burnTicks;
+            pCrucible.setChanged();
+        }
+
+        if (pCrucible.heat != maxHeat) {
+            pCrucible.heat = maxHeat;
+            pCrucible.setChanged();
+        }
+
         // Smelting recipes
         ItemStackHandler inventory = pCrucible.getInventory();
         if (inventory.getSlots() > 0) {
             for (int slot = 0; slot < inventory.getSlots(); slot++) {
                 CrucibleRecipe.Active recipe = pCrucible.activeRecipes[slot];
-                if (recipe == null) {
-                    recipe = new CrucibleRecipe.Active();
-                    pCrucible.activeRecipes[slot] = recipe;
-                    pCrucible.setChanged();
-                }
+                if (recipe.updateWith(pLevel, new CrucibleRecipe.Input(inventory.getStackInSlot(slot), pCrucible.heat))) {
+                    pCrucible.burnTicks--;
 
-                recipe.updateWith(pLevel, inventory.getStackInSlot(slot));
-                if (recipe.isFinished()) {
-                    // If there is enough space to insert fluid
-                    FluidStack output = recipe.createOutput();
-                    // Only finalize the recipe if there is EXACTLY enough space for fluid.
-                    if (pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
-                        pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.EXECUTE);
-                        inventory.setStackInSlot(slot, recipe.createByproduct());
-                        recipe.reset();
+                    if (recipe.isFinished()) {
+                        // If there is enough space to insert fluid
+                        FluidStack output = recipe.createOutput();
+                        // Only finalize the recipe if there is enough space for the output fluid.
+                        if (pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.SIMULATE) == output.getAmount()) {
+                            pCrucible.getFluidTank().fill(output, IFluidHandler.FluidAction.EXECUTE);
+                            inventory.setStackInSlot(slot, recipe.createByproduct());
+                            recipe.reset();
+                        }
                     }
                 }
             }
@@ -147,18 +185,19 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             List<Entity> meltingEntities = pLevel.getEntities((Entity) null, structure.getInternalBounds(), e -> !(e instanceof ItemEntity));
             for (Entity entity : meltingEntities) {
                 if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
-                    EntityMeltingRecipe.Input recipeInput = new EntityMeltingRecipe.Input(entity.getType(), pCrucible.getFluidTank().getStored() > 0);
+                    EntityMeltingRecipe.Input recipeInput = new EntityMeltingRecipe.Input(entity.getType(), pCrucible.getFluidTank().getStored() > 0, pCrucible.heat);
                     pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
                         EntityMeltingRecipe recipe = recipeHolder.value();
                         pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
                     });
+                    pCrucible.burnTicks -= 10;
                 }
             }
         }
 
         // Alloying Recipes
         if (pCrucible.fluidTank.getTanks() > 1) {
-            AlloyingRecipe.Input recipeInput = new AlloyingRecipe.Input(pCrucible.fluidTank.getFluids());
+            AlloyingRecipe.Input recipeInput = new AlloyingRecipe.Input(pCrucible.fluidTank.getFluids(), pCrucible.heat);
             List<RecipeHolder<AlloyingRecipe>> recipes = pLevel.getRecipeManager().getRecipesFor(RecipeSetup.ALLOYING_TYPE.get(), recipeInput, pLevel);
             recipes.sort(Comparator.comparingInt(r -> r.value().ingredients().size()));
             if (!recipes.isEmpty()) {
@@ -173,15 +212,20 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                     for (FluidStack resultantAlloy : resultantAlloys) {
                         pCrucible.fluidTank.fill(resultantAlloy, IFluidHandler.FluidAction.EXECUTE);
                     }
+                    pCrucible.burnTicks -= 10;
                 }
             }
         }
-    }
 
+        pCrucible.setChanged();
+    }
 
 
     private void setInventoryWithSize(int size) {
         CrucibleRecipe.Active[] newRecipes = new CrucibleRecipe.Active[size];
+        for (int i = 0, len = newRecipes.length; i < len; i++)
+            newRecipes[i] = new CrucibleRecipe.Active();
+
         if (this.activeRecipes != null) {
             System.arraycopy(this.activeRecipes, 0, newRecipes, 0, Math.min(this.activeRecipes.length, size));
         }
@@ -223,9 +267,11 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         this.setInventoryWithSize(size);
         this.setTankSize(size * FluidType.BUCKET_VOLUME);
         if (this.getLevel() instanceof ServerLevel) {
+            this.fuelProviders.invalidate();
             this.getStructure().getDrainPositions().forEach(drainPos -> {
                 this.getLevel().getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(this.getBlockPos()));
             });
+
         }
         this.invalidateCapabilities();
         CrucibleStructure.ALL_CRUCIBLES.put(this.getBlockPos(), this.getStructure().getShape());
@@ -256,6 +302,14 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         return this.crucibleStructure;
     }
 
+    public List<ActiveFuel> getActiveFuels() {
+        return this.activeFuels;
+    }
+
+    public int getHeat() {
+        return this.heat;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag pTag, HolderLookup.Provider pRegistries) {
         super.saveAdditional(pTag, pRegistries);
@@ -277,9 +331,18 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             }
         }
 
+        ListTag activeFuels = new ListTag();
+        for (ActiveFuel fuel : this.activeFuels) {
+            if (fuel == null) continue;
+            activeFuels.add(fuel.saveTo(new CompoundTag(), pRegistries));
+        }
+
+        pTag.put("ActiveFuels", activeFuels);
         pTag.put("ActiveRecipes", activeRecipes);
         pTag.put("FluidTank", this.fluidTank.serializeNBT(pRegistries));
         pTag.put("Inventory", this.inventory.serializeNBT(pRegistries));
+        pTag.putInt("Heat", this.heat);
+        pTag.putInt("BurnTicks", this.burnTicks);
     }
 
     @Override
@@ -304,9 +367,18 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             this.activeRecipes[slot] = recipe;
         });
 
+        ListTag activeFuelsTag = pTag.getList("ActiveFuels", Tag.TAG_COMPOUND);
+        this.activeFuels.clear();
+        activeFuelsTag.stream().map(tag -> ((CompoundTag) tag)).forEach(fuelTag -> {
+            ActiveFuel fuel = ActiveFuel.load(fuelTag, pRegistries);
+            if (fuel == null) return;
+            this.activeFuels.add(fuel);
+        });
+
         this.inventory.deserializeNBT(pRegistries, pTag.getCompound("Inventory"));
         this.fluidTank.deserializeNBT(pRegistries, pTag.getCompound("FluidTank"));
-
+        this.heat = pTag.getInt("Heat");
+        this.burnTicks = pTag.getInt("BurnTicks");
     }
 
     @Override
@@ -328,6 +400,17 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInv, Player pPlayer) {
-        return new CrucibleMenu(pContainerId, pPlayerInv, this, this.dataAccess);
+        return new CrucibleMenu(pContainerId, pPlayerInv, this, this.recipeDataAccess);
+    }
+
+    public static int getBaseBiomeTemperature(Biome biome, boolean ultraWarm) {
+        if (!ServerConfigs.useBiomeTemperature()) return 0;
+
+        double baseTemp = biome.getBaseTemperature() * ServerConfigs.getBaseTemperature();
+        if (ultraWarm) {
+            baseTemp *= ServerConfigs.getUltraWarmModifier();
+        }
+
+        return (int) Math.floor(baseTemp);
     }
 }

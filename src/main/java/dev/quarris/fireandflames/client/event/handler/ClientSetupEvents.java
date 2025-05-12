@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.client.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.renderer.blockentity.*;
+import dev.quarris.fireandflames.client.screen.CrucibleBurnerScreen;
 import dev.quarris.fireandflames.client.screen.CrucibleScreen;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.FluidSetup;
@@ -38,6 +39,7 @@ public class ClientSetupEvents {
     @SubscribeEvent
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(MenuSetup.CRUCIBLE.get(), CrucibleScreen::new);
+        event.register(MenuSetup.CRUCIBLE_BURNER.get(), CrucibleBurnerScreen::new);
     }
 
     @SubscribeEvent

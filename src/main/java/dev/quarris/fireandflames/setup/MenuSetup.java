@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.world.inventory.menu.CrucibleBurnerMenu;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -14,6 +15,7 @@ public class MenuSetup {
     public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(Registries.MENU, ModRef.ID);
 
     public static final Supplier<MenuType<CrucibleMenu>> CRUCIBLE = REGISTRY.register("crucible", () -> IMenuTypeExtension.create(CrucibleMenu::new));
+    public static final Supplier<MenuType<CrucibleBurnerMenu>> CRUCIBLE_BURNER = REGISTRY.register("crucible_burner", () -> IMenuTypeExtension.create(CrucibleBurnerMenu::new));
 
     public static void init(IEventBus modBus) {
         REGISTRY.register(modBus);

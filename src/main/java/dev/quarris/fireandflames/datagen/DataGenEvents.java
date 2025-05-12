@@ -6,11 +6,9 @@ import dev.quarris.fireandflames.datagen.client.EnUsLanguageGen;
 import dev.quarris.fireandflames.datagen.client.ItemModelGen;
 import dev.quarris.fireandflames.datagen.server.*;
 import dev.quarris.fireandflames.datagen.server.loot.BlockLoot;
-import dev.quarris.ppfluids.datagen.server.LootTableGen;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -50,6 +48,8 @@ public class DataGenEvents {
         gen.addProvider(event.includeServer(), (DataProvider.Factory<LootTableProvider>) output -> new LootTableProvider(output, Set.of(), List.of(
             new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
         ), lookup));
+
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<DataMapGen>) (packOutput -> new DataMapGen(packOutput, lookup)));
     }
 
 }

@@ -18,7 +18,8 @@ public class CrucibleRecipeSerializer implements RecipeSerializer<CrucibleRecipe
         Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(CrucibleRecipe::ingredient),
         ItemStack.SINGLE_ITEM_CODEC.optionalFieldOf("byproduct", ItemStack.EMPTY).forGetter(CrucibleRecipe::byproduct),
         IFluidOutput.CODEC.fieldOf("result").forGetter(CrucibleRecipe::result),
-        Codec.INT.fieldOf("smelting_time").orElse(200).forGetter(CrucibleRecipe::smeltingTime)
+        Codec.INT.fieldOf("smelting_time").orElse(200).forGetter(CrucibleRecipe::smeltingTime),
+        Codec.INT.fieldOf("heat").orElse(800).forGetter(CrucibleRecipe::heat)
     ).apply(instance, CrucibleRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CrucibleRecipe> STREAM_CODEC = StreamCodec.composite(
@@ -27,6 +28,7 @@ public class CrucibleRecipeSerializer implements RecipeSerializer<CrucibleRecipe
         ItemStack.OPTIONAL_STREAM_CODEC, CrucibleRecipe::byproduct,
         IFluidOutput.STREAM_CODEC, CrucibleRecipe::result,
         ByteBufCodecs.INT, CrucibleRecipe::smeltingTime,
+        ByteBufCodecs.INT, CrucibleRecipe::heat,
         CrucibleRecipe::new
     );
 

@@ -16,11 +16,14 @@ import java.util.List;
 
 public record AlloyingRecipe(
     List<FluidInput> ingredients,
-    List<IFluidOutput> results
+    List<IFluidOutput> results,
+    int heat
 ) implements Recipe<AlloyingRecipe.Input> {
 
     @Override
     public boolean matches(Input recipeInput, Level level) {
+        if (recipeInput.heat < this.heat) return false;
+
         List<FluidStack> inputs = recipeInput.inputs().stream().map(FluidStack::copy).toList();
 
         for (FluidInput ingredient : this.ingredients) {
@@ -71,7 +74,7 @@ public record AlloyingRecipe(
         return RecipeSetup.ALLOYING_TYPE.get();
     }
 
-    public record Input(List<FluidStack> inputs) implements RecipeInput {
+    public record Input(List<FluidStack> inputs, int heat) implements RecipeInput {
 
         @Override
         public ItemStack getItem(int index) {

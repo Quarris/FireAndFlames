@@ -22,6 +22,7 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
 
     private boolean requiresFluid = true;
     private float chance = 1.0f;
+    private int heat = 800;
 
     private EntityMeltingRecipeBuilder(
         EntityTypePredicate entityPredicate,
@@ -64,6 +65,11 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public EntityMeltingRecipeBuilder heat(int heat) {
+        this.heat = heat;
+        return this;
+    }
+
     public FluidStack getFluidResult() {
         return this.result.createFluid();
     }
@@ -95,7 +101,7 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-        EntityMeltingRecipe recipe = new EntityMeltingRecipe(this.entityPredicate, this.requiresFluid, this.result, this.chance);
+        EntityMeltingRecipe recipe = new EntityMeltingRecipe(this.entityPredicate, this.requiresFluid, this.result, this.chance, this.heat);
         recipeOutput.accept(id, recipe, null);
     }
 

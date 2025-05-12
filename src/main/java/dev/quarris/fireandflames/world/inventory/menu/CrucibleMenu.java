@@ -1,11 +1,9 @@
 package dev.quarris.fireandflames.world.inventory.menu;
 
-import dev.quarris.fireandflames.client.screen.components.CrucibleFluidTankComponent;
 import dev.quarris.fireandflames.network.payload.CrucibleScrollC2SPayload;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -138,9 +136,6 @@ public class CrucibleMenu extends AbstractContainerMenu {
         }
 
         this.crucible.getFluidTank().setFirst(slot);
-        if (!this.crucible.getLevel().isClientSide()) {
-        }
-
         return true;
     }
 }

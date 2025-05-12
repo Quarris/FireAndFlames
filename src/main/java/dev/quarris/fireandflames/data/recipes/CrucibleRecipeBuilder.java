@@ -23,6 +23,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
 
     private ItemStack byproduct = ItemStack.EMPTY;
     private String group = "";
+    private int heat = 800;
 
     private CrucibleRecipeBuilder(
         Ingredient ingredient,
@@ -64,6 +65,11 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
+    public CrucibleRecipeBuilder heat(int heat) {
+        this.heat = heat;
+        return this;
+    }
+
     public CrucibleRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
         return this;
     }
@@ -94,7 +100,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-        CrucibleRecipe recipe = new CrucibleRecipe(this.group, this.ingredient, this.byproduct, this.result, this.smeltingTime);
+        CrucibleRecipe recipe = new CrucibleRecipe(this.group, this.ingredient, this.byproduct, this.result, this.smeltingTime, this.heat);
         recipeOutput.accept(id, recipe, null);
     }
 

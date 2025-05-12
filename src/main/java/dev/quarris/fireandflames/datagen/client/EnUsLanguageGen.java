@@ -26,6 +26,7 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addBlock(BlockSetup.CRUCIBLE_WINDOW, "Crucible Window");
         this.addBlock(BlockSetup.CRUCIBLE_DRAIN, "Crucible Drain");
         this.addBlock(BlockSetup.CRUCIBLE_TANK, "Crucible Fuel Tank");
+        this.addBlock(BlockSetup.CRUCIBLE_BURNER, "Crucible Fuel Burner");
         this.addBlock(BlockSetup.CRUCIBLE_FAWSIT, "Crucible Fawsit (Faucet)");
         this.addBlock(BlockSetup.CASTING_BASIN, "Casting Basin");
         this.addBlock(BlockSetup.CASTING_TABLE, "Casting Table");
@@ -35,6 +36,7 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add(TagSetup.FluidTags.MOLTEN_IRON, "Molten Iron");
 
         this.add("container.fireandflames.crucible.title", "Crucible");
+        this.add("container.fireandflames.crucible_burner.title", "Crucible Fuel Burner");
         this.add("container.fireandflames.crucible.fluid_tank.empty", "Empty");
         this.add("container.fireandflames.fluid_storage.fluid_amount", "%s - %s mb");
         this.add("container.fireandflames.fluid_storage.more", "and %s more...");

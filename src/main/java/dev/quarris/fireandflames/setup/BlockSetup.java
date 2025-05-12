@@ -69,6 +69,14 @@ public class BlockSetup {
             .isViewBlocking(((state, level, pos) -> false)),
         () -> new Item.Properties().component(DataComponentSetup.FLUID_CONTAINER, FluidContainerContents.EMPTY));
 
+    public static final DeferredBlock<CrucibleBurnerBlock> CRUCIBLE_BURNER = registerBlock("crucible_burner", CrucibleBurnerBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.STONE),
+        new Item.Properties());
+
     public static final DeferredBlock<CrucibleFawsitBlock> CRUCIBLE_FAWSIT = registerBlock("crucible_faucet", CrucibleFawsitBlock::new,
         BlockBehaviour.Properties.of()
             .forceSolidOn()

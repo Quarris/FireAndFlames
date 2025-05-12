@@ -20,6 +20,7 @@ public class AlloyingRecipeBuilder implements RecipeBuilder {
 
     private final List<IFluidOutput> results;
     private List<FluidInput> ingredients;
+    private int heat = 800;
 
     public AlloyingRecipeBuilder(List<IFluidOutput> results) {
         this.results = results;
@@ -33,6 +34,11 @@ public class AlloyingRecipeBuilder implements RecipeBuilder {
 
     public AlloyingRecipeBuilder requires(FluidInput ingredient) {
         this.ingredients.add(ingredient);
+        return this;
+    }
+
+    public AlloyingRecipeBuilder heat(int heat) {
+        this.heat = heat;
         return this;
     }
 
@@ -67,7 +73,7 @@ public class AlloyingRecipeBuilder implements RecipeBuilder {
             throw new IllegalStateException("Invalid alloying recipe: " + id + ". Alloys require at least 2 inputs.");
         }
 
-        recipeOutput.accept(id, new AlloyingRecipe(this.ingredients, this.results), null);
+        recipeOutput.accept(id, new AlloyingRecipe(this.ingredients, this.results, this.heat), null);
     }
 
     static ResourceLocation getDefaultRecipeId(FluidStack result) {

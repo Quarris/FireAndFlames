@@ -169,6 +169,16 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
             .save(pOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_BURNER.get())
+            .pattern("BBB")
+            .pattern("BFB")
+            .pattern("BBB")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .define('F', Items.FLINT)
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .unlockedBy("has_flint", has(Items.FLINT))
+            .save(pOutput);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_FAWSIT.get())
             .pattern("B B")
             .pattern(" B ")

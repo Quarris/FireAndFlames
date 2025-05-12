@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.BlockSetup;
+import dev.quarris.fireandflames.setup.CapabilitySetup;
 import dev.quarris.fireandflames.setup.TagSetup;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
-import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -26,19 +26,20 @@ public class CrucibleStructure {
     public static final Codec<CrucibleStructure> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         BlockPos.CODEC.fieldOf("controller_position").forGetter(CrucibleStructure::getControllerPosition),
         BlockPos.CODEC.listOf().fieldOf("drain_positions").forGetter(CrucibleStructure::getDrainPositions),
+        BlockPos.CODEC.listOf().fieldOf("fuel_positions").forGetter(CrucibleStructure::getFuelPositions),
         CrucibleShape.CODEC.fieldOf("shape").forGetter(CrucibleStructure::getShape),
         Codec.BOOL.fieldOf("invalid").forGetter(CrucibleStructure::isInvalid),
         Codec.BOOL.fieldOf("dirty").forGetter(CrucibleStructure::isDirty)
     ).apply(instance, CrucibleStructure::new));
 
-    private static final int MAX_SIZE = 23; // Maximum width/depth
-
     private final BlockPos controllerPosition;
     private final List<BlockPos> drainPositions = Lists.newArrayList();
+    private final List<BlockPos> fuelPositions = Lists.newArrayList();
     private CrucibleShape shape;
     private boolean invalid;
     private boolean dirty;
 
+    private boolean validating;
     private List<BlockPos> baseSides;
     private AABB internalBounds;
 
@@ -46,14 +47,15 @@ public class CrucibleStructure {
         return formCrucibleStructure(level, controllerPosition);
     }
 
-    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, CrucibleShape shape) {
+    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, List<BlockPos> fuelPositions, CrucibleShape shape) {
         this.controllerPosition = controllerPosition;
         this.shape = shape;
         this.drainPositions.addAll(drainPositions);
+        this.fuelPositions.addAll(fuelPositions);
     }
 
-    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, CrucibleShape shape, boolean dirty, boolean invalid) {
-        this(controllerPosition, drainPositions, shape);
+    private CrucibleStructure(BlockPos controllerPosition, List<BlockPos> drainPositions, List<BlockPos> fuelPositions, CrucibleShape shape, boolean dirty, boolean invalid) {
+        this(controllerPosition, drainPositions, fuelPositions, shape);
         this.dirty = dirty;
         this.invalid = invalid;
     }
@@ -65,26 +67,46 @@ public class CrucibleStructure {
             int drainHeight = drainPos.getY() - this.shape.position.getY();
             return drainHeight >= changeHeight;
         });
-        int newHeight = validateLayersFrom(drains, pLevel, this.controllerPosition, this.getBaseSides(), this.shape, changeHeight);
+
+        List<BlockPos> fuelProviders = this.getFuelPositions();
+        fuelProviders.removeIf(fuelPos -> {
+            int fuelProviderHeight = fuelPos.getY() - this.shape.position.getY();
+            return fuelProviderHeight >= changeHeight;
+        });
+
+        int newHeight = validateLayersFrom(drains, fuelProviders, pLevel, this.controllerPosition, this.getBaseSides(), this.shape, changeHeight);
         if (newHeight != this.shape.height) {
             if (newHeight < 2) {
                 this.invalid = true;
                 return;
             }
 
+            this.validating = true;
             for (BlockPos drainPos : this.drainPositions) {
                 pLevel.getBlockEntity(drainPos, BlockEntitySetup.CRUCIBLE_DRAIN.get()).ifPresent(drain -> drain.setCruciblePosition(null));
             }
 
             this.drainPositions.clear();
             this.drainPositions.addAll(drains);
+
+            this.fuelPositions.clear();
+            this.fuelPositions.addAll(fuelProviders);
             this.shape = this.shape.withHeight(newHeight);
             this.dirty = true;
+            this.validating = false;
         }
     }
 
     public List<BlockPos> getDrainPositions() {
         return Lists.newArrayList(this.drainPositions);
+    }
+
+    public List<BlockPos> getFuelPositions() {
+        return Lists.newArrayList(this.fuelPositions);
+    }
+
+    public boolean isValidating() {
+        return this.validating;
     }
 
     public int getInternalVolume() {
@@ -124,13 +146,14 @@ public class CrucibleStructure {
         // For each wall position, go up until any of the blocks are no longer crucible blocks
         // That indicates the height of the structure
         List<BlockPos> drains = new ArrayList<>();
-        int height = validateLayersFrom(drains, level, controllerPosition, wallPositions, calculatedShape, 0);
+        List<BlockPos> fuelProviders = new ArrayList<>();
+        int height = validateLayersFrom(drains, fuelProviders, level, controllerPosition, wallPositions, calculatedShape, 0);
         if (height < 2) {
             return null;
         }
 
         calculatedShape = calculatedShape.withHeight(height);
-        return new CrucibleStructure(controllerPosition, drains, calculatedShape);
+        return new CrucibleStructure(controllerPosition, drains, fuelProviders, calculatedShape);
     }
 
     /**
@@ -140,7 +163,7 @@ public class CrucibleStructure {
      * @param startHeight the height at which to start validating from.
      * @return the height at which the structure was validated at.
      */
-    private static int validateLayersFrom(List<BlockPos> outputDrainPositions, Level level, BlockPos controllerPosition, List<BlockPos> baseSides, CrucibleShape shape, int startHeight) {
+    private static int validateLayersFrom(List<BlockPos> outputDrainPositions, List<BlockPos> outputFuelPositions, Level level, BlockPos controllerPosition, List<BlockPos> baseSides, CrucibleShape shape, int startHeight) {
         int height = startHeight;
 
         // Validate floor
@@ -173,6 +196,7 @@ public class CrucibleStructure {
             // Check wall positions
             boolean foundControllerInLayer = false;
             List<BlockPos> drainPositionsInLayer = new ArrayList<>();
+            List<BlockPos> fuelProviderPositionsInLayer = new ArrayList<>();
             for (BlockPos baseWallPos : baseSides) {
                 BlockPos wallPos = baseWallPos.above(height);
                 BlockState state = level.getBlockState(wallPos);
@@ -197,11 +221,16 @@ public class CrucibleStructure {
                 if (!isValidCrucibleBlock(level, wallPos)) {
                     break heightCheck;
                 }
+
+                if (level.getCapability(CapabilitySetup.FUEL_PROVIDER, wallPos, null) != null) {
+                    fuelProviderPositionsInLayer.add(wallPos);
+                }
             }
 
             // Successfully validated the layer.
             height++;
             outputDrainPositions.addAll(drainPositionsInLayer);
+            outputFuelPositions.addAll(fuelProviderPositionsInLayer);
             if (foundControllerInLayer) {
                 foundController = true;
             }
@@ -257,7 +286,7 @@ public class CrucibleStructure {
 
         // Search back of the controller until reaching a valid crucible block.
         boolean invalidSize = true;
-        for (int i = 0; i < MAX_SIZE - 2; i++) {
+        for (int i = 0; i < ServerConfigs.getCrucibleSize() - 2; i++) {
             BlockPos checkPos = searchPos.relative(back, i);
             BlockState state = level.getBlockState(checkPos);
 
@@ -278,7 +307,7 @@ public class CrucibleStructure {
 
         invalidSize = true;
         // Search the internal air spaces left of the controller until reaching a valid crucible block
-        for (int i = 0; i < MAX_SIZE; i++) {
+        for (int i = 0; i < ServerConfigs.getCrucibleSize(); i++) {
             BlockPos checkPos = searchPos.relative(left, i);
             if (isValidCrucibleBlock(level, checkPos)) {
                 structurePos.set(Math.min(structurePos.getX(), checkPos.getX()), structurePos.getY(), Math.min(structurePos.getZ(), checkPos.getZ()));
@@ -297,7 +326,7 @@ public class CrucibleStructure {
         // Search the internal air spaces right of the controller until reaching a valid crucible block
 
         invalidSize = true;
-        for (int i = 0; i < MAX_SIZE; i++) {
+        for (int i = 0; i < ServerConfigs.getCrucibleSize(); i++) {
             BlockPos checkPos = searchPos.relative(right, i);
             if (isValidCrucibleBlock(level, checkPos)) {
                 structurePos.set(Math.min(structurePos.getX(), checkPos.getX()), structurePos.getY(), Math.min(structurePos.getZ(), checkPos.getZ()));
@@ -318,7 +347,7 @@ public class CrucibleStructure {
         int depth = maxPos.getZ() - structurePos.getZ() + 1;
 
         // Internal width must be within valid range
-        if (width < 3 || width > MAX_SIZE || depth < 3 || depth > MAX_SIZE) { // Minimum 3x3 (1x1 internal)
+        if (width < 3 || width > ServerConfigs.getCrucibleSize() || depth < 3 || depth > ServerConfigs.getCrucibleSize()) { // Minimum 3x3 (1x1 internal)
             return null;
         }
 

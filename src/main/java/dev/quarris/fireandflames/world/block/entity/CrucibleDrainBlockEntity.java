@@ -29,7 +29,7 @@ public class CrucibleDrainBlockEntity extends BlockEntity {
         this.setChanged();
         if (this.getLevel() != null) {
             this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 0);
-            //this.getLevel().updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
+            this.getLevel().updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         }
     }
 

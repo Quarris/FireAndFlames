@@ -34,8 +34,6 @@ import java.util.List;
 
 public abstract class FluidStorageBlock extends BaseEntityBlock {
 
-    public static final ResourceLocation CONTENTS = ModRef.res("fluid_contents");
-
     public FluidStorageBlock(Properties properties) {
         super(properties);
     }

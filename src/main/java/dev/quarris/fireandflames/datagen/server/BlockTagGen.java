@@ -27,7 +27,8 @@ public class BlockTagGen extends BlockTagsProvider {
         this.tag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS).add(
             BlockSetup.FIRE_BRICKS.get(),
             BlockSetup.CRUCIBLE_WINDOW.get(),
-            BlockSetup.CRUCIBLE_TANK.get()
+            BlockSetup.CRUCIBLE_TANK.get(),
+            BlockSetup.CRUCIBLE_BURNER.get()
         );
 
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
