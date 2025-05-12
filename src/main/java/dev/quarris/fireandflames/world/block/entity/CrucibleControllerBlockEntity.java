@@ -41,14 +41,12 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
 
@@ -151,6 +149,21 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
             pCrucible.burnTicks = burnTicks;
             pCrucible.setChanged();
+        } else {
+            // If we are already burning fuel, continue to check for fuels that have a higher temperature value
+            baseTemp = maxHeat;
+            var fuelProviders = pCrucible.fuelProviders.get().stream().map(BlockCapabilityCache::getCapability).filter(Objects::nonNull).toList();
+            for (IFuelProvider fuelProvider : fuelProviders) {
+                ActiveFuel activeFuel = fuelProvider.burn(baseTemp + 1, pCrucible.activeFuels::contains);
+                if (activeFuel.isEmpty()) continue;
+                pCrucible.burnTicks += activeFuel.burnValue();
+                int heat = activeFuel.heat();
+                if (heat > maxHeat) {
+                    maxHeat = heat;
+                }
+
+                pCrucible.activeFuels.add(activeFuel);
+            }
         }
 
         if (pCrucible.heat != maxHeat) {

@@ -33,7 +33,7 @@ public class FluidHandlerFuelWrapper extends AbstractFuelProvider {
     }
 
     @Override
-    public ActiveFuel burn(int baseTemp, IFuelConflictChecker checker) {
+    public ActiveFuel burn(int minTemperature, IFuelConflictChecker checker) {
         if (this.invalid()) return ActiveFuel.EMPTY;
 
         FluidStack toDrain = FluidStack.EMPTY;
@@ -47,7 +47,7 @@ public class FluidHandlerFuelWrapper extends AbstractFuelProvider {
             Optional<Integer> fluidHeat = getFluidHeat(drained);
             if (fluidHeat.isEmpty()) continue;
             int temperature = fluidHeat.get();
-            if (ServerConfigs.isHeatEnabled() && temperature < baseTemp) continue;
+            if (ServerConfigs.isHeatEnabled() && temperature < minTemperature) continue;
 
             if (temperature > maxHeat) {
                 maxHeat = temperature;
