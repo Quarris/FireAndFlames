@@ -13,7 +13,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,7 +29,8 @@ public class CastingRecipeBuilder implements RecipeBuilder {
 
     private int coolingTime = 100;
     private Ingredient itemInput = Ingredient.EMPTY;
-    private boolean consumesItem;
+    private boolean consumesInput;
+    private boolean moveItem;
 
     private CastingRecipeBuilder(RecipeType<?> type, FluidInput fluidInput, IItemOutput result) {
         this.type = type;
@@ -39,15 +39,15 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     }
 
     public static CastingRecipeBuilder basin(FluidIngredient fluid, int amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesItem(true);
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesInput(true);
     }
 
     public static CastingRecipeBuilder basin(FluidIngredient fluid, INumberProvider amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesItem(true);
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesInput(true);
     }
 
     public static CastingRecipeBuilder basin(FluidStack fluid, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result).consumesItem(true);
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result).consumesInput(true);
     }
 
     public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, IItemOutput result) {
@@ -72,8 +72,13 @@ public class CastingRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
-    public CastingRecipeBuilder consumesItem(boolean consumesItem) {
-        this.consumesItem = consumesItem;
+    public CastingRecipeBuilder consumesInput(boolean consumesInput) {
+        this.consumesInput = consumesInput;
+        return this;
+    }
+
+    public CastingRecipeBuilder moveItem(boolean moveItem) {
+        this.moveItem = moveItem;
         return this;
     }
 
@@ -106,11 +111,11 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
         CastingRecipe recipe = null;
         if (this.type == RecipeSetup.BASIN_CASTING_TYPE.get()) {
-            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
+            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesInput, this.moveItem);
         }
 
         if (this.type == RecipeSetup.TABLE_CASTING_TYPE.get()) {
-            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesItem);
+            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesInput, this.moveItem);
         }
 
         if (recipe != null) {

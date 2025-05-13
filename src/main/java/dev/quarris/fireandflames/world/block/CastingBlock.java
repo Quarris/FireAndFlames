@@ -31,7 +31,7 @@ public abstract class CastingBlock extends BaseEntityBlock {
         }
 
         return pLevel.getBlockEntity(pPos, this.getBlockEntityType()).map(castingBlock -> {
-            int slot = castingBlock.getSlotWithItem();
+            int slot = castingBlock.getSlotToTakeFrom();
 
             if (slot == -1) {
                 return InteractionResult.PASS;

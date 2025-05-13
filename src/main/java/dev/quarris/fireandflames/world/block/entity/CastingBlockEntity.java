@@ -146,17 +146,23 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         pBasin.coolingTicks++;
         pBasin.setChanged();
         if (pBasin.coolingTicks >= recipe.coolingTime) {
-            if (recipe.consumesItem()) {
+            if (recipe.consumesInput()) {
                 pBasin.getInventory().setStackInSlot(0, ItemStack.EMPTY);
             }
+            int outputSlot = recipe.shouldMoveItem() ? 0 : 1;
 
-            pBasin.getInventory().setStackInSlot(1, recipe.getOutput().createItemStack());
+            if (recipe.shouldMoveItem()) {
+                pBasin.getInventory().setStackInSlot(1, pBasin.getInventory().getStackInSlot(0).copy());
+            }
+            pBasin.getInventory().setStackInSlot(outputSlot, recipe.getOutput().createItemStack());
             pBasin.tank.setFluid(FluidStack.EMPTY);
             pBasin.recipe = null;
         }
     }
 
-    public int getSlotWithItem() {
+    public int getSlotToTakeFrom() {
+        if (!this.tank.isEmpty()) return -1;
+
         if (!this.getInventory().getStackInSlot(1).isEmpty()) {
             return 1;
         }

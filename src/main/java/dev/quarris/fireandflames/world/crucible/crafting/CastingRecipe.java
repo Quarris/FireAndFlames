@@ -15,16 +15,16 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
     public final FluidInput fluidInput;
     public final Ingredient itemInput;
     public final int coolingTime;
-    private final boolean consumeItem;
-    // private final boolean copyData; ?
+    private final boolean consumeInput;
+    private final boolean moveItem;
 
-    protected CastingRecipe(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem/*, boolean copyData*/) {
+    protected CastingRecipe(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeInput, boolean moveItem) {
         this.result = result;
         this.fluidInput = fluidInput;
         this.itemInput = itemInput;
         this.coolingTime = coolingTime;
-        this.consumeItem = consumeItem;
-        // this.copyData = copyData;
+        this.consumeInput = consumeInput;
+        this.moveItem = moveItem;
     }
 
     @Override
@@ -68,8 +68,12 @@ public abstract class CastingRecipe implements Recipe<CastingRecipe.Input> {
         return this.coolingTime;
     }
 
-    public boolean consumesItem() {
-        return this.consumeItem;
+    public boolean consumesInput() {
+        return this.consumeInput;
+    }
+
+    public boolean shouldMoveItem() {
+        return this.moveItem;
     }
 
     @Override

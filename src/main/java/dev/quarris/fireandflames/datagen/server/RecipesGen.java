@@ -80,13 +80,13 @@ public class RecipesGen extends RecipeProvider {
     private static void castingRecipes(RecipeOutput pOutput) {
         CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_GOLD), new MultiplyNumber(new ConstantNumber(2), ConfigNumber.ConfigValue.INGOT_MB.toProvider()), new IItemOutput.Stack(ItemSetup.INGOT_CAST.get()))
             .withItemInput(Ingredient.of(Tags.Items.INGOTS))
-            .consumesItem(true)
+            .moveItem(true)
             .coolingTime(240)
             .saveFnf(pOutput);
 
         CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_GOLD), new MultiplyNumber(new ConstantNumber(2), ConfigNumber.ConfigValue.INGOT_MB.toProvider()), new IItemOutput.Stack(ItemSetup.NUGGET_CAST.get()))
             .withItemInput(Ingredient.of(Tags.Items.NUGGETS))
-            .consumesItem(true)
+            .moveItem(true)
             .coolingTime(240)
             .saveFnf(pOutput);
     }

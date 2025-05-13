@@ -10,8 +10,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 public class TableCastingRecipe extends CastingRecipe {
 
-    public TableCastingRecipe(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem) {
-        super(result, fluidInput, itemInput, coolingTime, consumeItem);
+    public TableCastingRecipe(IItemOutput result, FluidInput fluidInput, Ingredient itemInput, int coolingTime, boolean consumeItem, boolean moveItem) {
+        super(result, fluidInput, itemInput, coolingTime, consumeItem, moveItem);
     }
 
     @Override
