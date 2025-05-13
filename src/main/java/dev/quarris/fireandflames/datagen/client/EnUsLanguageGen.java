@@ -19,6 +19,8 @@ public class EnUsLanguageGen extends LanguageProvider {
     protected void addTranslations() {
         this.addItem(ItemSetup.FIRE_CLAY_BALL, "Fire Clay Ball");
         this.addItem(ItemSetup.FIRE_BRICK, "Fire Brick");
+        this.addItem(ItemSetup.INGOT_CAST, "Ingot Cast");
+        this.addItem(ItemSetup.NUGGET_CAST, "Nugget Cast");
 
         this.addBlock(BlockSetup.FIRE_CLAY, "Fire Clay");
         this.addBlock(BlockSetup.FIRE_BRICKS, "Fire Bricks");

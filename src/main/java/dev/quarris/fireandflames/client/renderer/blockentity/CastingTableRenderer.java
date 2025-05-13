@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.quarris.fireandflames.client.util.FluidRenderer;
+import dev.quarris.fireandflames.setup.ItemSetup;
 import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CastingTableBlockEntity;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
@@ -56,11 +57,14 @@ public class CastingTableRenderer implements BlockEntityRenderer<CastingTableBlo
 
         int slots = pTable.getInventory().getSlots();
         for (int slot = 0; slot < slots; slot++) {
+            ItemStack stack = pTable.getInventory().getStackInSlot(slot);
             pPoseStack.pushPose();
             pPoseStack.translate(0.5, 15/16f + (1/16f) * (10/16f) / 2, 0.5);
+            if (slot == 1 || stack.is(ItemSetup.NUGGET_CAST) || stack.is(ItemSetup.INGOT_CAST)) {
+                pPoseStack.translate(0, 0.001, 0);
+            }
             pPoseStack.scale(10/16f, 10/16f, 10/16f);
             pPoseStack.rotateAround(Axis.XP.rotationDegrees(90), 0, 0, 0);
-            ItemStack stack = pTable.getInventory().getStackInSlot(slot);
             itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, pLight, pOverlay, pPoseStack, pBufferSource, pTable.getLevel(), 0);
             pPoseStack.popPose();
         }

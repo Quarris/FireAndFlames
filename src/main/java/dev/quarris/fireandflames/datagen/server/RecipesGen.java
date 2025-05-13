@@ -58,11 +58,11 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void metalRecipes(RecipeOutput output) {
-        metalRecipe(output, "iron", TagSetup.FluidTags.MOLTEN_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON, Tags.Items.RAW_MATERIALS_IRON, Tags.Items.STORAGE_BLOCKS_IRON, Tags.Items.INGOTS_IRON);
-        metalRecipe(output, "gold", TagSetup.FluidTags.MOLTEN_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD, Tags.Items.INGOTS_GOLD);
-        metalRecipe(output, "copper", TagSetup.FluidTags.MOLTEN_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER, Tags.Items.INGOTS_COPPER);
-        metalRecipe(output, "ancient_debris", TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, null, Tags.Items.ORES_NETHERITE_SCRAP, null, null);
-        metalRecipe(output, "netherite", TagSetup.FluidTags.MOLTEN_NETHERITE, null, null, Tags.Items.STORAGE_BLOCKS_NETHERITE, Tags.Items.INGOTS_NETHERITE);
+        metalRecipe(output, "iron", TagSetup.FluidTags.MOLTEN_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON, Tags.Items.RAW_MATERIALS_IRON, Tags.Items.STORAGE_BLOCKS_IRON, Tags.Items.INGOTS_IRON, Tags.Items.NUGGETS_IRON);
+        metalRecipe(output, "gold", TagSetup.FluidTags.MOLTEN_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD, Tags.Items.INGOTS_GOLD, Tags.Items.NUGGETS_GOLD);
+        metalRecipe(output, "copper", TagSetup.FluidTags.MOLTEN_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER, Tags.Items.INGOTS_COPPER, null);
+        metalRecipe(output, "ancient_debris", TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, null, Tags.Items.ORES_NETHERITE_SCRAP, null, null, null);
+        metalRecipe(output, "netherite", TagSetup.FluidTags.MOLTEN_NETHERITE, null, null, Tags.Items.STORAGE_BLOCKS_NETHERITE, Tags.Items.INGOTS_NETHERITE, null);
     }
 
     private static void alloyingRecipes(RecipeOutput pOutput) {
@@ -78,14 +78,17 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
-        CastingRecipeBuilder.table(new FluidStack(Fluids.WATER, 50), new IItemOutput.Stack(Items.BREAD))
-            .withItemInput(Ingredient.of(Items.WHEAT))
-            .coolingTime(40)
-            .save(pOutput, ModRef.res("casting/table/bread_from_water_and_wheat"));
+        CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_GOLD), new MultiplyNumber(new ConstantNumber(2), ConfigNumber.ConfigValue.INGOT_MB.toProvider()), new IItemOutput.Stack(ItemSetup.INGOT_CAST.get()))
+            .withItemInput(Ingredient.of(Tags.Items.INGOTS))
+            .consumesItem(true)
+            .coolingTime(240)
+            .saveFnf(pOutput);
 
-        CastingRecipeBuilder.table(new FluidStack(Fluids.LAVA, 100), new IItemOutput.Stack(Items.REDSTONE))
-            .coolingTime(40)
-            .save(pOutput, ModRef.res("casting/table/redstone_from_lava"));
+        CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_GOLD), new MultiplyNumber(new ConstantNumber(2), ConfigNumber.ConfigValue.INGOT_MB.toProvider()), new IItemOutput.Stack(ItemSetup.NUGGET_CAST.get()))
+            .withItemInput(Ingredient.of(Tags.Items.NUGGETS))
+            .consumesItem(true)
+            .coolingTime(240)
+            .saveFnf(pOutput);
     }
 
     private static void meltingRecipes(RecipeOutput pOutput) {
@@ -205,7 +208,7 @@ public class RecipesGen extends RecipeProvider {
             .save(pOutput, ModRef.res("crucible_window_shapeless"));
     }
 
-    public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag) {
+    public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag, TagKey<Item> nuggetTag) {
         if (blockTag != null) {
             CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), ConfigNumber.ConfigValue.BLOCK_MB.toProvider(), new IItemOutput.Tag(blockTag))
                 .coolingTime(20 * 3 * 5)
@@ -218,6 +221,7 @@ public class RecipesGen extends RecipeProvider {
 
         if (ingotTag != null) {
             CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), ConfigNumber.ConfigValue.INGOT_MB.toProvider(), new IItemOutput.Tag(ingotTag))
+                .withItemInput(Ingredient.of(ItemSetup.INGOT_CAST))
                 .coolingTime(20 * 3)
                 .saveFnf(output);
 
@@ -235,6 +239,16 @@ public class RecipesGen extends RecipeProvider {
             CrucibleRecipeBuilder.smelting(fluidTag, new MultiplyNumber(ConfigNumber.ConfigValue.BLOCK_MB.toProvider(), ConfigNumber.ConfigValue.ORE_MULTIPLIER.toProvider()), Ingredient.of(rawBlockTag), 900)
                 .heat(1100)
                 .save(output, ModRef.res("crucible/" + name + "_from_raw_block"));
+        }
+
+        if (nuggetTag != null) {
+            CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), ConfigNumber.ConfigValue.NUGGET_MB.toProvider(), new IItemOutput.Tag(nuggetTag))
+                .withItemInput(Ingredient.of(ItemSetup.NUGGET_CAST))
+                .coolingTime(20 * 3)
+                .saveFnf(output);
+
+            CrucibleRecipeBuilder.smelting(fluidTag, ConfigNumber.ConfigValue.NUGGET_MB.toProvider(), Ingredient.of(nuggetTag), 100)
+                .save(output, ModRef.res("crucible/" + name + "_from_nugget"));
         }
 
 

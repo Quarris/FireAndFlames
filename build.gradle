@@ -46,13 +46,22 @@ neoForge {
         client {
             client()
 
+            programArguments.addAll '--username', 'Quarris'
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        clientTester {
+            client()
+
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            programArguments.addAll '--username', 'Tester'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
-            programArgument '--nogui'
+
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 

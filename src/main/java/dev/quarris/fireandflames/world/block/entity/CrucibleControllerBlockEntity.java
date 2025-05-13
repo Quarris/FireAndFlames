@@ -189,6 +189,8 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                             recipe.reset();
                         }
                     }
+
+                    pCrucible.setChanged();
                 }
             }
         }
@@ -204,6 +206,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                         pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
                     });
                     pCrucible.burnTicks -= 10;
+                    pCrucible.setChanged();
                 }
             }
         }
@@ -232,11 +235,10 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                         pCrucible.fluidTank.fill(resultantAlloy, IFluidHandler.FluidAction.EXECUTE);
                     }
                     pCrucible.burnTicks -= 10;
+                    pCrucible.setChanged();
                 }
             }
         }
-
-        pCrucible.setChanged();
     }
 
 
