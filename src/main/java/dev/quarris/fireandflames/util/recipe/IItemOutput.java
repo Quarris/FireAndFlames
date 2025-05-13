@@ -45,8 +45,8 @@ public interface IItemOutput {
 
         public static final Codec<Stack> CODEC = ItemStack.CODEC.xmap(Stack::new, Stack::createItemStack);
 
-        public Stack(Item item, int amount) {
-            this(new ItemStack(item, amount));
+        public Stack(Item item, int count) {
+            this(new ItemStack(item, count));
         }
 
         public Stack(Item item) {

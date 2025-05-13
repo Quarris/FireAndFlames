@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.config.number.ConstantNumber;
+import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
@@ -39,7 +41,7 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
     private CrucibleRecipeBuilder(
         Ingredient ingredient,
         TagKey<Fluid> result,
-        int resultAmount,
+        INumberProvider resultAmount,
         int smeltingTime
     ) {
         this(ingredient, new IFluidOutput.Tag(result, resultAmount), smeltingTime);
@@ -60,6 +62,10 @@ public class CrucibleRecipeBuilder implements RecipeBuilder {
     }
 
     public static CrucibleRecipeBuilder smelting(TagKey<Fluid> result, int amount, Ingredient ingredient, int smeltingTime) {
+        return new CrucibleRecipeBuilder(ingredient, result, new ConstantNumber(amount), smeltingTime);
+    }
+
+    public static CrucibleRecipeBuilder smelting(TagKey<Fluid> result, INumberProvider amount, Ingredient ingredient, int smeltingTime) {
         return new CrucibleRecipeBuilder(ingredient, result, amount, smeltingTime);
     }
 

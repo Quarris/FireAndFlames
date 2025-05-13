@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.data.recipes;
 
+import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.advancements.Criterion;
@@ -35,6 +36,14 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         EntityTypePredicate entityPredicate,
         TagKey<Fluid> result,
         int amount
+    ) {
+        this(entityPredicate, new IFluidOutput.Tag(result, amount));
+    }
+
+    private EntityMeltingRecipeBuilder(
+        EntityTypePredicate entityPredicate,
+        TagKey<Fluid> result,
+        INumberProvider amount
     ) {
         this(entityPredicate, new IFluidOutput.Tag(result, amount));
     }

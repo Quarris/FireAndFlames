@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.client.screen.components;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -97,10 +98,10 @@ public class CrucibleFluidTankComponent {
                 fluidTextComponents.add(Component.literal(String.valueOf(mb)).append(" mb").withStyle(ChatFormatting.GRAY));
             }
         } else {
-            int blocks = amount / (144 * 9);
-            int ingots = (amount % (144 * 9)) / 144;
-            int nuggets = (amount % (144 * 9)) % 144 / 16;
-            int mb = (amount % (144 * 9)) % 144 % 16;
+            int blocks = (int) (amount / ServerConfigs.getBlockMb());
+            int ingots = (int) ((amount % (ServerConfigs.getBlockMb())) / ServerConfigs.getIngotMb());
+            int nuggets = (int) ((amount % (ServerConfigs.getBlockMb())) % ServerConfigs.getIngotMb() / ServerConfigs.getNuggetMb());
+            int mb = (int) ((amount % (ServerConfigs.getBlockMb())) % ServerConfigs.getIngotMb() % ServerConfigs.getNuggetMb());
 
             if (blocks > 0) {
                 fluidTextComponents.add(Component.literal(String.valueOf(blocks)).append(" Blocks").withStyle(ChatFormatting.GRAY));

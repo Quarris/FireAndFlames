@@ -65,16 +65,17 @@ public class CrucibleFluidTank implements IFluidHandler {
             }
 
             var inputStack = testStack;
+            int requiredAmount = input.amount().evaluateInt();
             finalInputsToDrain.compute(testIndex, (id, stack) -> {
                 if (stack == null) {
-                    return inputStack.copyWithAmount(input.amount());
+                    return inputStack.copyWithAmount(requiredAmount);
                 }
 
-                stack.grow(input.amount());
+                stack.grow(requiredAmount);
                 return stack;
             });
-            testStack.shrink(input.amount());
-            amountDrained += input.amount();
+            testStack.shrink(requiredAmount);
+            amountDrained += requiredAmount;
 
             if (testStack.isEmpty()) {
                 stacksRemoved++;

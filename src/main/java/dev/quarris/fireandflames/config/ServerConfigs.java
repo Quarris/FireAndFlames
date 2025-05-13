@@ -22,6 +22,11 @@ public class ServerConfigs {
     private static final ModConfigSpec.DoubleValue SMELTING_HEAT_BONUS_MULTIPLIER;
     private static final ModConfigSpec.DoubleValue ALLOYING_HEAT_BONUS_MULTIPLIER;
 
+    private static final ModConfigSpec.DoubleValue ORE_MULTIPLIER;
+    private static final ModConfigSpec.IntValue INGOT_MB;
+    private static final ModConfigSpec.IntValue BLOCK_MB;
+    private static final ModConfigSpec.IntValue NUGGET_MB;
+
     // Crucible
     private static int maxCrucibleSize;
 
@@ -39,6 +44,12 @@ public class ServerConfigs {
     // Recipes
     private static float smeltingHeatBonusMultiplier;
     private static float alloyingHeatBonusMultiplier;
+
+    // Constants
+    private static double oreMultiplier;
+    private static double ingotMb;
+    private static double blockMb;
+    private static double nuggetMb;
 
 
     static {
@@ -102,26 +113,50 @@ public class ServerConfigs {
         }
 
         builder.comment(
-            "Recipe Settings"
+            " Recipe Settings"
         ).push("recipe"); {
             builder.push("smelting"); {
                 SMELTING_HEAT_BONUS_MULTIPLIER = builder.comment(
-                    "The bonus smelting speed multiplier based on the heat of the crucible.",
-                    "For example, when the crucible is at 2x required heat, the speed of the smelting is '2 * <heat_bonus> * (1/<base_recipe_time>)' per tick"
+                    " The bonus smelting speed multiplier based on the heat of the crucible.",
+                    " For example, when the crucible is at 2x required heat, the speed of the smelting is '2 * <heat_bonus> * (1/<base_recipe_time>)' per tick"
                 ).defineInRange("heat_bonus_multiplier", 1.0, 1.0, 10.0);
                 builder.pop();
             }
 
             builder.push("alloying"); {
                 ALLOYING_HEAT_BONUS_MULTIPLIER = builder.comment(
-                    "The bonus alloying speed multiplier based on the heat of the crucible.",
-                    "For example, when the crucible is at 2x required heat, the speed of the alloying is '2 * <heat_bonus>' iteration per tick"
+                    " The bonus alloying speed multiplier based on the heat of the crucible.",
+                    " For example, when the crucible is at 2x required heat, the speed of the alloying is '2 * <heat_bonus>' iteration per tick"
                 ).defineInRange("heat_bonus_multiplier", 10.0, 1.0, 10.0);
 
                 builder.pop();
             }
 
             builder.pop();
+        }
+
+        builder.comment(
+            " Configurable values used in recipes and such.",
+            " Modify these to automatically change the specific values in recipe without having to modify recipes themselves"
+        ).push("constants"); {
+            ORE_MULTIPLIER = builder.comment(
+                " How much fluid to generate from smelting raw ores.",
+                " This takes into account single raw item and raw blocks.",
+                " Example: 1 Raw Iron => <ingot_amount> * <ore_multiplier>",
+                "                                   144 * 2"
+            ).defineInRange("ore_multiplier", 2.0, 0.0, 100.0);
+
+            INGOT_MB = builder.comment(
+                " Amount of mb in an ingot."
+            ).defineInRange("ingot_mb", 144, 1, Integer.MAX_VALUE);
+
+            BLOCK_MB = builder.comment(
+                " Amount of mb in a block."
+            ).defineInRange("block_mb", 1296, 1, Integer.MAX_VALUE);
+
+            NUGGET_MB = builder.comment(
+                " Amount of mb in a nugget."
+            ).defineInRange("nugget_mb", 16, 1, Integer.MAX_VALUE);
         }
 
         SPEC = builder.build();
@@ -167,6 +202,22 @@ public class ServerConfigs {
         return alloyingHeatBonusMultiplier;
     }
 
+    public static double getOreMultiplier() {
+        return oreMultiplier;
+    }
+
+    public static double getIngotMb() {
+        return ingotMb;
+    }
+
+    public static double getBlockMb() {
+        return blockMb;
+    }
+
+    public static double getNuggetMb() {
+        return nuggetMb;
+    }
+
     private static void reloadConfigs() {
         maxCrucibleSize = MAX_CRUCIBLE_SIZE.get();
 
@@ -181,6 +232,11 @@ public class ServerConfigs {
 
         smeltingHeatBonusMultiplier = SMELTING_HEAT_BONUS_MULTIPLIER.get().floatValue();
         alloyingHeatBonusMultiplier = ALLOYING_HEAT_BONUS_MULTIPLIER.get().floatValue();
+
+        oreMultiplier = ORE_MULTIPLIER.get();
+        ingotMb = INGOT_MB.get();
+        blockMb = BLOCK_MB.get();
+        nuggetMb = NUGGET_MB.get();
     }
 
     @SubscribeEvent

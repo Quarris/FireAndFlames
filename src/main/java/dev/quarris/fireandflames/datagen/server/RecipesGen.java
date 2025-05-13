@@ -1,6 +1,9 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.config.number.ConfigNumber;
+import dev.quarris.fireandflames.data.config.number.ConstantNumber;
+import dev.quarris.fireandflames.data.config.number.MultiplyNumber;
 import dev.quarris.fireandflames.data.recipes.AlloyingRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.CastingRecipeBuilder;
 import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
@@ -204,32 +207,32 @@ public class RecipesGen extends RecipeProvider {
 
     public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag) {
         if (blockTag != null) {
-            CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), 144 * 9, new IItemOutput.Tag(blockTag))
+            CastingRecipeBuilder.basin(FluidIngredient.tag(fluidTag), ConfigNumber.ConfigValue.BLOCK_MB.toProvider(), new IItemOutput.Tag(blockTag))
                 .coolingTime(20 * 3 * 5)
                 .saveFnf(output);
 
-            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 9, Ingredient.of(blockTag), 900)
+            CrucibleRecipeBuilder.smelting(fluidTag, ConfigNumber.ConfigValue.BLOCK_MB.toProvider(), Ingredient.of(blockTag), 900)
                 .heat(1100)
                 .save(output, ModRef.res("crucible/" + name + "_from_block"));
         }
 
         if (ingotTag != null) {
-            CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), 144, new IItemOutput.Tag(ingotTag))
+            CastingRecipeBuilder.table(FluidIngredient.tag(fluidTag), ConfigNumber.ConfigValue.INGOT_MB.toProvider(), new IItemOutput.Tag(ingotTag))
                 .coolingTime(20 * 3)
                 .saveFnf(output);
 
-            CrucibleRecipeBuilder.smelting(fluidTag, 144, Ingredient.of(ingotTag), 100)
+            CrucibleRecipeBuilder.smelting(fluidTag, ConfigNumber.ConfigValue.INGOT_MB.toProvider(), Ingredient.of(ingotTag), 100)
                 .save(output, ModRef.res("crucible/" + name + "_from_ingot"));
         }
 
 
         if (rawItemTag != null) {
-            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2, Ingredient.of(rawItemTag), 100)
+            CrucibleRecipeBuilder.smelting(fluidTag, new MultiplyNumber(ConfigNumber.ConfigValue.INGOT_MB.toProvider(), ConfigNumber.ConfigValue.ORE_MULTIPLIER.toProvider()), Ingredient.of(rawItemTag), 100)
                 .save(output, ModRef.res("crucible/" + name + "_from_raw"));
         }
 
         if (rawBlockTag != null) {
-            CrucibleRecipeBuilder.smelting(fluidTag, 144 * 2 * 9, Ingredient.of(rawBlockTag), 900)
+            CrucibleRecipeBuilder.smelting(fluidTag, new MultiplyNumber(ConfigNumber.ConfigValue.BLOCK_MB.toProvider(), ConfigNumber.ConfigValue.ORE_MULTIPLIER.toProvider()), Ingredient.of(rawBlockTag), 900)
                 .heat(1100)
                 .save(output, ModRef.res("crucible/" + name + "_from_raw_block"));
         }

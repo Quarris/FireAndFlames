@@ -74,7 +74,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
             }
 
             // Update capacity
-            this.capacity = recipe.value().getFluidInput().amount();
+            this.capacity = recipe.value().getFluidInput().amount().evaluateInt();
 
             int filled = super.fill(resource, action);
             if (action.simulate()) {
@@ -137,7 +137,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         }
 
         T recipe = pBasin.recipe.value();
-        if (pBasin.tank.getFluid().getAmount() < recipe.getFluidInput().amount()) {
+        if (pBasin.tank.getFluid().getAmount() < recipe.getFluidInput().amount().evaluateInt()) {
             pBasin.coolingTicks = 0;
             pBasin.recipe = null;
             return;
@@ -214,6 +214,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         this.recipe = null;
         if (pTag.contains("RecipeId")) {
             ResourceLocation recipeId = ResourceLocation.parse(pTag.getString("RecipeId"));
+            // TODO Level can be null during world load
             var recipe = this.getLevel().getRecipeManager().byKey(recipeId);
             this.recipe = recipe.map(r -> (RecipeHolder<T>) r).orElse(null);
         }

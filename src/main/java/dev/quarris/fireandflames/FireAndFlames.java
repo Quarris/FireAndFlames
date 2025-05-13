@@ -14,6 +14,7 @@ public class FireAndFlames {
     public FireAndFlames(ModContainer container, IEventBus modBus) {
         container.registerConfig(ModConfig.Type.SERVER, ServerConfigs.SPEC);
 
+        RegistrySetup.init(modBus);
         BlockSetup.init(modBus);
         ItemSetup.init(modBus);
         DataComponentSetup.init(modBus);
@@ -22,6 +23,8 @@ public class FireAndFlames {
         MenuSetup.init(modBus);
         RecipeSetup.init(modBus);
         CreativeTabSetup.init(modBus);
-
+        NumberProviderSetup.init(modBus);
     }
+
+
 }

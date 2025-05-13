@@ -3,6 +3,9 @@ package dev.quarris.fireandflames.util.recipe;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.quarris.fireandflames.data.config.number.ConstantNumber;
+import dev.quarris.fireandflames.data.config.number.INumberProvider;
+import dev.quarris.fireandflames.setup.RegistrySetup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -36,7 +39,7 @@ public interface IFluidOutput {
     StreamCodec<RegistryFriendlyByteBuf, List<IFluidOutput>> LIST_STREAM_CODEC = STREAM_CODEC.apply(
         ByteBufCodecs.collection(NonNullList::createWithCapacity));
 
-    IFluidOutput withAmount(int amount);
+    IFluidOutput withAmount(INumberProvider amount);
 
     FluidStack createFluid();
 
@@ -49,8 +52,8 @@ public interface IFluidOutput {
         }
 
         @Override
-        public IFluidOutput withAmount(int amount) {
-            return new Stack(this.stack.copyWithAmount(amount));
+        public IFluidOutput withAmount(INumberProvider amount) {
+            return new Stack(this.stack.copyWithAmount(amount.evaluateInt()));
         }
 
         @Override
@@ -59,21 +62,25 @@ public interface IFluidOutput {
         }
     }
 
-    record Tag(TagKey<Fluid> tag, int amount) implements IFluidOutput {
+    record Tag(TagKey<Fluid> tag, INumberProvider amount) implements IFluidOutput {
+
+        public Tag(TagKey<Fluid> tag, int amount) {
+            this(tag, new ConstantNumber(amount));
+        }
 
         public static final Codec<Tag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             TagKey.codec(Registries.FLUID).fieldOf("tag").forGetter(Tag::tag),
-            Codec.INT.fieldOf("amount").forGetter(Tag::amount)
+            INumberProvider.CODEC.fieldOf("amount").forGetter(Tag::amount)
         ).apply(instance, Tag::new));
 
         @Override
-        public IFluidOutput withAmount(int amount) {
+        public IFluidOutput withAmount(INumberProvider amount) {
             return new Tag(this.tag, amount);
         }
 
         @Override
         public FluidStack createFluid() {
-            return BuiltInRegistries.FLUID.getTag(this.tag).map(tags -> new FluidStack(tags.get(0), this.amount)).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
+            return BuiltInRegistries.FLUID.getTag(this.tag).map(tags -> new FluidStack(tags.get(0), this.amount.evaluateInt())).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
         }
     }
 }

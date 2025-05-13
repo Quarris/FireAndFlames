@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.data.recipes;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
@@ -41,11 +42,19 @@ public class CastingRecipeBuilder implements RecipeBuilder {
         return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesItem(true);
     }
 
+    public static CastingRecipeBuilder basin(FluidIngredient fluid, INumberProvider amount, IItemOutput result) {
+        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesItem(true);
+    }
+
     public static CastingRecipeBuilder basin(FluidStack fluid, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result).consumesItem(true);
     }
 
     public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, IItemOutput result) {
+        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(fluid, amount), result);
+    }
+
+    public static CastingRecipeBuilder table(FluidIngredient fluid, INumberProvider amount, IItemOutput result) {
         return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(fluid, amount), result);
     }
 

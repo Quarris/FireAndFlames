@@ -16,6 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Function;
+
 public class CrucibleScreen extends EffectRenderingInventoryScreen<CrucibleMenu> {
 
     private static final ResourceLocation CRUCIBLE_LOCATION = ModRef.res("textures/gui/container/crucible.png");
