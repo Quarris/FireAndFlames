@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.compat.jei;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
 import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
@@ -22,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
@@ -52,9 +54,10 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
         builder.addInputSlot(8, 8).addIngredients(recipe.ingredient());
 
         FluidStack fluidResult = recipe.getFluidResult();
-        builder.addOutputSlot(59, 6)
+        int fluidHeight = Mth.lerpInt((float) Math.min(1, fluidResult.getAmount() / (2 * ServerConfigs.getBlockMb())), 3, 20);
+        builder.addOutputSlot(59, 6 + 20 - fluidHeight)
             .addFluidStack(fluidResult.getFluid(), fluidResult.getAmount(), fluidResult.getComponents().asPatch())
-            .setFluidRenderer(fluidResult.getAmount(), false, 8, 20);
+            .setFluidRenderer(fluidResult.getAmount(), false, 8, fluidHeight);
 
         ItemStack byproduct = recipe.byproduct();
         if (!byproduct.isEmpty()) {
