@@ -49,6 +49,12 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add("creative_tabs.fireandflames.creative_tab", "Fire and Flames");
         this.add("death.attack.crucible_melting", "%1$s was melted by the heat of the crucible");
         this.add("death.attack.crucible_melting.player", "%1$s was thrown to the pits of the crucible by %2$s");
+
+        // JEI
+        this.add("gui.fireandflames.jei.category.crucible", "Crucible");
+
+        // Jade
+        this.add("config.jade.plugin_fireandflames.crucible_heat", "Crucible Heat");
     }
 
     private void addFluid(Supplier<? extends FluidType> fluid, String name) {

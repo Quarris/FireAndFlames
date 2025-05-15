@@ -434,4 +434,8 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
         return (int) Math.floor(baseTemp);
     }
+
+    public int getBurnTicks() {
+        return this.burnTicks;
+    }
 }
