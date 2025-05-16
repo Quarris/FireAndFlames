@@ -5,6 +5,8 @@ import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
+import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -28,23 +30,34 @@ public class JeiCompat implements IModCompat, IModPlugin {
 
     private CrucibleRecipeCategory crucibleCategory;
     private AlloyingRecipeCategory alloyingCategory;
+    private CastingRecipeCategory<BasinCastingRecipe> basinCategory;
+    private CastingRecipeCategory<TableCastingRecipe> tableCategory;
     private IJeiKeyMappings keyMappings;
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         this.crucibleCategory = new CrucibleRecipeCategory(registration.getJeiHelpers().getGuiHelper());
         this.alloyingCategory = new AlloyingRecipeCategory(registration.getJeiHelpers().getGuiHelper());
+        this.basinCategory = new CastingRecipeCategory<>(registration.getJeiHelpers().getGuiHelper(), true, BasinCastingRecipe.class);
+        this.tableCategory = new CastingRecipeCategory<>(registration.getJeiHelpers().getGuiHelper(), false, TableCastingRecipe.class);
 
         registration.addRecipeCategories(this.crucibleCategory);
         registration.addRecipeCategories(this.alloyingCategory);
+        registration.addRecipeCategories(this.basinCategory);
+        registration.addRecipeCategories(this.tableCategory);
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(BlockSetup.CRUCIBLE_CONTROLLER,
             this.crucibleCategory.getRecipeType(),
-            this.alloyingCategory.getRecipeType()
+            this.alloyingCategory.getRecipeType(),
+            this.basinCategory.getRecipeType(),
+            this.tableCategory.getRecipeType()
         );
+
+        registration.addRecipeCatalyst(BlockSetup.CASTING_BASIN, this.basinCategory.getRecipeType());
+        registration.addRecipeCatalyst(BlockSetup.CASTING_TABLE, this.tableCategory.getRecipeType());
     }
 
     @Override
@@ -58,6 +71,8 @@ public class JeiCompat implements IModCompat, IModPlugin {
 
         registerRecipesFor(registration, recipeManager, RecipeSetup.CRUCIBLE_TYPE.get(), this.crucibleCategory.getRecipeType());
         registerRecipesFor(registration, recipeManager, RecipeSetup.ALLOYING_TYPE.get(), this.alloyingCategory.getRecipeType());
+        registerRecipesFor(registration, recipeManager, RecipeSetup.TABLE_CASTING_TYPE.get(), this.tableCategory.getRecipeType());
+        registerRecipesFor(registration, recipeManager, RecipeSetup.BASIN_CASTING_TYPE.get(), this.basinCategory.getRecipeType());
     }
 
     private static <I extends RecipeInput, T extends Recipe<I>> void registerRecipesFor(IRecipeRegistration registration, RecipeManager recipeManager, RecipeType<T> recipeType, mezz.jei.api.recipe.RecipeType<T> category) {
