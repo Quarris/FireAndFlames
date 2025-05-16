@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.compat.jade;
 
+import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
@@ -10,6 +11,10 @@ import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin
 public class JadeCompat implements IModCompat, IWailaPlugin {
+
+    public JadeCompat() {
+        CompatManager.jade = this;
+    }
 
     @Override
     public void register(IWailaCommonRegistration registration) {

@@ -52,6 +52,7 @@ public class EnUsLanguageGen extends LanguageProvider {
 
         // JEI
         this.add("gui.fireandflames.jei.category.crucible", "Crucible");
+        this.add("gui.fireandflames.jei.category.alloying", "Alloying");
 
         // Jade
         this.add("config.jade.plugin_fireandflames.crucible_heat", "Crucible Heat");

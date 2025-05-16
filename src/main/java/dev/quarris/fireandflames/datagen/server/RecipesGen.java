@@ -19,7 +19,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -30,9 +29,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.conditions.NotCondition;
-import net.neoforged.neoforge.common.conditions.TagEmptyCondition;
-import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
@@ -75,6 +71,20 @@ public class RecipesGen extends RecipeProvider {
             .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 4))
             .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_GOLD, 4))
             .save(pOutput, ModRef.res("crucible/alloying/netherite_from_scrap_and_gold"));
+
+        AlloyingRecipeBuilder.alloy(
+                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_NETHERITE, 1),
+                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_GOLD, 1),
+                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 1)
+            )
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 4))
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_IRON, 4))
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_GOLD, 4))
+            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_COPPER, 4))
+            .requires(new FluidInput(Tags.Fluids.LAVA, 4))
+            .requires(new FluidInput(Tags.Fluids.WATER, 4))
+            .requires(new FluidInput(Tags.Fluids.MILK, 4))
+            .save(pOutput, ModRef.res("crucible/alloying/test"));
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {

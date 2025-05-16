@@ -12,8 +12,11 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.gui.placement.HorizontalAlignment;
+import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.ICodecHelper;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.IRecipeManager;
 import mezz.jei.api.recipe.RecipeType;
@@ -40,13 +43,17 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
     private final IGuiHelper guiHelper;
     private final IDrawable icon;
     private final IDrawableStatic background;
-    private IDrawableAnimated recipeArrow;
 
     public CrucibleRecipeCategory(IGuiHelper guiHelper) {
         this.guiHelper = guiHelper;
         this.icon = guiHelper.createDrawableItemLike(BlockSetup.CRUCIBLE_CONTROLLER);
-        this.recipeArrow = this.guiHelper.createAnimatedRecipeArrow(20);
         this.background = this.guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
+    }
+
+    @Override
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, CrucibleRecipe recipe, IFocusGroup focuses) {
+        builder.addAnimatedRecipeFlame(20).setPosition(34, 8);
+
     }
 
     @Override
@@ -68,14 +75,13 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
     @Override
     public void draw(CrucibleRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         this.background.draw(guiGraphics);
-        this.recipeArrow.draw(guiGraphics, 31, 8);
         PoseStack matrix = guiGraphics.pose();
         matrix.pushPose();
         float scale = 0.5f;
         matrix.scale(scale, scale, 1);
-        int x = (int) (30 / scale);
-        int y = (int) (9 / scale);
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.literal(recipe.heat() + "°").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFF);
+        int x = (int) (42 / scale);
+        int y = (int) (24 / scale);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.literal(recipe.heat() + "°").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFF);
         matrix.popPose();
     }
 
