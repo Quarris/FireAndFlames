@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.compat.jei;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
@@ -14,11 +15,12 @@ import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -28,6 +30,7 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
     public static final ResourceLocation BACKGROUND = ModRef.res("textures/gui/jei/category/casting/recipe_background.png");
     public static final ResourceLocation ITEM_SLOT_BACKGROUND = ModRef.res("textures/gui/jei/category/casting/item_slot.png");
     public static final ResourceLocation FLUID_SLOT_BACKGROUND = ModRef.res("textures/gui/jei/category/casting/fluid_slot.png");
+    public static final Component CAST_CONSUMED_TEXT = Component.translatable("gui.fireandflames.jei.cast_consumed");
 
     public static final int WIDTH = 128;
     public static final int HEIGHT = 64;
@@ -40,14 +43,10 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
 
     private final Component title;
     private final RecipeType<R> type;
-    private final boolean isBasin;
-    private final IGuiHelper guiHelper;
 
     public CastingRecipeCategory(IGuiHelper guiHelper, boolean isBasin, Class<R> recipeClass) {
         this.type = new RecipeType<>(ModRef.res(isBasin ? "basin_casting" : "table_casting"), recipeClass);
         this.title = Component.translatable("gui.fireandflames.jei.category." + (isBasin ? "basin" : "table") + "_casting");
-        this.isBasin = isBasin;
-        this.guiHelper = guiHelper;
         this.icon = guiHelper.createDrawableItemLike(isBasin ? BlockSetup.CASTING_BASIN : BlockSetup.CASTING_TABLE);
         this.background = guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
         this.itemSlotBackground = guiHelper.drawableBuilder(ITEM_SLOT_BACKGROUND, 0, 0, 18, 18).setTextureSize(18, 18).build();
@@ -85,6 +84,16 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
     @Override
     public void draw(R recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         this.background.draw(guiGraphics);
+        if (!recipe.getItemInput().isEmpty() && recipe.consumesInput()) {
+            PoseStack matrix = guiGraphics.pose();
+            matrix.pushPose();
+            float scale = 0.5f;
+            matrix.scale(scale, scale, 1);
+            int x = (int) (59 / scale);
+            int y = (int) (8 / scale);
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, CAST_CONSUMED_TEXT.copy().withStyle(ChatFormatting.RED), x, y, 0xFFFFFFFF);
+            matrix.popPose();
+        }
     }
 
     @Override

@@ -92,12 +92,14 @@ public class RecipesGen extends RecipeProvider {
             .withItemInput(Ingredient.of(Tags.Items.INGOTS))
             .moveItem(true)
             .coolingTime(240)
+            .consumesInput(true)
             .saveFnf(pOutput);
 
         CastingRecipeBuilder.table(FluidIngredient.tag(TagSetup.FluidTags.MOLTEN_GOLD), new MultiplyNumber(new ConstantNumber(2), ConfigNumber.ConfigValue.INGOT_MB.toProvider()), new IItemOutput.Stack(ItemSetup.NUGGET_CAST.get()))
             .withItemInput(Ingredient.of(Tags.Items.NUGGETS))
             .moveItem(true)
             .coolingTime(240)
+            .consumesInput(true)
             .saveFnf(pOutput);
     }
 

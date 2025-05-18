@@ -40,14 +40,12 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
     public static final int WIDTH = 96;
     public static final int HEIGHT = 32;
 
-    private final IGuiHelper guiHelper;
     private final IDrawable icon;
     private final IDrawableStatic background;
 
     public CrucibleRecipeCategory(IGuiHelper guiHelper) {
-        this.guiHelper = guiHelper;
         this.icon = guiHelper.createDrawableItemLike(BlockSetup.CRUCIBLE_CONTROLLER);
-        this.background = this.guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
+        this.background = guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
     }
 
     @Override
