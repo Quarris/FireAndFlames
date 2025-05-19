@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.quarris.fireandflames.client.util.FluidRenderer;
 import dev.quarris.fireandflames.setup.ItemSetup;
+import dev.quarris.fireandflames.setup.TagSetup;
 import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CastingTableBlockEntity;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
@@ -60,7 +61,7 @@ public class CastingTableRenderer implements BlockEntityRenderer<CastingTableBlo
             ItemStack stack = pTable.getInventory().getStackInSlot(slot);
             pPoseStack.pushPose();
             pPoseStack.translate(0.5, 15/16f + (1/16f) * (10/16f) / 2, 0.5);
-            if (slot == 1 || stack.is(ItemSetup.NUGGET_CAST) || stack.is(ItemSetup.INGOT_CAST)) {
+            if (slot == 1 || stack.is(TagSetup.ItemTags.CASTS)) {
                 pPoseStack.translate(0, 0.001, 0);
             }
             pPoseStack.scale(10/16f, 10/16f, 10/16f);

@@ -22,6 +22,8 @@ public class TagSetup {
 
     public static class ItemTags {
 
+        public static TagKey<Item> CASTS = create(ModRef.res("casts"));
+
         private static TagKey<Item> create(ResourceLocation id) {
             return TagKey.create(Registries.ITEM, id);
         }

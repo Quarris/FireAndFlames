@@ -28,10 +28,10 @@ public class CastingTableBlock extends CastingBlock {
 
     private static final VoxelShape SHAPE = Shapes.or(
         Block.box(1, 12, 1, 15, 16, 15),
-        Block.box(1, 0, 1, 3, 12, 3),
-        Block.box(1, 0, 13, 3, 12, 15),
-        Block.box(13, 0, 1, 15, 12, 3),
-        Block.box(13, 0, 13, 15, 12, 15)
+        Block.box(1, 0, 1, 4, 12, 4),
+        Block.box(1, 0, 12, 4, 12, 15),
+        Block.box(12, 0, 1, 15, 12, 4),
+        Block.box(12, 0, 12, 15, 12, 15)
     );
 
     public CastingTableBlock(Properties pProperties) {

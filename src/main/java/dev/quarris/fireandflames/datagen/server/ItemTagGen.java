@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.datagen.server;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.setup.ItemSetup;
+import dev.quarris.fireandflames.setup.TagSetup;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -22,7 +24,7 @@ public class ItemTagGen extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
-
+        this.tag(TagSetup.ItemTags.CASTS).add(ItemSetup.NUGGET_CAST.asItem(), ItemSetup.INGOT_CAST.asItem());
     }
 
     private static ResourceKey<Item> key(Block block) {
