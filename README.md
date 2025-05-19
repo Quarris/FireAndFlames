@@ -1,25 +1,22 @@
+![Fire and Flames text banner](https://i.imgur.com/4FuamGF.png)
 
-Installation information
-=======
+![Mod Banner showing Crucible structure with molten gold and Raw Iron Blocks](https://i.imgur.com/Ah1e4XV.png)
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+Fire and Flames allows you to craft tools and armour using materials that you processed in a Crucible.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+The Crucible is a core component of Fire and Flames. A multiblock structure to smelt your ores and create alloys.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+Crucible is powered by heat from solid and fluid sources.  
+![Screen showing Coal used in the Crucible Burner](https://i.imgur.com/5nljXfm.png)
+![Image showing Fuel Tank filled with Lava placed within the Crucible structure](https://i.imgur.com/mqqqJdw.png)
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+Smelt your ores to get more than you would in a normal furnace!  
+![Crucible Screen containing Molten Gold and Copper as well as Raw Iron Block being smelted](https://i.imgur.com/949LaId.png)
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+Cast your molten goodies into the Casting Table and Basin to form them into ingots and blocks.
+
+![Molten Iron being poured into the Casting Basin and Copper Ingot already formed in the Casting Table](https://i.imgur.com/y2mRQ8Z.png)
+
+Fire and Flames is designed around data-packs and configs to create easy to configure exdperience.
+
+Visit the [Wiki](https://github.com/Quarris/FireAndFlames/wiki) to find out more about how to play and develop around it. (WIKI IS HEAVILY WIP ATM)
