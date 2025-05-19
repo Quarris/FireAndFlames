@@ -3,6 +3,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.78'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -222,3 +224,33 @@ idea {
         downloadJavadoc = true
     }
 }
+
+var changelogText = file('changelog.md').exists() ? file('changelog.md').text : ""
+curseforge {
+    project {
+        apiKey = System.getenv('CURSEFORGE_API_PUBLISH')
+        id = curseforge_id
+        changelog = changelogText
+        changelogType = "markdown"
+        releaseType = release_type
+        addGameVersion minecraft_version // Add the Minecraft versions you're targeting
+        addGameVersion "NeoForge" // Add the Minecraft versions you're targeting
+
+        mainArtifact(jar) {
+            displayName = "$mod_name v$project.version ($minecraft_version)"
+        }
+    }
+}
+
+modrinth {
+    token = System.getenv('MODRINTH_API_PUBLISH')
+    projectId = modrinth_id
+    versionNumber = project.version
+    versionName = "$mod_name v$project.version ($minecraft_version)"
+    versionType = release_type
+    uploadFile = jar
+    gameVersions = [minecraft_version] // Add the Minecraft versions you're targeting
+    loaders = ["neoforge"]
+    changelog = changelogText
+}
+
