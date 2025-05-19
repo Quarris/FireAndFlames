@@ -31,6 +31,8 @@ public class BlockTagGen extends BlockTagsProvider {
             BlockSetup.CRUCIBLE_BURNER.get()
         );
 
+        this.tag(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON).addTag(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS);
+
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
             .add(
                 BlockSetup.FIRE_BRICKS.get(),

@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.compat.jade;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,15 +19,15 @@ public enum CrucibleHeatComponentProvider implements IBlockComponentProvider, IS
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
-        tooltip.add(Component.literal("Heat: " + blockAccessor.getServerData().getInt("Heat")));
-        tooltip.add(Component.literal("Burned Fuel: " + blockAccessor.getServerData().getInt("BurnTicks")));
+        if (Screen.hasShiftDown()) {
+            tooltip.add(Component.literal("Burned Fuel: " + blockAccessor.getServerData().getInt("BurnTicks")));
+        }
     }
 
 
     @Override
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
-        if (blockAccessor.getBlockEntity() instanceof CrucibleControllerBlockEntity controller ){
-            compoundTag.putInt("Heat", controller.getHeat());
+        if (blockAccessor.getBlockEntity() instanceof CrucibleControllerBlockEntity controller){
             compoundTag.putInt("BurnTicks", controller.getBurnTicks());
         }
     }

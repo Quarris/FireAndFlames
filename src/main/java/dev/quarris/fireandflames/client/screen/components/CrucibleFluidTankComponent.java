@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.client.screen.components;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.quarris.fireandflames.client.util.GuiGraphicsExtensions;
 import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import net.minecraft.ChatFormatting;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.textures.FluidSpriteCache;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +89,8 @@ public class CrucibleFluidTankComponent {
         int amount = fluid.getAmount();
 
         if (Screen.hasShiftDown()) {
-            int buckets = amount / 1000;
-            int mb = amount % 1000;
+            int buckets = amount / FluidType.BUCKET_VOLUME;
+            int mb = amount % FluidType.BUCKET_VOLUME;
 
             if (buckets > 0) {
                 fluidTextComponents.add(Component.literal(String.valueOf(buckets)).append(" B").withStyle(ChatFormatting.GRAY));
@@ -146,6 +148,6 @@ public class CrucibleFluidTankComponent {
         float green = (float) (color >> 8 & 0xFF) / 255.0F;
         float blue = (float) (color & 0xFF) / 255.0F;
 
-        pGraphics.blit(pX, pY, 0, pWidth, pHeight, sprite, red, green, blue, 1.0f);
+        GuiGraphicsExtensions.blitTiledSprite(pGraphics.pose(), sprite, pX, pY, 0, pWidth, pHeight, 0, 0, sprite.contents().width(), sprite.contents().height(), sprite.contents().width(), sprite.contents().height(), red, green, blue, 1.0F);
     }
 }

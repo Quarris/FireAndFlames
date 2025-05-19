@@ -4,7 +4,12 @@ import com.mojang.serialization.MapCodec;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CastingBlockEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -15,6 +20,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class CastingBasinBlock extends CastingBlock {
 
@@ -28,6 +35,11 @@ public class CastingBasinBlock extends CastingBlock {
 
     public CastingBasinBlock(Properties pProperties) {
         super(pProperties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag tooltipFlag) {
+        tooltips.add(Component.translatable("block.fireandflames.casting_basin.description").withStyle(ChatFormatting.GRAY));
     }
 
     @Override

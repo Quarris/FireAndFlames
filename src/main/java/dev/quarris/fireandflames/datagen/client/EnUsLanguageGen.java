@@ -50,6 +50,15 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add("death.attack.crucible_melting", "%1$s was melted by the heat of the crucible");
         this.add("death.attack.crucible_melting.player", "%1$s was thrown to the pits of the crucible by %2$s");
 
+        this.add("block.fireandflames.casting_basin.description", "Forms blocks");
+        this.add("block.fireandflames.casting_table.description", "Forms items");
+        this.add("block.fireandflames.crucible_controller.description", "Heart of the Crucible");
+        this.add("block.fireandflames.crucible_burner.description", "Provider solid fuel for Crucible");
+        this.add("block.fireandflames.crucible_tank.description", "Provider fluid fuel for Crucible");
+        this.add("block.fireandflames.crucible_drain.description", "Allows interaction with fluids in the Crucible");
+        this.add("block.fireandflames.crucible_faucet.description", "Extracts fluids into tanks below");
+
+
         // JEI
         this.add("gui.fireandflames.jei.category.crucible", "Crucible");
         this.add("gui.fireandflames.jei.category.alloying", "Alloying");
@@ -71,6 +80,7 @@ public class EnUsLanguageGen extends LanguageProvider {
     }
 
     private void addFluidHolder(CustomFluidHolder fluidHolder, String name) {
+        this.addBlock(fluidHolder.getLiquidBlock(), name);
         this.addFluid(fluidHolder.getFluidType(), name);
         this.addItem(fluidHolder.getBucket(), name + " Bucket");
     }

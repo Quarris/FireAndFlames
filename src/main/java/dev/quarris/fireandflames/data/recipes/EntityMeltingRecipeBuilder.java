@@ -21,7 +21,7 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
     private final EntityTypePredicate entityPredicate;
     private final IFluidOutput result;
 
-    private boolean requiresFluid = true;
+    private boolean requiresFluid = false;
     private float chance = 1.0f;
     private int heat = 800;
 
@@ -64,8 +64,12 @@ public class EntityMeltingRecipeBuilder implements RecipeBuilder {
         return new EntityMeltingRecipeBuilder(entity, result, amount);
     }
 
-    public EntityMeltingRecipeBuilder requiresNoFluid() {
-        this.requiresFluid = false;
+    public static EntityMeltingRecipeBuilder melt(EntityTypePredicate entity, TagKey<Fluid> result, INumberProvider amount) {
+        return new EntityMeltingRecipeBuilder(entity, result, amount);
+    }
+
+    public EntityMeltingRecipeBuilder requiresFluid() {
+        this.requiresFluid = true;
         return this;
     }
 

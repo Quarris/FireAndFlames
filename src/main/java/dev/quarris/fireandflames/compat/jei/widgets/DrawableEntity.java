@@ -41,7 +41,6 @@ public class DrawableEntity implements IDrawable {
         int light = LightTexture.pack(15, 15);
         int cycleValue = Math.max(0, this.cycleTimer.getValue() - 1);
         EntityType<?> entityType = this.entities.get(cycleValue).value();
-        Entity entity = entityType.create(Minecraft.getInstance().level);
 
         PoseStack matrix = guiGraphics.pose();
         matrix.pushPose(); {
@@ -64,6 +63,7 @@ public class DrawableEntity implements IDrawable {
                 playerRenderer.render(player, 0, 0, matrix, Minecraft.getInstance().renderBuffers().bufferSource(), light);
             }
 
+            Entity entity = entityType.create(Minecraft.getInstance().level);
             if (entity != null) {
                 Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).render(entity, 0, 0, matrix, Minecraft.getInstance().renderBuffers().bufferSource(), light);
             }

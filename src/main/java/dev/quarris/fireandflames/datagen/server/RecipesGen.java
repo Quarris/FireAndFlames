@@ -19,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -27,7 +28,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
@@ -62,29 +62,10 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void alloyingRecipes(RecipeOutput pOutput) {
-        AlloyingRecipeBuilder.alloy(new IFluidOutput.Stack(NeoForgeMod.MILK.get(), 10))
-            .requires(new FluidInput(Tags.Fluids.LAVA, 10))
-            .requires(new FluidInput(Fluids.WATER, 2))
-            .save(pOutput, ModRef.res("crucible/alloying/milk_from_lava_and_water"));
-
         AlloyingRecipeBuilder.alloy(new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_NETHERITE, 1))
             .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 4))
             .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_GOLD, 4))
             .save(pOutput, ModRef.res("crucible/alloying/netherite_from_scrap_and_gold"));
-
-        AlloyingRecipeBuilder.alloy(
-                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_NETHERITE, 1),
-                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_GOLD, 1),
-                new IFluidOutput.Tag(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 1)
-            )
-            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_ANCIENT_DEBRIS, 4))
-            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_IRON, 4))
-            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_GOLD, 4))
-            .requires(new FluidInput(TagSetup.FluidTags.MOLTEN_COPPER, 4))
-            .requires(new FluidInput(Tags.Fluids.LAVA, 4))
-            .requires(new FluidInput(Tags.Fluids.WATER, 4))
-            .requires(new FluidInput(Tags.Fluids.MILK, 4))
-            .save(pOutput, ModRef.res("crucible/alloying/test"));
     }
 
     private static void castingRecipes(RecipeOutput pOutput) {
@@ -104,13 +85,13 @@ public class RecipesGen extends RecipeProvider {
     }
 
     private static void meltingRecipes(RecipeOutput pOutput) {
-        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.PLAYER), new FluidStack(Fluids.LAVA, 5))
-            .withChance(0.1f)
-            .save(pOutput, ModRef.res("crucible/melting/lava_from_player"));
+        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.IRON_GOLEM), TagSetup.FluidTags.MOLTEN_IRON, new MultiplyNumber(ConfigNumber.ConfigValue.NUGGET_MB.toProvider()))
+            .requiresFluid()
+            .save(pOutput, ModRef.res("crucible/melting/iron_from_iron_golem"));
 
-        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.SHEEP), FluidTags.WATER, 50)
-            .requiresNoFluid()
-            .save(pOutput, ModRef.res("crucible/melting/water_from_sheep"));
+        EntityMeltingRecipeBuilder.melt(EntityTypePredicate.of(EntityType.SNOW_GOLEM), FluidTags.WATER, 50)
+            .heat(300)
+            .save(pOutput, ModRef.res("crucible/melting/water_from_snow_golem"));
     }
 
     private static void crucibleRecipes(RecipeOutput pOutput) {
@@ -218,6 +199,44 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_fire_bricks", has(BlockSetup.FIRE_BRICKS.get()))
             .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
             .save(pOutput, ModRef.res("crucible_window_shapeless"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ItemSetup.FIRE_CLAY_BALL.get())
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Items.CLAY_BALL)
+            .unlockedBy("has_sand", has(Tags.Items.SANDS_RED))
+            .unlockedBy("has_clay", has(Items.CLAY_BALL))
+            .save(pOutput, ModRef.res("fire_clay_ball"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ItemSetup.FIRE_CLAY_BALL.get(), 2)
+            .requires(Tags.Items.SANDS)
+            .requires(Tags.Items.SANDS)
+            .requires(Tags.Items.SANDS)
+            .requires(Tags.Items.SANDS)
+            .requires(Tags.Items.DUSTS_REDSTONE)
+            .requires(Items.CLAY_BALL)
+            .requires(Items.CLAY_BALL)
+            .unlockedBy("has_sand", has(Tags.Items.SANDS))
+            .unlockedBy("has_redstone", has(Tags.Items.DUSTS_REDSTONE))
+            .unlockedBy("has_clay", has(Items.CLAY_BALL))
+            .save(pOutput, ModRef.res("fire_clay_ball_from_redstone"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ItemSetup.FIRE_CLAY_BALL.get(), 8)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Tags.Items.SANDS_RED)
+            .requires(Items.CLAY_BALL)
+            .requires(Items.CLAY_BALL)
+            .requires(Items.CLAY_BALL)
+            .requires(Items.CLAY_BALL)
+            .requires(Items.BLAZE_POWDER)
+            .unlockedBy("has_sand", has(Tags.Items.SANDS_RED))
+            .unlockedBy("has_clay", has(Items.CLAY_BALL))
+            .unlockedBy("has_blaze_powder", has(Items.BLAZE_POWDER))
+            .save(pOutput, ModRef.res("fire_clay_ball_from_blaze_powder"));
     }
 
     public static void metalRecipe(RecipeOutput output, String name, TagKey<Fluid> fluidTag, TagKey<Item> rawBlockTag, TagKey<Item> rawItemTag, TagKey<Item> blockTag, TagKey<Item> ingotTag, TagKey<Item> nuggetTag) {

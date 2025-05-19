@@ -16,10 +16,10 @@ public class EntityMeltingRecipeSerializer implements RecipeSerializer<EntityMel
 
     public static final MapCodec<EntityMeltingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         EntityTypePredicate.CODEC.fieldOf("entity_predicate").forGetter(EntityMeltingRecipe::entityPredicate),
-        Codec.BOOL.fieldOf("requires_fluid").forGetter(EntityMeltingRecipe::requiresFluid),
+        Codec.BOOL.optionalFieldOf("requires_fluid", false).forGetter(EntityMeltingRecipe::requiresFluid),
         IFluidOutput.CODEC.fieldOf("result").forGetter(EntityMeltingRecipe::result),
-        Codec.FLOAT.fieldOf("chance").forGetter(EntityMeltingRecipe::chance),
-        Codec.INT.fieldOf("heat").forGetter(EntityMeltingRecipe::heat)
+        Codec.FLOAT.optionalFieldOf("chance", 1.0f).forGetter(EntityMeltingRecipe::chance),
+        Codec.INT.optionalFieldOf("heat", 800).forGetter(EntityMeltingRecipe::heat)
     ).apply(instance, EntityMeltingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityMeltingRecipe> STREAM_CODEC = StreamCodec.composite(
