@@ -35,6 +35,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -195,10 +196,32 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             }
         }
 
-        // Entity Melting
+        // Entity Interaction
         if (pLevel.getGameTime() % 20 == 0) {
-            List<Entity> meltingEntities = pLevel.getEntities((Entity) null, structure.getInternalBounds(), e -> !(e instanceof ItemEntity));
-            for (Entity entity : meltingEntities) {
+            List<Entity> entitiesInStructure = pLevel.getEntities(null, structure.getInternalBounds());
+            for (Entity entity : entitiesInStructure) {
+                // Store any item entities into the crucible
+                if (entity instanceof ItemEntity item) {
+                    boolean changed = false;
+                    for (int slot = 0; slot < pCrucible.inventory.getSlots(); slot++) {
+                        ItemStack remainingStack = pCrucible.inventory.insertItem(slot, item.getItem(), false);
+                        if (ItemStack.matches(remainingStack, item.getItem())) {
+                            continue;
+                        }
+                        changed = true;
+                        item.setItem(remainingStack.copy());
+                        if (remainingStack.isEmpty()) {
+                            item.discard();
+                            break;
+                        }
+                    }
+                    if (changed) {
+                        pCrucible.setChanged();
+                    }
+                    continue;
+                }
+
+                // Any non-item entities should be melted.
                 if (entity.hurt(pLevel.damageSources().source(DamageTypeSetup.CRUCIBLE_MELTING_DAMAGE), 1)) {
                     EntityMeltingRecipe.Input recipeInput = new EntityMeltingRecipe.Input(entity.getType(), pCrucible.getFluidTank().getStored() > 0, pCrucible.heat);
                     pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
