@@ -1,6 +1,5 @@
 package dev.quarris.fireandflames.setup;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.config.number.*;

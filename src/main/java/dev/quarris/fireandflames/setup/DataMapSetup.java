@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.data.maps.FuelData;
+import dev.quarris.fireandflames.data.map.FuelData;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;

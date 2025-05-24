@@ -4,7 +4,6 @@ import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +30,7 @@ public class BlockLoot extends BlockLootSubProvider {
         this.dropSelf(BlockSetup.CASTING_BASIN.get());
         this.dropSelf(BlockSetup.CASTING_TABLE.get());
         this.dropSelf(BlockSetup.CRUCIBLE_BURNER.get());
+        this.dropSelf(BlockSetup.TINKERS_WORKBENCH.get());
         this.add(BlockSetup.CRUCIBLE_TANK.get(), this::createFluidStorageDrop);
 
         this.add(BlockSetup.FIRE_CLAY.get(), block -> this.createSingleItemTableWithSilkTouch(block, ItemSetup.FIRE_CLAY_BALL, ConstantValue.exactly(4.0F)));
@@ -47,7 +47,7 @@ public class BlockLoot extends BlockLootSubProvider {
                             LootItem.lootTableItem(block)
                                 .apply(
                                     CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                                        .include(DataComponentSetup.FLUID_CONTAINER.get())
+                                        .include(DataComponentSetup.TOOL_DATA.get())
                                 )
                         )
                 )

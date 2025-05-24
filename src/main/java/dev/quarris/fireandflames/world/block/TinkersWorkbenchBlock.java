@@ -1,0 +1,43 @@
+package dev.quarris.fireandflames.world.block;
+
+import com.mojang.serialization.MapCodec;
+import dev.quarris.fireandflames.world.block.entity.TinkersWorkbenchBlockEntity;
+import dev.quarris.fireandflames.world.inventory.menu.TinkersWorkbenchMenu;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
+
+public class TinkersWorkbenchBlock extends BaseEntityBlock {
+
+    public TinkersWorkbenchBlock(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        player.openMenu(new SimpleMenuProvider((id, inv, pl) -> new TinkersWorkbenchMenu(id, inv, ContainerLevelAccess.create(level, pos)), TinkersWorkbenchBlockEntity.TITLE));
+        return InteractionResult.CONSUME;
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(TinkersWorkbenchBlock::new);
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new TinkersWorkbenchBlockEntity(pos, state);
+    }
+}

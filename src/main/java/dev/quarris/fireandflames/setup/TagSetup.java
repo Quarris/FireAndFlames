@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.part.PartType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;

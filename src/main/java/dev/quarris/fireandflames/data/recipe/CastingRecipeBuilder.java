@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.data.recipes;
+package dev.quarris.fireandflames.data.recipe;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.config.number.INumberProvider;

@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.data.maps;
+package dev.quarris.fireandflames.data.map;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

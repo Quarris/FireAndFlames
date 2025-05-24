@@ -1,14 +1,13 @@
 package dev.quarris.fireandflames.world.crucible.fuel;
 
 import dev.quarris.fireandflames.config.ServerConfigs;
-import dev.quarris.fireandflames.data.maps.FuelData;
+import dev.quarris.fireandflames.data.map.FuelData;
 import dev.quarris.fireandflames.util.data.DataMapUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;

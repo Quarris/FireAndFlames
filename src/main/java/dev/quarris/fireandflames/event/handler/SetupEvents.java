@@ -1,25 +1,22 @@
 package dev.quarris.fireandflames.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.ToolMaterial;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.CapabilitySetup;
+import dev.quarris.fireandflames.setup.MaterialSetup;
+import dev.quarris.fireandflames.setup.RegistrySetup;
 import dev.quarris.fireandflames.world.crucible.fuel.FluidHandlerFuelWrapper;
-import dev.quarris.fireandflames.world.crucible.fuel.IFuelProvider;
 import dev.quarris.fireandflames.world.crucible.fuel.ItemHandlerFuelWrapper;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 @EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
 public class SetupEvents {
@@ -59,4 +56,8 @@ public class SetupEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void registerDatapackRegister(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(RegistrySetup.Keys.MATERIALS, ToolMaterial.CODEC, ToolMaterial.NETWORK_CODEC, builder -> builder.sync(true));
+    }
 }

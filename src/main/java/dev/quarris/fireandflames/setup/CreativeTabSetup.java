@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.part.ICustomPart;
+import dev.quarris.fireandflames.data.tool.ICustomTool;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -11,12 +13,37 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class CreativeTabSetup {
     public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ModRef.ID);
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = REGISTRY.register("creative_tab", () -> CreativeModeTab.builder()
-        .title(Component.translatable("creative_tabs.fireandflames.creative_tab"))
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = REGISTRY.register("main", () -> CreativeModeTab.builder()
+        .title(Component.translatable("creative_tabs.fireandflames.main"))
         .icon(() -> new ItemStack(BlockSetup.CRUCIBLE_CONTROLLER))
         .displayItems((pParams, pOutput) -> {
-            ItemSetup.REGISTRY.getEntries().forEach(entry -> pOutput.accept(entry.get()));
+            ItemSetup.REGISTRY.getEntries().forEach(entry -> {
+                pOutput.accept(entry.get().getDefaultInstance());
+            });
             FluidSetup.REGISTRY.getBucketEntries().forEach(entry -> pOutput.accept(entry.get()));
+        })
+        .build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOL = REGISTRY.register("tools", () -> CreativeModeTab.builder()
+        .title(Component.translatable("creative_tabs.fireandflames.tools"))
+        .icon(() -> new ItemStack(ToolItemSetup.PICKAXE.get()))
+        .withSearchBar()
+        .displayItems((pParams, pOutput) -> {
+            ToolItemSetup.REGISTRY.getEntries().forEach(entry -> {
+                if (entry.get() instanceof ICustomTool tool) {
+                    pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().forEach(material -> {
+                        pOutput.accept(tool.createFrom(material.value()));
+                    });
+                    return;
+                }
+
+                if (entry.get() instanceof ICustomPart part) {
+                    pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().forEach(material -> {
+                        pOutput.accept(part.createFrom(material.value()));
+                    });
+                    return;
+                }
+            });
         })
         .build());
 

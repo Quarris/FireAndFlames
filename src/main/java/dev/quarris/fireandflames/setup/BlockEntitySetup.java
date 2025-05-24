@@ -60,6 +60,13 @@ public class BlockEntitySetup {
                 BlockSetup.CASTING_TABLE.get()
             ).build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TinkersWorkbenchBlockEntity>> TINKERS_WORKBENCH =
+        REGISTRY.register("tinkers_workbench",
+            () -> BlockEntityType.Builder.of(
+                TinkersWorkbenchBlockEntity::new,
+                BlockSetup.TINKERS_WORKBENCH.get()
+            ).build(null));
+
     public static void init(IEventBus modBus) {
         REGISTRY.register(modBus);
     }
