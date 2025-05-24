@@ -4,10 +4,10 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.config.number.ConfigNumber;
 import dev.quarris.fireandflames.data.config.number.ConstantNumber;
 import dev.quarris.fireandflames.data.config.number.MultiplyNumber;
-import dev.quarris.fireandflames.data.recipes.AlloyingRecipeBuilder;
-import dev.quarris.fireandflames.data.recipes.CastingRecipeBuilder;
-import dev.quarris.fireandflames.data.recipes.CrucibleRecipeBuilder;
-import dev.quarris.fireandflames.data.recipes.EntityMeltingRecipeBuilder;
+import dev.quarris.fireandflames.data.recipe.AlloyingRecipeBuilder;
+import dev.quarris.fireandflames.data.recipe.CastingRecipeBuilder;
+import dev.quarris.fireandflames.data.recipe.CrucibleRecipeBuilder;
+import dev.quarris.fireandflames.data.recipe.EntityMeltingRecipeBuilder;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.ItemSetup;
 import dev.quarris.fireandflames.setup.TagSetup;
@@ -19,7 +19,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -34,9 +33,9 @@ import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
 import java.util.concurrent.CompletableFuture;
 
-public class RecipesGen extends RecipeProvider {
+public class RecipeGen extends RecipeProvider {
 
-    public RecipesGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+    public RecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries);
     }
 

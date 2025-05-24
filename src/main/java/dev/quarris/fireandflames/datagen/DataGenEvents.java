@@ -6,6 +6,7 @@ import dev.quarris.fireandflames.datagen.client.EnUsLanguageGen;
 import dev.quarris.fireandflames.datagen.client.ItemModelGen;
 import dev.quarris.fireandflames.datagen.server.*;
 import dev.quarris.fireandflames.datagen.server.loot.BlockLoot;
+import dev.quarris.fireandflames.setup.RegistrySetup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataProvider;
@@ -35,12 +36,10 @@ public class DataGenEvents {
 
         // Server
         gen.addProvider(event.includeServer(), (DataProvider.Factory<DatapackBuiltinEntriesProvider>) output ->
-            new DatapackBuiltinEntriesProvider(output, lookup, new RegistrySetBuilder()
-                .add(Registries.DAMAGE_TYPE, DamageTypeGen::bootstrap),
-                Set.of(ModRef.ID))
+            new DatapackBuiltinEntriesProvider(output, lookup, RegistrySetup.DATAPACK_REGISTRIES, Set.of(ModRef.ID))
         );
 
-        gen.addProvider(event.includeServer(), (DataProvider.Factory<RecipesGen>) (packOutput -> new RecipesGen(packOutput, lookup)));
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<RecipeGen>) (packOutput -> new RecipeGen(packOutput, lookup)));
         var blockTags = gen.addProvider(event.includeClient(), (DataProvider.Factory<BlockTagGen>) (packOutput -> new BlockTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<ItemTagGen>) (packOutput -> new ItemTagGen(packOutput, lookup, blockTags.contentsGetter(), existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<FluidTagGen>) (packOutput -> new FluidTagGen(packOutput, lookup, existingFiles)));

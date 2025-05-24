@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.ToolData;
+import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.world.fluid.component.FluidContainerContents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -14,6 +16,14 @@ public class DataComponentSetup {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<FluidContainerContents>> FLUID_CONTAINER = REGISTRY.registerComponentType(
         "fluid_container", builder -> builder.persistent(FluidContainerContents.CODEC).networkSynchronized(FluidContainerContents.STREAM_CODEC).cacheEncoding()
+    );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolData>> TOOL_DATA = REGISTRY.registerComponentType(
+        "tool_data", builder -> builder.persistent(ToolData.CODEC).networkSynchronized(ToolData.STREAM_CODEC).cacheEncoding()
+    );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolPart>> TOOL_PART = REGISTRY.registerComponentType(
+        "tool_part", builder -> builder.persistent(ToolPart.CODEC).networkSynchronized(ToolPart.STREAM_CODEC).cacheEncoding()
     );
 
     public static void init(IEventBus modBus) {

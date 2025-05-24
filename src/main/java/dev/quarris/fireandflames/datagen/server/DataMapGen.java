@@ -1,10 +1,9 @@
 package dev.quarris.fireandflames.datagen.server;
 
-import dev.quarris.fireandflames.data.maps.FuelData;
+import dev.quarris.fireandflames.data.map.FuelData;
 import dev.quarris.fireandflames.setup.DataMapSetup;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.DataMapProvider;
 

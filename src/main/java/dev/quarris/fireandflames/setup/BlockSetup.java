@@ -6,11 +6,9 @@ import dev.quarris.fireandflames.world.fluid.component.FluidContainerContents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -95,6 +93,13 @@ public class BlockSetup {
     public static final DeferredBlock<CastingBlock> CASTING_TABLE = registerBlock("casting_table", CastingTableBlock::new,
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_ORANGE)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.STONE));
+
+    public static final DeferredBlock<TinkersWorkbenchBlock> TINKERS_WORKBENCH = registerBlock("tinkers_workbench", TinkersWorkbenchBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.WOOD)
             .requiresCorrectToolForDrops()
             .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));

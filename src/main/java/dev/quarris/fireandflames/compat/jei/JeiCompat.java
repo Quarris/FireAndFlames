@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.compat.jei;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.client.screen.tinkersworkbench.TinkersWorkbenchScreen;
 import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.setup.BlockSetup;
@@ -10,6 +11,7 @@ import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -64,6 +66,11 @@ public class JeiCompat implements IModCompat, IModPlugin {
 
         registration.addRecipeCatalyst(BlockSetup.CASTING_BASIN, this.basinCategory.getRecipeType());
         registration.addRecipeCatalyst(BlockSetup.CASTING_TABLE, this.tableCategory.getRecipeType());
+    }
+
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addGuiContainerHandler(TinkersWorkbenchScreen.class, new TinkersWorkbenchGuiHandler());
     }
 
     @Override

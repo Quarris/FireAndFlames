@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.util.data;
 
-import dev.quarris.fireandflames.data.maps.FuelData;
+import dev.quarris.fireandflames.data.map.FuelData;
 import dev.quarris.fireandflames.setup.DataMapSetup;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
