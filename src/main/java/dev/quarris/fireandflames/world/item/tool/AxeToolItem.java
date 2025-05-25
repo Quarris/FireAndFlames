@@ -52,7 +52,7 @@ public class AxeToolItem extends AxeItem implements ICustomTool {
     }
 
     @Override
-    public ItemStack createFrom(ToolParts parts) {
+    public ItemStack createFrom(ToolData data) {
         ItemStack stack = new ItemStack(this);
 
         stack.set(DataComponents.TOOL, new Tool(List.of(
@@ -61,7 +61,7 @@ public class AxeToolItem extends AxeItem implements ICustomTool {
         ), 1.0f, 1));
 
         stack.set(DataComponents.MAX_DAMAGE, 1000);
-        stack.set(DataComponentSetup.TOOL_DATA, new ToolData(parts));
+        stack.set(DataComponentSetup.TOOL_DATA, data);
 
         return stack;
     }

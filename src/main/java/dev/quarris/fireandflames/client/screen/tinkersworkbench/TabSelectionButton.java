@@ -14,11 +14,11 @@ public class TabSelectionButton extends AbstractButton {
 
     public static final ResourceLocation SLOT_SPRITE = ModRef.res("container/tinkers_workbench/tool_tab_button");
 
-    private final int id;
+    private final ResourceLocation id;
     private final TabIconRenderer tabIconRenderer;
     private final TabSelectionWidget.OnToolTypeSelected onPress;
 
-    public TabSelectionButton(int id, int x, int y, int width, int height, TabIconRenderer tabIconRenderer, TabSelectionWidget.OnToolTypeSelected onPress) {
+    public TabSelectionButton(ResourceLocation id, int x, int y, int width, int height, TabIconRenderer tabIconRenderer, TabSelectionWidget.OnToolTypeSelected onPress) {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.id = id;
         this.tabIconRenderer = tabIconRenderer;

@@ -29,7 +29,7 @@ public final class ToolType<T extends ICustomTool> {
     public ItemStack buildFrom(ToolParts parts) {
         if (!this.partsValid(parts)) return ItemStack.EMPTY;
 
-        return this.toolItem.get().createFrom(parts);
+        return this.toolItem.get().createFrom(new ToolData(parts));
     }
 
     public boolean partsValid(ToolParts parts) {
@@ -102,7 +102,7 @@ public final class ToolType<T extends ICustomTool> {
 
         private final Supplier<T> toolItem;
         private final Map<String, PartSlot> parts = new Object2ObjectArrayMap<>();
-        private int ordering = Integer.MAX_VALUE;
+        private int ordering = -1;
 
         private Builder(Supplier<T> toolItem) {
             this.toolItem = toolItem;
