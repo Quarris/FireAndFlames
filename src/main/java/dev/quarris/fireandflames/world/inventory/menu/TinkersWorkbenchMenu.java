@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.world.inventory.menu;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.tool.ToolType;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
@@ -9,7 +10,6 @@ import dev.quarris.fireandflames.data.tool.part.ToolParts;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.setup.RegistrySetup;
-import dev.quarris.fireandflames.setup.ToolTypeSetup;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -34,13 +34,14 @@ import java.util.function.Consumer;
 
 public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
+    private static final ResourceLocation UPGRADE_TAB_NAME = ModRef.res("upgrade");
     private static final SimpleTab UPGRADE_TAB = SimpleTab.builder()
-        .addSlot(container -> new NamedSlot("tool", container, 0, 44, 69))
-        .addSlot(container -> new NamedSlot("catalyst", container, 1, 30, 91))
-        .addSlot(container -> new NamedSlot("catalyst", container, 2, 22, 65))
-        .addSlot(container -> new NamedSlot("catalyst", container, 3, 44, 47))
-        .addSlot(container -> new NamedSlot("catalyst", container, 4, 66, 65))
-        .addSlot(container -> new NamedSlot("catalyst", container, 5, 58, 91))
+        .addSlot(container -> new NamedContainerSlot("tool", container, 0, 44, 69))
+        .addSlot(container -> new NamedContainerSlot("catalyst", container, 1, 30, 91))
+        .addSlot(container -> new NamedContainerSlot("catalyst", container, 2, 22, 65))
+        .addSlot(container -> new NamedContainerSlot("catalyst", container, 3, 44, 47))
+        .addSlot(container -> new NamedContainerSlot("catalyst", container, 4, 66, 65))
+        .addSlot(container -> new NamedContainerSlot("catalyst", container, 5, 58, 91))
         .result((name, stacks) -> {
             ItemStack tool = stacks.get("tool").copy();
             tool.set(DataComponents.ITEM_NAME, name);
@@ -98,7 +99,7 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
         transferContentsToInventory(this.playerInventory.player, transferStacks.values());
 
-        ToolResultSlot resultSlot = new ToolResultSlot(this.resultContainer, 0, 138, 70, (player) -> this.currentTab.clearContainer());
+        ToolResultSlot resultSlot = new ToolResultSlot(this.resultContainer, 0, 138, 70, (player) -> this.access.execute((level, pos) -> this.currentTab.clearContainer()));
         tab.resultSlotIcon().ifPresent(icon -> resultSlot.setBackground(InventoryMenu.BLOCK_ATLAS, icon));
         this.addSlot(resultSlot);
 
@@ -114,6 +115,20 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
         for (int hotbar = 0; hotbar < 9; hotbar++) {
             this.addSlot(new Slot(this.playerInventory, hotbar, 8 + hotbar * 18, 195));
         }
+    }
+
+    public boolean setTabByName(ResourceLocation tabName) {
+        if (UPGRADE_TAB_NAME.equals(tabName)) {
+            this.setTab(UPGRADE_TAB);
+            return true;
+        }
+
+        if (RegistrySetup.TOOL_TYPES.containsKey(tabName)) {
+            this.setTab(ToolTab.of(RegistrySetup.TOOL_TYPES.get(tabName)));
+            return true;
+        }
+
+        return false;
     }
 
     private static void transferContentsToInventory(Player player, Collection<ItemStack> stacks) {
@@ -142,7 +157,6 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
     @Override
     public void slotsChanged(Container container) {
-        super.slotsChanged(container);
         this.computeOutput(Component.literal(this.toolName));
     }
 
@@ -165,7 +179,7 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
     private void computeOutput(Component toolName) {
         ItemStack result = this.currentTab.createResult(toolName, slotName -> this.inputSlots.get(slotName).stream().map(NamedSlot::getItem).toList());
-        this.resultContainer.setItem(0, result);
+        this.access.execute((level, pos) -> this.resultContainer.setItem(0, result));
         if (this.nameChangedListener != null) {
             String name = result.getHoverName().getString();
             if (result.isEmpty()) {
@@ -191,36 +205,11 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
         return true;
     }
 
-    @Override
-    public boolean clickMenuButton(Player player, int id) {
-        switch (id) {
-            case 0: {
-                this.setTab(UPGRADE_TAB);
-                break;
-            }
-            case 1: {
-                this.setTab(ToolTab.of(ToolTypeSetup.PICKAXE.get()));
-                break;
-            }
-            case 2: {
-                this.setTab(ToolTab.of(ToolTypeSetup.AXE.get()));
-                break;
-            }
-            case 3: {
-                this.setTab(ToolTab.of(ToolTypeSetup.HAMMER.get()));
-                break;
-            }
-        }
-
-        return true;
-    }
-
     public void setNameChangedListener(Consumer<String> onNameChanged) {
         this.nameChangedListener = onNameChanged;
     }
 
     public interface ITab {
-
 
         Container getContainer();
 
@@ -272,7 +261,7 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
         @Override
         public void initTab(ContainerListener listener, Consumer<NamedSlot> inputSlots) {
             this.container = new SimpleContainer(this.slotFactories.size());
-            //this.container.addListener(listener);
+            this.container.addListener(listener);
 
             for (INamedSlotFactory factory : this.slotFactories) {
                 inputSlots.accept(factory.createSlot(this.container));
@@ -338,10 +327,10 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
             int slot = 0;
             for (PartSlot partSlot : partSlots) {
                 SlotPosition slotPosition = partSlot.slotPos();
-                NamedSlot namedSlot = new NamedSlot(partSlot.name(), this.container, slot, slotPosition.x(), slotPosition.y()) {
+                NamedSlot namedSlot = new NamedContainerSlot(partSlot.name(), this.container, slot, slotPosition.x(), slotPosition.y()) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        return stack.get(DataComponentSetup.TOOL_PART).type().is(partSlot.type());
+                        return stack.has(DataComponentSetup.TOOL_PART) && stack.get(DataComponentSetup.TOOL_PART).type().is(partSlot.type());
                     }
                 };
                 namedSlot.setBackground(TextureAtlas.LOCATION_BLOCKS, partSlot.type().getKey().location().withPrefix("item/slot/"));

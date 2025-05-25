@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 public class TabSelectionWidget extends AbstractContainerWidget {
@@ -58,13 +59,23 @@ public class TabSelectionWidget extends AbstractContainerWidget {
 
         ToolMaterial goldMaterial = Minecraft.getInstance().level.registryAccess().registryOrThrow(RegistrySetup.Keys.MATERIALS).getOrThrow(MaterialSetup.GOLD);
         this.allOptions = new ArrayList<>();
-        this.allOptions.add(new TabSelection("Upgrade"::contains, new TabSelectionButton.StackTabRenderer(new ItemStack(Items.REDSTONE))));
+        this.allOptions.add(new TabSelection(ModRef.res("upgrade"), "Upgrade"::contains, new TabSelectionButton.StackTabRenderer(new ItemStack(Items.REDSTONE))));
 
             ToolItemSetup.REGISTRY.getEntries().stream()
                 .filter(item -> item.get() instanceof ICustomTool)
                 .map(i -> ((ICustomTool) i.get()))
-                .sorted(Comparator.comparingInt(tool -> tool.getType().ordering()))
-                .map(tool -> new TabSelection(RegistrySetup.TOOL_TYPES.getKey(tool.getType()).getPath()::contains, new TabSelectionButton.StackTabRenderer(tool.createFrom(goldMaterial))))
+                .sorted(((Comparator<ICustomTool>) (tool1, tool2) -> {
+                    int ordering1 = tool1.getType().ordering();
+                    int ordering2 = tool2.getType().ordering();
+                    if (ordering1 < 0 && ordering2 < 0) return 0;
+                    if (ordering1 < 0) return 1;
+                    if (ordering2 < 0) return -1;
+                    return 0;
+                }).thenComparingInt(tool -> tool.getType().ordering()))
+                .map(tool -> {
+                    ResourceLocation toolName = RegistrySetup.TOOL_TYPES.getKey(tool.getType());
+                    return new TabSelection(toolName, toolName.getPath().toLowerCase(Locale.ROOT)::contains, new TabSelectionButton.StackTabRenderer(tool.createFrom(goldMaterial)));
+                })
                 .forEach(this.allOptions::add);
         this.filteredOptions = new ArrayList<>(this.allOptions);
 
@@ -121,7 +132,7 @@ public class TabSelectionWidget extends AbstractContainerWidget {
         this.selectionButtons.clear();
         for (int i = 0; i < this.maxToolCount; i++) {
             TabSelection selection = options.get(this.scroll + i);
-            this.selectionButtons.add(new TabSelectionButton(i, this.getX() + 18, this.getY() + 20 + i * 22, 20, 20, selection.iconRenderer(), this.onToolTypeSelected));
+            this.selectionButtons.add(new TabSelectionButton(selection.name(), this.getX() + 18, this.getY() + 20 + i * 22, 20, 20, selection.iconRenderer(), this.onToolTypeSelected));
         }
     }
 
@@ -187,10 +198,10 @@ public class TabSelectionWidget extends AbstractContainerWidget {
     }
 
     public interface OnToolTypeSelected {
-        void select(int id);
+        void select(ResourceLocation tabName);
     }
 
-    public record TabSelection(Predicate<String> filter, TabSelectionButton.TabIconRenderer iconRenderer) {
+    public record TabSelection(ResourceLocation name, Predicate<String> filter, TabSelectionButton.TabIconRenderer iconRenderer) {
 
     }
 }

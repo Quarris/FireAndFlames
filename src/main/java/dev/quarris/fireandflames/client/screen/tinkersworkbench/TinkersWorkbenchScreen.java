@@ -2,6 +2,7 @@ package dev.quarris.fireandflames.client.screen.tinkersworkbench;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.screen.widgets.DefaultedEditBox;
+import dev.quarris.fireandflames.network.payload.TinkersWorkbenchChangeTabC2SPayload;
 import dev.quarris.fireandflames.network.payload.TinkersWorkbenchToolNameChangeC2SPayload;
 import dev.quarris.fireandflames.world.inventory.menu.NamedSlot;
 import dev.quarris.fireandflames.world.inventory.menu.TinkersWorkbenchMenu;
@@ -49,9 +50,9 @@ public class TinkersWorkbenchScreen extends AbstractContainerScreen<TinkersWorkb
         });
     }
 
-    private void changeTab(int id) {
-        if (this.menu.clickMenuButton(this.minecraft.player, id)) {
-            this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, id);
+    private void changeTab(ResourceLocation tabName) {
+        if (this.menu.setTabByName(tabName)) {
+            PacketDistributor.sendToServer(new TinkersWorkbenchChangeTabC2SPayload(tabName));
         }
     }
 
@@ -68,7 +69,7 @@ public class TinkersWorkbenchScreen extends AbstractContainerScreen<TinkersWorkb
 
     @Override
     protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
-        if (slot instanceof NamedSlot named) {
+        if (slot instanceof NamedSlot) {
             guiGraphics.blitSprite(SLOT_SPRITE, slot.x - 1, slot.y - 1, 18, 18);
         }
         super.renderSlot(guiGraphics, slot);
@@ -84,7 +85,7 @@ public class TinkersWorkbenchScreen extends AbstractContainerScreen<TinkersWorkb
     protected void renderTooltip(GuiGraphics guiGraphics, int x, int y) {
         if (this.getSlotUnderMouse() instanceof NamedSlot namedSlot && !namedSlot.hasItem()) {
             String key = Util.makeDescriptionId("tool_part.slot", ModRef.res(namedSlot.getName().toLowerCase(Locale.ROOT)));
-            guiGraphics.renderTooltip(this.font, Language.getInstance().has(key) ? Component.translatable(key): Component.literal(key), x, y);
+            guiGraphics.renderTooltip(this.font, Language.getInstance().has(key) ? Component.translatable(key): Component.literal(namedSlot.getName()), x, y);
             return;
         }
 

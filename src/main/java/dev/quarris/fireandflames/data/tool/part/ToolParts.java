@@ -46,6 +46,18 @@ public class ToolParts {
         return this == EMPTY || this.namedParts.isEmpty();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ToolParts toolParts = (ToolParts) o;
+        return Objects.equals(mainPartName, toolParts.mainPartName) && Objects.equals(namedParts, toolParts.namedParts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mainPartName, namedParts);
+    }
+
     public static Builder builder() {
         return new Builder();
     }

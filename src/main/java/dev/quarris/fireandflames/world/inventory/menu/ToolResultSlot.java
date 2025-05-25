@@ -16,8 +16,13 @@ public class ToolResultSlot extends Slot {
 
     @Override
     public void onTake(Player player, ItemStack stack) {
-        super.onTake(player, stack);
         this.onToolCrafted.onCraft(player);
+        super.onTake(player, stack);
+    }
+
+    @Override
+    public boolean mayPlace(ItemStack stack) {
+        return false;
     }
 
     public interface OnToolCrafted {

@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record TinkersWorkbenchToolNameChangeC2SPayload(String toolName) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ModRef.res("tinkers_workbench_tool_name_chane");
+    public static final ResourceLocation ID = ModRef.res("tinkers_workbench_tool_name_change");
     public static final Type<TinkersWorkbenchToolNameChangeC2SPayload> TYPE = new Type<>(ID);
     public static final StreamCodec<RegistryFriendlyByteBuf, TinkersWorkbenchToolNameChangeC2SPayload> CODEC = StreamCodec.composite(
         ByteBufCodecs.STRING_UTF8, TinkersWorkbenchToolNameChangeC2SPayload::toolName,

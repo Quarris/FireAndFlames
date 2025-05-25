@@ -36,10 +36,14 @@ public class PickaxeToolItem extends PickaxeItem implements ICustomTool {
         ToolData toolData = stack.get(DataComponentSetup.TOOL_DATA);
         if (toolData == null || toolData.isEmpty()) return;
 
-        ToolParts toolParts = toolData.toolParts();
-        for (PartSlot slot : this.toolType.get().getAllSlots()) {
-            ToolPart part = toolParts.getPart(slot.name());
-            tooltipComponents.add(Component.literal("[" + slot.name() + "] - " + part.material().name()).withStyle(ChatFormatting.GRAY));
+        try {
+            ToolParts toolParts = toolData.toolParts();
+            for (PartSlot slot : this.toolType.get().getAllSlots()) {
+                ToolPart part = toolParts.getPart(slot.name());
+                tooltipComponents.add(Component.literal("[" + slot.name() + "] - " + part.material().name()).withStyle(ChatFormatting.GRAY));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,7 +60,7 @@ public class PickaxeToolItem extends PickaxeItem implements ICustomTool {
     }
 
     @Override
-    public ItemStack createFrom(ToolParts parts) {
+    public ItemStack createFrom(ToolData data) {
         ItemStack stack = new ItemStack(this);
 
         stack.set(DataComponents.TOOL, new Tool(List.of(
@@ -65,7 +69,7 @@ public class PickaxeToolItem extends PickaxeItem implements ICustomTool {
         ), 1.0f, 1));
 
         stack.set(DataComponents.MAX_DAMAGE, 1000);
-        stack.set(DataComponentSetup.TOOL_DATA, new ToolData(parts));
+        stack.set(DataComponentSetup.TOOL_DATA, data);
 
         return stack;
     }
