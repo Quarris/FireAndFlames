@@ -32,14 +32,14 @@ public class CreativeTabSetup {
             ToolItemSetup.REGISTRY.getEntries().forEach(entry -> {
                 if (entry.get() instanceof ICustomTool tool) {
                     pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().forEach(material -> {
-                        pOutput.accept(tool.createFrom(material.value()));
+                        pOutput.accept(tool.createFrom(material));
                     });
                     return;
                 }
 
                 if (entry.get() instanceof ICustomPart part) {
                     pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().forEach(material -> {
-                        pOutput.accept(part.createFrom(material.value()));
+                        pOutput.accept(part.createFrom(material));
                     });
                     return;
                 }

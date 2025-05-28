@@ -79,7 +79,6 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
         this.remoteSlots.clear();
         this.lastSlots.clear();
 
-
         tab.initTab(this::slotsChanged, this::addInputSlot);
         this.currentTab = tab;
 
@@ -164,7 +163,11 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
         String validatedName = validateName(itemName);
         if (validatedName != null && !validatedName.equals(this.toolName)) {
             this.toolName = validatedName;
-            this.computeOutput(Component.literal(this.toolName));
+            ItemStack result = this.resultContainer.getItem(0);
+            if (!result.isEmpty()) {
+                result.set(DataComponents.ITEM_NAME, Component.literal(itemName));
+            }
+
             return true;
         } else {
             return false;
@@ -326,8 +329,8 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
             int slot = 0;
             for (PartSlot partSlot : partSlots) {
-                SlotPosition slotPosition = partSlot.slotPos();
-                NamedSlot namedSlot = new NamedContainerSlot(partSlot.name(), this.container, slot, slotPosition.x(), slotPosition.y()) {
+                PartPosition partPosition = this.toolType.getPartPosition(partSlot);
+                NamedSlot namedSlot = new NamedContainerSlot(partSlot.name(), this.container, slot, partPosition.x(), partPosition.y()) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
                         return stack.has(DataComponentSetup.TOOL_PART) && stack.get(DataComponentSetup.TOOL_PART).type().is(partSlot.type());

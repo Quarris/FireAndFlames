@@ -30,7 +30,7 @@ public class ToolParts {
         return this.getPart(this.mainPartName);
     }
 
-    public Set<String> partKeys() {
+    public Set<String> partNames() {
         return this.namedParts.keySet();
     }
 
@@ -38,7 +38,7 @@ public class ToolParts {
         return this.namedParts.get(name);
     }
 
-    public Collection<ToolPart> getAllParts() {
+    public Collection<ToolPart> getParts() {
         return this.namedParts.values();
     }
 

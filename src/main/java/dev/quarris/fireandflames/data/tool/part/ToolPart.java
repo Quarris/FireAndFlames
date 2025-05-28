@@ -7,23 +7,26 @@ import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.RegistrySetup;
 import dev.quarris.fireandflames.setup.TagSetup;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.Optional;
 
-public record ToolPart(Holder<PartType> type, ToolMaterial material) {
+public record ToolPart(Holder<PartType> type, Holder<ToolMaterial> material) {
 
     public static final Codec<ToolPart> CODEC = Codec.pair(
         RegistrySetup.PART_TYPES.holderByNameCodec().fieldOf("type").codec(),
-        ToolMaterial.CODEC.fieldOf("material").codec()
+        ToolMaterial.HOLDER_CODEC.fieldOf("material").codec()
     ).xmap(pair -> new ToolPart(pair.getFirst(), pair.getSecond()), part -> Pair.of(part.type(), part.material()));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ToolPart> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.holderRegistry(RegistrySetup.Keys.PART_TYPES), ToolPart::type,
-        ToolMaterial.STREAM_CODEC, ToolPart::material,
+        ByteBufCodecs.holderRegistry(RegistrySetup.Keys.MATERIALS), ToolPart::material,
         ToolPart::new
     );
 

@@ -2,17 +2,17 @@ package dev.quarris.fireandflames.world.item.tool;
 
 import dev.quarris.fireandflames.data.tool.ICustomTool;
 import dev.quarris.fireandflames.data.tool.ToolData;
+import dev.quarris.fireandflames.data.tool.ToolType;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.data.tool.part.ToolParts;
-import dev.quarris.fireandflames.data.tool.ToolType;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.ToolTypeSetup;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
@@ -33,9 +33,9 @@ public class AxeToolItem extends AxeItem implements ICustomTool {
         if (toolData == null || toolData.isEmpty()) return;
 
         ToolParts toolParts = toolData.toolParts();
-        for (String key : toolParts.partKeys()) {
+        for (String key : toolParts.partNames()) {
             ToolPart part = toolParts.getPart(key);
-            tooltipComponents.add(Component.literal("[" + key + "] - " + part.material().name()).withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.literal("[" + key + "] - " + part.material().value().name()).withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -44,25 +44,14 @@ public class AxeToolItem extends AxeItem implements ICustomTool {
         ToolData tool = stack.get(DataComponentSetup.TOOL_DATA);
         String name = "You Shouldn't Have This";
         if (tool != null && !tool.isEmpty()) {
-            name = tool.toolParts().getMainPart().material().name();
+            name = tool.toolParts().getMainPart().material().value().name();
         }
 
         return Component.translatable(this.getDescriptionId(stack), name);
-
     }
 
     @Override
-    public ItemStack createFrom(ToolData data) {
-        ItemStack stack = new ItemStack(this);
-
-        stack.set(DataComponents.TOOL, new Tool(List.of(
-            Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, 1.0f),
-            Tool.Rule.deniesDrops(BlockTags.INCORRECT_FOR_WOODEN_TOOL)
-        ), 1.0f, 1));
-
-        stack.set(DataComponents.MAX_DAMAGE, 1000);
-        stack.set(DataComponentSetup.TOOL_DATA, data);
-
-        return stack;
+    public void verifyComponentsAfterLoad(ItemStack stack) {
+        this.onItemLoad(stack);
     }
 }
