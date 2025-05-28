@@ -1,34 +1,30 @@
 package dev.quarris.fireandflames.world.item.tool;
 
-import dev.quarris.fireandflames.data.tool.*;
+import dev.quarris.fireandflames.data.tool.ICustomTool;
+import dev.quarris.fireandflames.data.tool.ToolData;
+import dev.quarris.fireandflames.data.tool.ToolType;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.data.tool.part.ToolParts;
-import dev.quarris.fireandflames.setup.*;
+import dev.quarris.fireandflames.setup.DataComponentSetup;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class PickaxeToolItem extends PickaxeItem implements ICustomTool {
+public class ShovelToolItem extends ShovelItem implements ICustomTool {
 
-    private final Supplier<ToolType<PickaxeToolItem>> toolType;
-    public PickaxeToolItem(Supplier<ToolType<PickaxeToolItem>> toolType, Tier tier, Properties props) {
+    private final Supplier<ToolType<ShovelToolItem>> toolType;
+
+    public ShovelToolItem(Supplier<ToolType<ShovelToolItem>> toolType, Tier tier, Properties props) {
         super(tier, props);
         this.toolType = toolType;
     }
 
     @Override
-    public ToolType<PickaxeToolItem> getType() {
+    public ToolType<ShovelToolItem> getType() {
         return this.toolType.get();
     }
 

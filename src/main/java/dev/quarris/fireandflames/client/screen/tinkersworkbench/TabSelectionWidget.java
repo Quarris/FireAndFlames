@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.client.screen.tinkersworkbench;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.screen.widgets.ScrollbarWidget;
 import dev.quarris.fireandflames.data.tool.ICustomTool;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -57,26 +59,27 @@ public class TabSelectionWidget extends AbstractContainerWidget {
         super(x, y, width, height, CommonComponents.EMPTY);
         this.onToolTypeSelected = onToolTypeSelected;
 
-        ToolMaterial goldMaterial = Minecraft.getInstance().level.registryAccess().registryOrThrow(RegistrySetup.Keys.MATERIALS).getOrThrow(MaterialSetup.GOLD);
+        Holder<ToolMaterial> goldMaterial = Minecraft.getInstance().level.registryAccess().asGetterLookup().lookupOrThrow(RegistrySetup.Keys.MATERIALS).getOrThrow(MaterialSetup.GOLD);
         this.allOptions = new ArrayList<>();
         this.allOptions.add(new TabSelection(ModRef.res("upgrade"), "Upgrade"::contains, new TabSelectionButton.StackTabRenderer(new ItemStack(Items.REDSTONE))));
 
-            ToolItemSetup.REGISTRY.getEntries().stream()
-                .filter(item -> item.get() instanceof ICustomTool)
-                .map(i -> ((ICustomTool) i.get()))
-                .sorted(((Comparator<ICustomTool>) (tool1, tool2) -> {
-                    int ordering1 = tool1.getType().ordering();
-                    int ordering2 = tool2.getType().ordering();
-                    if (ordering1 < 0 && ordering2 < 0) return 0;
-                    if (ordering1 < 0) return 1;
-                    if (ordering2 < 0) return -1;
-                    return 0;
-                }).thenComparingInt(tool -> tool.getType().ordering()))
-                .map(tool -> {
-                    ResourceLocation toolName = RegistrySetup.TOOL_TYPES.getKey(tool.getType());
-                    return new TabSelection(toolName, toolName.getPath().toLowerCase(Locale.ROOT)::contains, new TabSelectionButton.StackTabRenderer(tool.createFrom(goldMaterial)));
-                })
-                .forEach(this.allOptions::add);
+        ToolItemSetup.REGISTRY.getEntries().stream()
+            .filter(item -> item.get() instanceof ICustomTool)
+            .map(i -> ((ICustomTool) i.get()))
+            .sorted(((Comparator<ICustomTool>) (tool1, tool2) -> {
+                int ordering1 = tool1.getType().ordering();
+                int ordering2 = tool2.getType().ordering();
+                if (ordering1 < 0 && ordering2 < 0) return 0;
+                if (ordering1 < 0) return 1;
+                if (ordering2 < 0) return -1;
+                return 0;
+            }).thenComparingInt(tool -> tool.getType().ordering()))
+            .map(tool -> {
+                ResourceLocation toolName = RegistrySetup.TOOL_TYPES.getKey(tool.getType());
+                return new TabSelection(toolName, toolName.getPath().toLowerCase(Locale.ROOT)::contains, new TabSelectionButton.StackTabRenderer(tool.createFrom(goldMaterial)));
+            })
+            .forEach(this.allOptions::add);
+
         this.filteredOptions = new ArrayList<>(this.allOptions);
 
         this.searchBar = new EditBox(Minecraft.getInstance().font, x + 6, y + 5, width - 12, 14, Component.literal("Filter tool")) {
@@ -115,7 +118,7 @@ public class TabSelectionWidget extends AbstractContainerWidget {
         int toolSelectionHeight = this.getHeight() - 20;
         int toolCountLimit = toolSelectionHeight / 22;
         this.maxToolCount = Math.min(count, toolCountLimit);
-        this.scrollbar.updateMaxScroll(this.maxToolCount - toolCountLimit);
+        this.scrollbar.updateMaxScroll(count - toolCountLimit);
     }
 
     private void onFilter(String filter) {
@@ -149,24 +152,24 @@ public class TabSelectionWidget extends AbstractContainerWidget {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
+        if (keyCode == InputConstants.KEY_ESCAPE || keyCode == InputConstants.KEY_TAB) {
             return false;
         }
 
-        if (this.searchBar.canConsumeInput()) {
-            return this.searchBar.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        if (this.searchBar.keyPressed(keyCode, scanCode, modifiers) || this.searchBar.canConsumeInput()) {
+            return true;
         }
 
-        if (this.scrollbar.isFocused()) {
-            return this.scrollbar.keyPressed(keyCode, scanCode, modifiers);
+        if (this.scrollbar.keyPressed(keyCode, scanCode, modifiers) || this.scrollbar.isFocused()) {
+            return true;
         }
 
-        return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return this.scrollbar.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
@@ -174,11 +177,6 @@ public class TabSelectionWidget extends AbstractContainerWidget {
         if (!focused) {
             this.setFocused(null);
         }
-    }
-
-    @Override
-    public void setFocused(@Nullable GuiEventListener widget) {
-        super.setFocused(widget);
     }
 
     @Override
@@ -201,7 +199,8 @@ public class TabSelectionWidget extends AbstractContainerWidget {
         void select(ResourceLocation tabName);
     }
 
-    public record TabSelection(ResourceLocation name, Predicate<String> filter, TabSelectionButton.TabIconRenderer iconRenderer) {
+    public record TabSelection(ResourceLocation name, Predicate<String> filter,
+                               TabSelectionButton.TabIconRenderer iconRenderer) {
 
     }
 }

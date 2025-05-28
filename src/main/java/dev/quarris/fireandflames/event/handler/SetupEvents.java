@@ -58,6 +58,6 @@ public class SetupEvents {
 
     @SubscribeEvent
     public static void registerDatapackRegister(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(RegistrySetup.Keys.MATERIALS, ToolMaterial.CODEC, ToolMaterial.NETWORK_CODEC, builder -> builder.sync(true));
+        event.dataPackRegistry(RegistrySetup.Keys.MATERIALS, ToolMaterial.CODEC, ToolMaterial.CODEC, builder -> builder.sync(true));
     }
 }

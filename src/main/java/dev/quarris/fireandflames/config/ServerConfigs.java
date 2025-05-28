@@ -1,11 +1,16 @@
 package dev.quarris.fireandflames.config;
 
 import dev.quarris.fireandflames.ModRef;
+import it.unimi.dsi.fastutil.Pair;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+@SuppressWarnings({"rawtypes", "unchecked"})
 @EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
 public class ServerConfigs {
 
@@ -54,16 +59,27 @@ public class ServerConfigs {
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        builder.comment("tools").push("tools");
+        builder.defineList("mining_levels", new ArrayList() {{
+            add(new ArrayList() {{ add(1.0F); add("minecraft:incorrect_for_wooden_tools"); }});
+            add(new ArrayList() {{ add(2.0F); add("minecraft:incorrect_for_stone_tools"); }});
+            add(new ArrayList() {{ add(2.5F); add("minecraft:incorrect_for_copper_tools"); add("c:incorrect_for_tin_tools"); }});
+            add(new ArrayList() {{ add(3.0F); add("minecraft:incorrect_for_iron_tools"); }});
+        }}, () -> null, o -> true);
+        builder.pop();
+
         builder.comment(
             " Crucible Configs"
-        ).push("crucible"); {
+        ).push("crucible");
+        {
             MAX_CRUCIBLE_SIZE = builder.comment(
                 " Max (external) width/depth of the crucible."
             ).defineInRange("max_size", 23, 3, 100);
 
             builder.comment(
                 " Heat Temperature Settings"
-            ).push("heat"); {
+            ).push("heat");
+            {
                 ENABLE_HEAT_REQUIREMENT = builder.comment(
                     " Enables the heat requirement for recipes and fuels."
                 ).define("enable_heat_requirement", true);
@@ -92,7 +108,8 @@ public class ServerConfigs {
 
             builder.comment(
                 " Fuel Settings"
-            ).push("fuel"); {
+            ).push("fuel");
+            {
                 USE_FLUID_TEMPERATURE = builder.comment(
                     " Should fluid temperature be used as the base heat values if they are not defined in the datapack fuel maps",
                     " The fluid temperature will be used as both heat and burn ticks."
@@ -114,8 +131,10 @@ public class ServerConfigs {
 
         builder.comment(
             " Recipe Settings"
-        ).push("recipe"); {
-            builder.push("smelting"); {
+        ).push("recipe");
+        {
+            builder.push("smelting");
+            {
                 SMELTING_HEAT_BONUS_MULTIPLIER = builder.comment(
                     " The bonus smelting speed multiplier based on the heat of the crucible.",
                     " For example, when the crucible is at 2x required heat, the speed of the smelting is '2 * <heat_bonus> * (1/<base_recipe_time>)' per tick"
@@ -123,7 +142,8 @@ public class ServerConfigs {
                 builder.pop();
             }
 
-            builder.push("alloying"); {
+            builder.push("alloying");
+            {
                 ALLOYING_HEAT_BONUS_MULTIPLIER = builder.comment(
                     " The bonus alloying speed multiplier based on the heat of the crucible.",
                     " For example, when the crucible is at 2x required heat, the speed of the alloying is '2 * <heat_bonus>' iteration per tick"
@@ -138,7 +158,8 @@ public class ServerConfigs {
         builder.comment(
             " Configurable values used in recipes and such.",
             " Modify these to automatically change the specific values in recipe without having to modify recipes themselves"
-        ).push("constants"); {
+        ).push("constants");
+        {
             ORE_MULTIPLIER = builder.comment(
                 " How much fluid to generate from smelting raw ores.",
                 " This takes into account single raw item and raw blocks.",
@@ -249,6 +270,7 @@ public class ServerConfigs {
     @SubscribeEvent
     public static void loadConfigs(ModConfigEvent.Loading event) {
         if (event.getConfig().getModId().equals(ModRef.ID)) {
+            ModRef.LOGGER.info(event.getConfig().getLoadedConfig().config().toString());
             reloadConfigs();
         }
     }

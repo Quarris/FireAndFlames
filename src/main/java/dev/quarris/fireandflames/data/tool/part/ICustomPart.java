@@ -8,9 +8,9 @@ public interface ICustomPart {
 
     Holder<PartType> getPartType();
 
-    ItemStack createFrom(ToolMaterial material);
+    ItemStack createFrom(Holder<ToolMaterial> material);
 
-    default ToolPart createPart(ToolMaterial material) {
+    default ToolPart createPart(Holder<ToolMaterial> material) {
         return new ToolPart(this.getPartType(), material);
     }
 

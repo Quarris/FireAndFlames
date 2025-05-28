@@ -28,7 +28,7 @@ public class PartItem extends Item implements ICustomPart {
         ToolPart toolPart = stack.get(DataComponentSetup.TOOL_PART);
         String name = "You Shouldn't Have This";
         if (toolPart != null) {
-            name = toolPart.material().name();
+            name = toolPart.material().value().name();
         }
 
         return Component.translatable(this.getDescriptionId(stack), name);
@@ -36,7 +36,7 @@ public class PartItem extends Item implements ICustomPart {
     }
 
     @Override
-    public ItemStack createFrom(ToolMaterial material) {
+    public ItemStack createFrom(Holder<ToolMaterial> material) {
         ItemStack stack = new ItemStack(this);
         stack.set(DataComponentSetup.TOOL_PART, new ToolPart(this.partType, material));
         return stack;

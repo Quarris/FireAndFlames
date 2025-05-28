@@ -22,11 +22,21 @@ public class ItemModelGen extends ItemModelProvider {
 
         this.basicItem(ToolItemSetup.PICKAXE.get());
         this.basicItem(ToolItemSetup.AXE.get());
+        this.basicItem(ToolItemSetup.SHOVEL.get());
+        this.basicItem(ToolItemSetup.HOE.get());
         this.basicItem(ToolItemSetup.HAMMER.get());
+        this.basicItem(ToolItemSetup.SWORD.get());
+
         this.basicItem(ToolItemSetup.AXE_HEAD.get());
         this.basicItem(ToolItemSetup.PICKAXE_HEAD.get());
+        this.basicItem(ToolItemSetup.SHOVEL_HEAD.get());
+        this.basicItem(ToolItemSetup.HOE_HEAD.get());
+        this.basicItem(ToolItemSetup.SWORD_BLADE.get());
+
         this.basicItem(ToolItemSetup.HANDLE.get());
         this.basicItem(ToolItemSetup.BINDING.get());
+        this.basicItem(ToolItemSetup.WIDE_GUARD.get());
+
         //this.getBuilder("custom_tool").customLoader(CustomToolLoaderBuilder::new);
     }
 }

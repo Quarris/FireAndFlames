@@ -35,19 +35,27 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addBlock(BlockSetup.CRUCIBLE_FAWSIT, "Crucible Fawsit (Faucet)");
         this.addBlock(BlockSetup.CASTING_BASIN, "Casting Basin");
         this.addBlock(BlockSetup.CASTING_TABLE, "Casting Table");
+        this.addBlock(BlockSetup.TINKERS_WORKBENCH, "Tinkers' Workbench");
     }
 
     private void addToolsAndParts() {
         // Tools
         this.addItem(ToolItemSetup.PICKAXE, "%s Pickaxe");
         this.addItem(ToolItemSetup.AXE, "%s Axe");
+        this.addItem(ToolItemSetup.SHOVEL, "%s Shovel");
+        this.addItem(ToolItemSetup.HOE, "%s Hoe");
         this.addItem(ToolItemSetup.HAMMER, "%s Hammer");
+        this.addItem(ToolItemSetup.SWORD, "%s Sword");
 
         // Parts
         this.addItem(ToolItemSetup.PICKAXE_HEAD, "%s Pickaxe Head");
         this.addItem(ToolItemSetup.AXE_HEAD, "%s Axe Head");
-        this.addItem(ToolItemSetup.HANDLE, "%s Tool Rod");
+        this.addItem(ToolItemSetup.SHOVEL_HEAD, "%s Shovel Head");
+        this.addItem(ToolItemSetup.HOE_HEAD, "%s Hoe Head");
+        this.addItem(ToolItemSetup.SWORD_BLADE, "%s Sword Head");
+        this.addItem(ToolItemSetup.HANDLE, "%s Handle");
         this.addItem(ToolItemSetup.BINDING, "%s Tool Binding");
+        this.addItem(ToolItemSetup.WIDE_GUARD, "%s Wide Guard");
     }
 
     private void addFluids() {
@@ -84,13 +92,18 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add("death.attack.crucible_melting", "%1$s was melted by the heat of the crucible");
         this.add("death.attack.crucible_melting.player", "%1$s was thrown to the pits of the crucible by %2$s");
 
-        this.addPartSlot(CommonPartSlots.HANDLE.name(), "Handle");
-        this.addPartSlot(CommonPartSlots.GRIP.name(), "Grip");
         this.addPartSlot(CommonPartSlots.PICKAXE_HEAD.name(), "Pickaxe Head");
         this.addPartSlot(CommonPartSlots.AXE_HEAD.name(), "Axe Head");
-        this.addPartSlot(CommonPartSlots.BINDING.name(), "Binding");
+        this.addPartSlot(CommonPartSlots.SHOVEL_HEAD.name(), "Shovel Head");
+        this.addPartSlot(CommonPartSlots.HOE_HEAD.name(), "Hoe Head");
         this.addPartSlot(CommonPartSlots.HAMMER_LEFT.name(), "Hammer Head");
         this.addPartSlot(CommonPartSlots.HAMMER_RIGHT.name(), "Hammer Head");
+        this.addPartSlot(CommonPartSlots.SWORD_BLADE.name(), "Sword Blade");
+
+        this.addPartSlot(CommonPartSlots.BINDING.name(), "Binding");
+        this.addPartSlot(CommonPartSlots.HANDLE.name(), "Handle");
+        this.addPartSlot(CommonPartSlots.GRIP.name(), "Grip");
+        this.addPartSlot(CommonPartSlots.WIDE_GUARD.name(), "Wide Guard");
     }
 
     private void addCompat() {
