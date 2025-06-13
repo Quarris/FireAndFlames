@@ -6,7 +6,7 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.compat.jei.widgets.DrawableEntity;
 import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.EntityMeltingRecipe;
 import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;

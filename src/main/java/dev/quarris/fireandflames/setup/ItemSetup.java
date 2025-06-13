@@ -16,6 +16,9 @@ public class ItemSetup {
     public static final DeferredItem<Item> FIRE_BRICK = registerItem("fire_brick", Item::new);
     public static final DeferredItem<Item> INGOT_CAST = registerItem("ingot_cast", Item::new);
     public static final DeferredItem<Item> NUGGET_CAST = registerItem("nugget_cast", Item::new);
+    public static final DeferredItem<Item> TOOL_SHAPE_CAST = registerItem("tool_shape_cast", Item::new);
+    public static final DeferredItem<Item> BLADE_SHAPE_CAST = registerItem("blade_shape_cast", Item::new);
+    public static final DeferredItem<Item> MISC_SHAPE_CAST = registerItem("misc_shape_cast", Item::new);
 
     // Helper method
     public static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> itemSupplier) {

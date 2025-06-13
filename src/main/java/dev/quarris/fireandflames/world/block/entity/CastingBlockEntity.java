@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.world.block.entity;
 
-import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CastingRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -8,7 +8,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -18,7 +17,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockEntity {
+public abstract class CastingBlockEntity extends BlockEntity {
 
     private ItemStackHandler inventory = new ItemStackHandler(2) {
         @Override
@@ -57,31 +56,34 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         }
     };
 
-    private final FluidTank tank = new FluidTank(0, stack -> this.getLevel().getRecipeManager().getRecipeFor(this.getRecipeType(), new CastingRecipe.Input(stack, this.inventory.getStackInSlot(0)), this.getLevel()).isPresent()) {
+    private final FluidTank tank = new FluidTank(0, stack -> this.getRecipeFor(new CastingRecipe.Input(stack, this.inventory.getStackInSlot(0))) != null) {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
             if (!CastingBlockEntity.this.inventory.getStackInSlot(1).isEmpty()) return 0;
 
-            RecipeHolder<T> recipe = CastingBlockEntity.this.recipe;
-            if (recipe == null) {
+            RecipeContents recipeContents = CastingBlockEntity.this.recipeContents;
+            if (recipeContents == null) {
                 // Set recipe based on input
-                recipe = CastingBlockEntity.this.getLevel().getRecipeManager().getRecipeFor(CastingBlockEntity.this.getRecipeType(), new CastingRecipe.Input(resource, CastingBlockEntity.this.inventory.getStackInSlot(0)), CastingBlockEntity.this.getLevel()).orElse(null);
+                var recipe = CastingBlockEntity.this.getRecipeFor(new CastingRecipe.Input(resource, CastingBlockEntity.this.inventory.getStackInSlot(0)));
+                if (recipe != null) {
+                    recipeContents = new RecipeContents(recipe.id(), recipe.value().requiredContents(resource, getLevel()));
+                }
             }
 
-            if (recipe == null) {
+            if (recipeContents == null) {
                 return 0;
             }
 
             // Update capacity
-            this.capacity = recipe.value().getFluidInput().amount().evaluateInt();
+            this.capacity = recipeContents.fluidAmount;
 
             int filled = super.fill(resource, action);
             if (action.simulate()) {
                 // Reset recipe and capacity
                 this.capacity = 0;
             } else if (filled > 0) {
-                CastingBlockEntity.this.recipe = recipe;
+                CastingBlockEntity.this.recipeContents = recipeContents;
             }
 
             return filled;
@@ -115,7 +117,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         @Override
         protected void onContentsChanged() {
             if (this.isEmpty()) {
-                CastingBlockEntity.this.recipe = null;
+                CastingBlockEntity.this.recipeContents = null;
                 this.setCapacity(0);
             }
 
@@ -123,23 +125,23 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         }
     };
 
-    private RecipeHolder<T> recipe;
+    private RecipeContents recipeContents;
     private int coolingTicks;
 
     protected CastingBlockEntity(BlockEntityType<? extends CastingBlockEntity> type, BlockPos pPos, BlockState pState) {
         super(type, pPos, pState);
     }
 
-    public static <T extends CastingRecipe> void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CastingBlockEntity<T> pBasin) {
-        if (pBasin.recipe == null) {
+    public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CastingBlockEntity pBasin) {
+        if (pBasin.recipeContents == null) {
             pBasin.coolingTicks = 0;
             return;
         }
 
-        T recipe = pBasin.recipe.value();
-        if (pBasin.tank.getFluid().getAmount() < recipe.getFluidInput().amount().evaluateInt()) {
+        CastingRecipe recipe = pBasin.getRecipe().value();
+        if (pBasin.tank.getFluid().getAmount() < pBasin.recipeContents.fluidAmount) {
             pBasin.coolingTicks = 0;
-            pBasin.recipe = null;
+            pBasin.recipeContents = null;
             return;
         }
 
@@ -154,9 +156,9 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
             if (recipe.shouldMoveItem()) {
                 pBasin.getInventory().setStackInSlot(1, pBasin.getInventory().getStackInSlot(0).copy());
             }
-            pBasin.getInventory().setStackInSlot(outputSlot, recipe.getOutput().createItemStack());
+            pBasin.getInventory().setStackInSlot(outputSlot, recipe.assemble(new CastingRecipe.Input(pBasin.tank.getFluid(), pBasin.inventory.getStackInSlot(0)), pBasin.getLevel().registryAccess()));
             pBasin.tank.setFluid(FluidStack.EMPTY);
-            pBasin.recipe = null;
+            pBasin.recipeContents = null;
         }
     }
 
@@ -182,15 +184,17 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         return this.tank;
     }
 
-    public RecipeHolder<T> getRecipe() {
-        return this.recipe;
+    public RecipeHolder<? extends CastingRecipe> getRecipe() {
+        if (this.recipeContents == null) return null;
+
+        return (RecipeHolder<? extends CastingRecipe>) this.getLevel().getRecipeManager().byKey(this.recipeContents.recipeId).orElse(null);
     }
 
     public int getCoolingTicks() {
         return this.coolingTicks;
     }
 
-    public abstract RecipeType<T> getRecipeType();
+    public abstract RecipeHolder<? extends CastingRecipe> getRecipeFor(CastingRecipe.Input input);
 
     @Override
     public void setChanged() {
@@ -206,8 +210,9 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         pTag.put("Inventory", this.inventory.serializeNBT(pRegistries));
         pTag.put("Tank", this.tank.writeToNBT(pRegistries, new CompoundTag()));
         pTag.putInt("CoolingTicks", this.coolingTicks);
-        if (this.recipe != null) {
-            pTag.putString("RecipeId", this.recipe.id().toString());
+        if (this.recipeContents != null) {
+            pTag.putString("RecipeId", this.recipeContents.recipeId.toString());
+            pTag.putInt("RecipeFluidAmount", this.recipeContents.fluidAmount);
         }
     }
 
@@ -217,12 +222,11 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         this.inventory.deserializeNBT(pRegistries, pTag.getCompound("Inventory"));
         this.tank.readFromNBT(pRegistries, pTag.getCompound("Tank"));
         this.coolingTicks = pTag.getInt("CoolingTicks");
-        this.recipe = null;
+        this.recipeContents = null;
         if (pTag.contains("RecipeId")) {
             ResourceLocation recipeId = ResourceLocation.parse(pTag.getString("RecipeId"));
-            // TODO Level can be null during world load
-            var recipe = this.getLevel().getRecipeManager().byKey(recipeId);
-            this.recipe = recipe.map(r -> (RecipeHolder<T>) r).orElse(null);
+            int fluidAmount = pTag.getInt("RecipeFluidAmount");
+            this.recipeContents = new RecipeContents(recipeId, fluidAmount);
         }
     }
 
@@ -236,5 +240,9 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
     @Override
     public @Nullable ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    public record RecipeContents(ResourceLocation recipeId, int fluidAmount) {
+
     }
 }

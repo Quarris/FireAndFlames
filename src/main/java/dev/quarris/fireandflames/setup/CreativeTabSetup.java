@@ -1,15 +1,23 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.part.ICustomPart;
 import dev.quarris.fireandflames.data.tool.ICustomTool;
+import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.Map;
 
 public class CreativeTabSetup {
     public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ModRef.ID);
@@ -37,13 +45,22 @@ public class CreativeTabSetup {
                     return;
                 }
 
-                if (entry.get() instanceof ICustomPart part) {
+                if (entry.get() instanceof IMaterialHolder part) {
                     pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().forEach(material -> {
                         pOutput.accept(part.createFrom(material));
                     });
                     return;
                 }
             });
+
+
+            for (Map.Entry<ResourceKey<Item>, Item> entry : BuiltInRegistries.ITEM.entrySet()) {
+                if (entry.getValue() instanceof ICustomPart part) {
+                    for (Holder.Reference<ToolMaterial> material : pParams.holders().lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().toList()) {
+                        pOutput.accept(part.createFrom(material));
+                    }
+                }
+            }
         })
         .build());
 

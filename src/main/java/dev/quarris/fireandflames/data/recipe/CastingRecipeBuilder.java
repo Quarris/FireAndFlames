@@ -5,9 +5,9 @@ import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
-import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.BasinCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.TableCastingRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -132,7 +132,7 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     }
 
     static ResourceLocation getDefaultRecipeId(IItemOutput output) {
-        if (output instanceof IItemOutput.Stack(ItemStack stack)) {
+        if (output instanceof IItemOutput.Stack(ItemStack stack, INumberProvider count)) {
             return BuiltInRegistries.ITEM.getKey(stack.getItem());
         } else if (output instanceof IItemOutput.Tag tagOutput) {
             return tagOutput.tag().location();

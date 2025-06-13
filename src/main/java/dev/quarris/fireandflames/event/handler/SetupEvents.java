@@ -1,22 +1,29 @@
 package dev.quarris.fireandflames.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.data.tool.ToolMaterial;
-import dev.quarris.fireandflames.setup.BlockEntitySetup;
-import dev.quarris.fireandflames.setup.CapabilitySetup;
-import dev.quarris.fireandflames.setup.MaterialSetup;
-import dev.quarris.fireandflames.setup.RegistrySetup;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
+import dev.quarris.fireandflames.data.tool.part.PartType;
+import dev.quarris.fireandflames.data.tool.part.ToolPart;
+import dev.quarris.fireandflames.setup.*;
 import dev.quarris.fireandflames.world.crucible.fuel.FluidHandlerFuelWrapper;
 import dev.quarris.fireandflames.world.crucible.fuel.ItemHandlerFuelWrapper;
+import dev.quarris.fireandflames.world.item.tool.PartItem;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
+
+import java.util.Optional;
 
 @EventBusSubscriber(modid = ModRef.ID, bus = EventBusSubscriber.Bus.MOD)
 public class SetupEvents {
@@ -59,5 +66,17 @@ public class SetupEvents {
     @SubscribeEvent
     public static void registerDatapackRegister(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(RegistrySetup.Keys.MATERIALS, ToolMaterial.CODEC, ToolMaterial.CODEC, builder -> builder.sync(true));
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void registerPartItems(RegisterEvent event) {
+        if (event.getRegistryKey() == RegistrySetup.Keys.PART_TYPES) {
+            for (ResourceKey<PartType> key : RegistrySetup.PART_TYPES.registryKeySet()) {
+                Optional<Holder.Reference<PartType>> optional = RegistrySetup.PART_TYPES.getHolder(key.location());
+                optional.ifPresent(holder -> {
+                    Registry.register(BuiltInRegistries.ITEM, holder.key().location(), new PartItem(holder, new Item.Properties().component(DataComponentSetup.TOOL_PART, ToolPart.EMPTY)));
+                });
+            }
+        }
     }
 }

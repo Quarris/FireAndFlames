@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.compat.jade;
 import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
+import dev.quarris.fireandflames.world.block.entity.CastingBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
@@ -19,12 +20,14 @@ public class JadeCompat implements IModCompat, IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerProgress(CrucibleProgressProvider.INSTANCE, CrucibleControllerBlockEntity.class);
+        registration.registerProgress(CastingProgressProvider.INSTANCE, CastingBlockEntity.class);
         registration.registerBlockDataProvider(CrucibleHeatComponentProvider.INSTANCE, CrucibleControllerBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerProgressClient(CrucibleProgressProvider.INSTANCE);
+        registration.registerProgressClient(CastingProgressProvider.INSTANCE);
         registration.registerBlockComponent(CrucibleHeatComponentProvider.INSTANCE, CrucibleControllerBlock.class);
     }
 

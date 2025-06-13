@@ -4,12 +4,13 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.tool.ToolType;
+import dev.quarris.fireandflames.data.tool.part.ICustomPart;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.data.tool.part.ToolParts;
-import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.setup.RegistrySetup;
+import dev.quarris.fireandflames.util.MenuHelper;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -104,16 +104,7 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
         this.computeOutput(Component.empty());
 
-        // Player Slots
-        for (int slotY = 0; slotY < 3; slotY++) {
-            for (int slotX = 0; slotX < 9; slotX++) {
-                this.addSlot(new Slot(this.playerInventory, slotX + slotY * 9 + 9, 8 + slotX * 18, 137 + slotY * 18));
-            }
-        }
-
-        for (int hotbar = 0; hotbar < 9; hotbar++) {
-            this.addSlot(new Slot(this.playerInventory, hotbar, 8 + hotbar * 18, 195));
-        }
+        MenuHelper.addPlayerSlots(this.playerInventory, 8, 137, this::addSlot);
     }
 
     public boolean setTabByName(ResourceLocation tabName) {
@@ -200,6 +191,7 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
+        // TODO
         return ItemStack.EMPTY;
     }
 
@@ -333,10 +325,10 @@ public class TinkersWorkbenchMenu extends AbstractContainerMenu {
                 NamedSlot namedSlot = new NamedContainerSlot(partSlot.name(), this.container, slot, partPosition.x(), partPosition.y()) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        return stack.has(DataComponentSetup.TOOL_PART) && stack.get(DataComponentSetup.TOOL_PART).type().is(partSlot.type());
+                        return stack.getItem() instanceof ICustomPart part && part.getType().is(partSlot.type());
                     }
                 };
-                namedSlot.setBackground(TextureAtlas.LOCATION_BLOCKS, partSlot.type().getKey().location().withPrefix("item/slot/"));
+                namedSlot.setBackground(InventoryMenu.BLOCK_ATLAS, partSlot.type().getKey().location().withPrefix("item/slot/"));
                 inputSlots.accept(namedSlot);
                 slot++;
             }

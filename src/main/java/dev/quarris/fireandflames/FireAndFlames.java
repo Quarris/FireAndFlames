@@ -2,10 +2,7 @@ package dev.quarris.fireandflames;
 
 
 import dev.quarris.fireandflames.config.ServerConfigs;
-import dev.quarris.fireandflames.data.tool.ToolMaterial;
 import dev.quarris.fireandflames.setup.*;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -25,9 +22,11 @@ public class FireAndFlames {
         FluidSetup.init(modBus);
         BlockEntitySetup.init(modBus);
         MenuSetup.init(modBus);
+        SoundSetup.init(modBus);
         RecipeSetup.init(modBus);
         CreativeTabSetup.init(modBus);
         NumberProviderSetup.init(modBus);
+        MaterialConverterSetup.init(modBus);
         PartTypeSetup.init(modBus);
         ToolTypeSetup.init(modBus);
     }

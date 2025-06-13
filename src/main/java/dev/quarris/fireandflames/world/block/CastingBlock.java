@@ -66,7 +66,7 @@ public abstract class CastingBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    public abstract BlockEntityType<? extends CastingBlockEntity<?>> getBlockEntityType();
+    public abstract BlockEntityType<? extends CastingBlockEntity> getBlockEntityType();
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {

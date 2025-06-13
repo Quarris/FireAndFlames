@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.data.tool;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
 import net.minecraft.core.Holder;

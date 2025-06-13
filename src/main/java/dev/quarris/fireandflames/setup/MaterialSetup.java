@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.data.tool.ToolMaterial;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 

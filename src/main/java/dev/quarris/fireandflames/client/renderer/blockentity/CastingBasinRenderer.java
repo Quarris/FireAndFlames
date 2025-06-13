@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.quarris.fireandflames.client.util.FluidRenderer;
 import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
-import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CastingRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -26,7 +26,7 @@ public class CastingBasinRenderer implements BlockEntityRenderer<CastingBasinBlo
     @Override
     public void render(CastingBasinBlockEntity pBasin, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pLight, int pOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        BasinCastingRecipe recipe = null;
+        CastingRecipe recipe = null;
         if (pBasin.getRecipe() != null) {
             recipe = pBasin.getRecipe().value();
         }

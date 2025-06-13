@@ -49,7 +49,7 @@ public class CastingTableBlock extends CastingBlock {
     }
 
     @Override
-    public BlockEntityType<? extends CastingBlockEntity<?>> getBlockEntityType() {
+    public BlockEntityType<? extends CastingBlockEntity> getBlockEntityType() {
         return BlockEntitySetup.CASTING_TABLE.get();
     }
 

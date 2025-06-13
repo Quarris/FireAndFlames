@@ -1,17 +1,10 @@
 package dev.quarris.fireandflames.data.tool.part;
 
-import dev.quarris.fireandflames.data.tool.ToolMaterial;
+import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
 import net.minecraft.core.Holder;
-import net.minecraft.world.item.ItemStack;
 
-public interface ICustomPart {
+public interface ICustomPart extends IMaterialHolder {
 
-    Holder<PartType> getPartType();
-
-    ItemStack createFrom(Holder<ToolMaterial> material);
-
-    default ToolPart createPart(Holder<ToolMaterial> material) {
-        return new ToolPart(this.getPartType(), material);
-    }
+    Holder<PartType> getType();
 
 }

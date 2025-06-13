@@ -2,8 +2,10 @@ package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.tool.ToolData;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.world.fluid.component.FluidContainerContents;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
@@ -24,6 +26,10 @@ public class DataComponentSetup {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolPart>> TOOL_PART = REGISTRY.registerComponentType(
         "tool_part", builder -> builder.persistent(ToolPart.CODEC).networkSynchronized(ToolPart.STREAM_CODEC).cacheEncoding()
+    );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Holder<ToolMaterial>>> MATERIAL_HOLDER = REGISTRY.registerComponentType(
+        "material_holder", builder -> builder.persistent(ToolMaterial.HOLDER_CODEC).networkSynchronized(ToolMaterial.HOLDER_STREAM_CODEC).cacheEncoding()
     );
 
     public static void init(IEventBus modBus) {

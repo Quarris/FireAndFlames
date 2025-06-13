@@ -2,7 +2,7 @@ package dev.quarris.fireandflames.data.recipe;
 
 import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
-import dev.quarris.fireandflames.world.crucible.crafting.AlloyingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.AlloyingRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
