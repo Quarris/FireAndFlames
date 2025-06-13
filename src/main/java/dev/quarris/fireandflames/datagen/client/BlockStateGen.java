@@ -42,6 +42,12 @@ public class BlockStateGen extends BlockStateProvider {
         this.simpleFluid(FluidSetup.MOLTEN_ANCIENT_DEBRIS);
         this.simpleFluid(FluidSetup.MOLTEN_NETHERITE);
 
+        this.horizontalBlock(BlockSetup.ARTISAN_TABLE.get(), this.models().getExistingFile(ModRef.res("block/artisan_table")));
+        this.itemModels().simpleBlockItem(BlockSetup.ARTISAN_TABLE.get());
+
+        this.horizontalBlock(BlockSetup.SMITHING_ANVIL.get(), this.models().getExistingFile(ModRef.res("block/smithing_anvil")));
+        this.itemModels().simpleBlockItem(BlockSetup.SMITHING_ANVIL.get());
+
         BlockSetup.CRUCIBLE_CONTROLLER.asOptional().ifPresent(block -> {
             this.getVariantBuilder(block).forAllStates(
                 (state) -> {

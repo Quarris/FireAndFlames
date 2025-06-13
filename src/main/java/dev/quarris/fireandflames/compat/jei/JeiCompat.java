@@ -1,26 +1,32 @@
 package dev.quarris.fireandflames.compat.jei;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.client.screen.tinkersworkbench.TinkersWorkbenchScreen;
+import dev.quarris.fireandflames.client.screen.ArtisanTableScreen;
+import dev.quarris.fireandflames.client.screen.CrucibleScreen;
+import dev.quarris.fireandflames.client.screen.TinkersWorkbenchScreen;
 import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
+import dev.quarris.fireandflames.compat.jei.recipetypes.JeiArtisanRecipe;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.util.data.DataMapUtil;
+import dev.quarris.fireandflames.world.inventory.crafting.ArtisanRecipeOutput;
+import dev.quarris.fireandflames.world.inventory.crafting.BasinCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.TableCastingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiKeyMappings;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,12 +37,14 @@ public class JeiCompat implements IModCompat, IModPlugin {
         CompatManager.JEI = this;
     }
 
+    private IJeiKeyMappings keyMappings;
+
     private CrucibleRecipeCategory crucibleCategory;
     private AlloyingRecipeCategory alloyingCategory;
     private CastingRecipeCategory<BasinCastingRecipe> basinCategory;
     private CastingRecipeCategory<TableCastingRecipe> tableCategory;
     private EntityMeltingRecipeCategory entityMeltingCategory;
-    private IJeiKeyMappings keyMappings;
+    private ArtisanRecipeCategory artisanCategory;
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
@@ -46,12 +54,14 @@ public class JeiCompat implements IModCompat, IModPlugin {
         this.basinCategory = new CastingRecipeCategory<>(guiHelper, true, BasinCastingRecipe.class);
         this.tableCategory = new CastingRecipeCategory<>(guiHelper, false, TableCastingRecipe.class);
         this.entityMeltingCategory = new EntityMeltingRecipeCategory(guiHelper);
+        this.artisanCategory = new ArtisanRecipeCategory(guiHelper);
 
         registration.addRecipeCategories(this.crucibleCategory);
         registration.addRecipeCategories(this.alloyingCategory);
         registration.addRecipeCategories(this.basinCategory);
         registration.addRecipeCategories(this.tableCategory);
         registration.addRecipeCategories(this.entityMeltingCategory);
+        registration.addRecipeCategories(this.artisanCategory);
     }
 
     @Override
@@ -66,11 +76,16 @@ public class JeiCompat implements IModCompat, IModPlugin {
 
         registration.addRecipeCatalyst(BlockSetup.CASTING_BASIN, this.basinCategory.getRecipeType());
         registration.addRecipeCatalyst(BlockSetup.CASTING_TABLE, this.tableCategory.getRecipeType());
+
+        registration.addRecipeCatalyst(BlockSetup.ARTISAN_TABLE, this.artisanCategory.getRecipeType());
     }
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addGuiContainerHandler(TinkersWorkbenchScreen.class, new TinkersWorkbenchGuiHandler());
+
+        registration.addRecipeClickArea(CrucibleScreen.class, 5, 5, 50, 10, this.crucibleCategory.getRecipeType(), this.alloyingCategory.getRecipeType(), this.entityMeltingCategory.getRecipeType());
+        registration.addRecipeClickArea(ArtisanTableScreen.class, 5, 5, 50, 10, this.artisanCategory.getRecipeType());
     }
 
     @Override
@@ -87,6 +102,15 @@ public class JeiCompat implements IModCompat, IModPlugin {
         registerRecipesFor(registration, recipeManager, RecipeSetup.TABLE_CASTING_TYPE.get(), this.tableCategory.getRecipeType());
         registerRecipesFor(registration, recipeManager, RecipeSetup.BASIN_CASTING_TYPE.get(), this.basinCategory.getRecipeType());
         registerRecipesFor(registration, recipeManager, RecipeSetup.ENTITY_MELTING_TYPE.get(), this.entityMeltingCategory.getRecipeType());
+
+        List<JeiArtisanRecipe> artisanRecipes = new ArrayList<>();
+        recipeManager.getAllRecipesFor(RecipeSetup.ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient().ingredient(), i -> new ArtisanRecipeOutput(1, ItemStack.EMPTY, ItemStack.EMPTY))));
+        /*recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> {
+            DataMapUtil.
+            artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient().ingredient()));
+        });*/
+        recipeManager.getAllRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient(), i -> new ArtisanRecipeOutput(1, ItemStack.EMPTY, ItemStack.EMPTY))));
+        registration.addRecipes(this.artisanCategory.getRecipeType(), artisanRecipes);
     }
 
     private static <I extends RecipeInput, T extends Recipe<I>> void registerRecipesFor(IRecipeRegistration registration, RecipeManager recipeManager, RecipeType<T> recipeType, mezz.jei.api.recipe.RecipeType<T> category) {

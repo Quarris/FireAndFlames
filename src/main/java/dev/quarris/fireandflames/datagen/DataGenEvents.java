@@ -4,6 +4,7 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.datagen.client.BlockStateGen;
 import dev.quarris.fireandflames.datagen.client.EnUsLanguageGen;
 import dev.quarris.fireandflames.datagen.client.ItemModelGen;
+import dev.quarris.fireandflames.datagen.client.SoundGen;
 import dev.quarris.fireandflames.datagen.server.*;
 import dev.quarris.fireandflames.datagen.server.loot.BlockLoot;
 import dev.quarris.fireandflames.setup.RegistrySetup;
@@ -33,6 +34,7 @@ public class DataGenEvents {
         gen.addProvider(event.includeClient(), (DataProvider.Factory<EnUsLanguageGen>) EnUsLanguageGen::new);
         gen.addProvider(event.includeClient(), (DataProvider.Factory<BlockStateGen>) (packOutput -> new BlockStateGen(packOutput, existingFiles)));
         gen.addProvider(event.includeClient(), (DataProvider.Factory<ItemModelGen>) (packOutput -> new ItemModelGen(packOutput, existingFiles)));
+        gen.addProvider(event.includeClient(), (DataProvider.Factory<SoundGen>) (packOutput -> new SoundGen(packOutput, existingFiles)));
 
         // Server
         gen.addProvider(event.includeServer(), (DataProvider.Factory<DatapackBuiltinEntriesProvider>) output ->

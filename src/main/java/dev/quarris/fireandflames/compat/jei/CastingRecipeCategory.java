@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.BasicCastingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCategory<R> {
+public class CastingRecipeCategory<R extends BasicCastingRecipe> implements IRecipeCategory<R> {
 
     public static final ResourceLocation BACKGROUND = ModRef.res("textures/gui/jei/category/casting/recipe_background.png");
     public static final ResourceLocation ITEM_SLOT_BACKGROUND = ModRef.res("textures/gui/jei/category/casting/item_slot.png");

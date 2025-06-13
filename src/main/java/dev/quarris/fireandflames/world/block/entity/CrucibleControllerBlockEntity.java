@@ -10,9 +10,9 @@ import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import dev.quarris.fireandflames.world.block.CrucibleControllerBlock;
 import dev.quarris.fireandflames.world.crucible.CrucibleFluidTank;
 import dev.quarris.fireandflames.world.crucible.CrucibleStructure;
-import dev.quarris.fireandflames.world.crucible.crafting.AlloyingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.AlloyingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.EntityMeltingRecipe;
 import dev.quarris.fireandflames.world.crucible.fuel.ActiveFuel;
 import dev.quarris.fireandflames.world.crucible.fuel.IFuelProvider;
 import dev.quarris.fireandflames.world.inventory.menu.CrucibleMenu;
@@ -54,7 +54,6 @@ import java.util.*;
 public class CrucibleControllerBlockEntity extends BlockEntity implements MenuProvider {
 
     public static final Component TITLE = Component.translatable("container.fireandflames.crucible.title");
-
 
     private CrucibleStructure crucibleStructure;
     private final CrucibleFluidTank fluidTank;

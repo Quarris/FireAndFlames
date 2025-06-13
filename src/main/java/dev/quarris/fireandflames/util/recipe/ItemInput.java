@@ -2,6 +2,8 @@ package dev.quarris.fireandflames.util.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.quarris.fireandflames.data.config.number.ConstantNumber;
+import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -10,43 +12,60 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
 
-public record ItemInput(Ingredient ingredient, int count) {
+public record ItemInput(Ingredient ingredient, INumberProvider count) {
 
     public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Ingredient.MAP_CODEC_NONEMPTY.forGetter(ItemInput::ingredient),
-        Codec.INT.fieldOf("count").forGetter(ItemInput::count)
+        INumberProvider.CODEC.fieldOf("count").forGetter(ItemInput::count)
     ).apply(instance, ItemInput::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
         Ingredient.CONTENTS_STREAM_CODEC, ItemInput::ingredient,
-        ByteBufCodecs.INT, ItemInput::count,
+        INumberProvider.STREAM_CODEC, ItemInput::count,
         ItemInput::new
     );
 
     public static final StreamCodec<RegistryFriendlyByteBuf, List<ItemInput>> LIST_STREAM_CODEC = STREAM_CODEC.apply(
         ByteBufCodecs.collection(NonNullList::createWithCapacity));
 
-    public ItemInput withAmount(int amount) {
-        return new ItemInput(this.ingredient, amount);
+    public ItemInput withAmount(INumberProvider count) {
+        return new ItemInput(this.ingredient, count);
     }
 
-    public ItemInput(ItemStack item) {
-        this(Ingredient.of(item), item.getCount());
+    public ItemInput(ItemLike item) {
+        this(item, 1);
     }
 
-    public ItemInput(Item item, int amount) {
-        this(Ingredient.of(item), amount);
+    public ItemInput(TagKey<Item> itemTag) {
+        this(itemTag, 1);
     }
 
-    public ItemInput(TagKey<Item> itemTag, int amount) {
-        this(Ingredient.of(itemTag), amount);
+    public ItemInput(ItemStack stack) {
+        this(Ingredient.of(stack), new ConstantNumber(stack.getCount()));
+    }
+
+    public ItemInput(ItemLike item, int count) {
+        this(Ingredient.of(item), new ConstantNumber(count));
+    }
+
+    public ItemInput(TagKey<Item> itemTag, int count) {
+        this(Ingredient.of(itemTag), new ConstantNumber(count));
+    }
+
+    public ItemInput(ItemLike item, INumberProvider count) {
+        this(Ingredient.of(item), count);
+    }
+
+    public ItemInput(TagKey<Item> itemTag, INumberProvider count) {
+        this(Ingredient.of(itemTag), count);
     }
 
     public boolean matchesAmount(ItemStack input) {
-        return this.test(input) && input.getCount() >= this.count;
+        return this.test(input) && input.getCount() >= this.count.evaluateInt();
     }
 
     public boolean test(ItemStack input) {

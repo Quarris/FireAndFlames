@@ -4,9 +4,7 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.ModClient;
 import dev.quarris.fireandflames.client.model.CustomToolModelLoader;
 import dev.quarris.fireandflames.client.renderer.blockentity.*;
-import dev.quarris.fireandflames.client.screen.CrucibleBurnerScreen;
-import dev.quarris.fireandflames.client.screen.CrucibleScreen;
-import dev.quarris.fireandflames.client.screen.tinkersworkbench.TinkersWorkbenchScreen;
+import dev.quarris.fireandflames.client.screen.*;
 import dev.quarris.fireandflames.client.util.extensions.CustomToolClientExtensions;
 import dev.quarris.fireandflames.setup.*;
 import dev.quarris.fireandflames.util.fluid.CustomFluidHolder;
@@ -41,6 +39,8 @@ public class ClientSetupEvents {
         event.register(MenuSetup.CRUCIBLE.get(), CrucibleScreen::new);
         event.register(MenuSetup.CRUCIBLE_BURNER.get(), CrucibleBurnerScreen::new);
         event.register(MenuSetup.TINKERS_WORKBENCH.get(), TinkersWorkbenchScreen::new);
+        event.register(MenuSetup.SMITHING_ANVIL.get(), SmithingAnvilScreen::new);
+        event.register(MenuSetup.ARTISAN_TABLE.get(), ArtisanTableScreen::new);
     }
 
     @SubscribeEvent

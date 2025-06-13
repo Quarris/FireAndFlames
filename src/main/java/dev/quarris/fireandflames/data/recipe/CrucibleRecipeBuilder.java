@@ -2,7 +2,7 @@ package dev.quarris.fireandflames.data.recipe;
 
 import dev.quarris.fireandflames.data.config.number.ConstantNumber;
 import dev.quarris.fireandflames.data.config.number.INumberProvider;
-import dev.quarris.fireandflames.world.crucible.crafting.CrucibleRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CrucibleRecipe;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;

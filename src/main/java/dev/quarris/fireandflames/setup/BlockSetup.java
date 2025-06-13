@@ -104,6 +104,20 @@ public class BlockSetup {
             .strength(1.0F, 2.0F)
             .sound(SoundType.STONE));
 
+    public static final DeferredBlock<SmithingAnvilBlock> SMITHING_ANVIL = registerBlock("smithing_anvil", SmithingAnvilBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.METAL)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.METAL));
+
+    public static final DeferredBlock<ArtisanTableBlock> ARTISAN_TABLE = registerBlock("artisan_table", ArtisanTableBlock::new,
+        BlockBehaviour.Properties.of()
+            .mapColor(MapColor.METAL)
+            .requiresCorrectToolForDrops()
+            .strength(1.0F, 2.0F)
+            .sound(SoundType.METAL));
+
     // Helper methods
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockSupplier, BlockBehaviour.Properties blockProps) {
         return registerBlock(name, blockSupplier, blockProps, new Item.Properties());

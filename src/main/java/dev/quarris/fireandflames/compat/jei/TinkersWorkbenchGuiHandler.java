@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.compat.jei;
 
-import dev.quarris.fireandflames.client.screen.tinkersworkbench.TinkersWorkbenchScreen;
+import dev.quarris.fireandflames.client.screen.TinkersWorkbenchScreen;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.client.renderer.Rect2i;
 

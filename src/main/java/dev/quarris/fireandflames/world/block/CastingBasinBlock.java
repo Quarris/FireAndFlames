@@ -48,7 +48,7 @@ public class CastingBasinBlock extends CastingBlock {
     }
 
     @Override
-    public BlockEntityType<? extends CastingBlockEntity<?>> getBlockEntityType() {
+    public BlockEntityType<? extends CastingBlockEntity> getBlockEntityType() {
         return BlockEntitySetup.CASTING_BASIN.get();
     }
 

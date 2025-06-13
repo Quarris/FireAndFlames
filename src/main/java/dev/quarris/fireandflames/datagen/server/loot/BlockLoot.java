@@ -31,6 +31,9 @@ public class BlockLoot extends BlockLootSubProvider {
         this.dropSelf(BlockSetup.CASTING_TABLE.get());
         this.dropSelf(BlockSetup.CRUCIBLE_BURNER.get());
         this.dropSelf(BlockSetup.TINKERS_WORKBENCH.get());
+        this.dropSelf(BlockSetup.SMITHING_ANVIL.get());
+        this.dropSelf(BlockSetup.ARTISAN_TABLE.get());
+
         this.add(BlockSetup.CRUCIBLE_TANK.get(), this::createFluidStorageDrop);
 
         this.add(BlockSetup.FIRE_CLAY.get(), block -> this.createSingleItemTableWithSilkTouch(block, ItemSetup.FIRE_CLAY_BALL, ConstantValue.exactly(4.0F)));

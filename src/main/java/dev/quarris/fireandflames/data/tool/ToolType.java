@@ -1,5 +1,6 @@
 package dev.quarris.fireandflames.data.tool;
 
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.PartType;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
@@ -40,12 +41,11 @@ public final class ToolType<T extends ICustomTool> {
     }
 
     public boolean partsValid(ToolParts parts) {
+        if (parts.getParts().size() != this.parts.size()) return false;
+
         for (Map.Entry<String, PartSlot> entry : this.parts.entrySet()) {
             ToolPart part = parts.getPart(entry.getKey());
             if (part == null) return false;
-            if (!part.type().is(entry.getValue().type())) {
-                return false;
-            }
         }
 
         return true;
@@ -55,7 +55,7 @@ public final class ToolType<T extends ICustomTool> {
         ToolParts.Builder builder = ToolParts.builder();
 
         for (PartSlot slot : this.parts.values()) {
-            builder.add(slot.name(), new ToolPart(slot.type(), material));
+            builder.add(slot.name(), new ToolPart(material));
         }
 
         return builder.build(this.mainPartName);

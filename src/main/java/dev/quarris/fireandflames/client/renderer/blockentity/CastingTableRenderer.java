@@ -4,12 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.quarris.fireandflames.client.util.FluidRenderer;
-import dev.quarris.fireandflames.setup.ItemSetup;
 import dev.quarris.fireandflames.setup.TagSetup;
-import dev.quarris.fireandflames.world.block.entity.CastingBasinBlockEntity;
 import dev.quarris.fireandflames.world.block.entity.CastingTableBlockEntity;
-import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.CastingRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -31,7 +28,7 @@ public class CastingTableRenderer implements BlockEntityRenderer<CastingTableBlo
     @Override
     public void render(CastingTableBlockEntity pTable, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pLight, int pOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        TableCastingRecipe recipe = null;
+        CastingRecipe recipe = null;
         if (pTable.getRecipe() != null) {
             recipe = pTable.getRecipe().value();
         }

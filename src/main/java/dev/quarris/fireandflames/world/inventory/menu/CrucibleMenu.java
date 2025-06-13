@@ -3,6 +3,7 @@ package dev.quarris.fireandflames.world.inventory.menu;
 import dev.quarris.fireandflames.network.payload.CrucibleScrollC2SPayload;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
+import dev.quarris.fireandflames.util.MenuHelper;
 import dev.quarris.fireandflames.world.block.entity.CrucibleControllerBlockEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -55,16 +56,7 @@ public class CrucibleMenu extends AbstractContainerMenu {
             });
         }
 
-        // Player Slots
-        for (int slotY = 0; slotY < 3; slotY++) {
-            for (int slotX = 0; slotX < 9; slotX++) {
-                this.addSlot(new Slot(pPlayerInv, slotX + slotY * 9 + 9, 8 + slotX * 18, 127 + slotY * 18));
-            }
-        }
-
-        for (int hotbar = 0; hotbar < 9; hotbar++) {
-            this.addSlot(new Slot(pPlayerInv, hotbar, 8 + hotbar * 18, 185));
-        }
+        MenuHelper.addPlayerSlots(pPlayerInv, 8, 127, this::addSlot);
 
         this.addDataSlots(this.dataAccess);
         this.scrollTo(0);

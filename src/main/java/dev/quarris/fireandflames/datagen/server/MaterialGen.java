@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.datagen.server;
 
-import dev.quarris.fireandflames.data.tool.ToolMaterial;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.setup.MaterialSetup;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.tags.BlockTags;

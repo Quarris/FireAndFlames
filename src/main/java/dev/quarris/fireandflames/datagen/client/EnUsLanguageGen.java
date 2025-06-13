@@ -22,6 +22,9 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addItem(ItemSetup.FIRE_BRICK, "Fire Brick");
         this.addItem(ItemSetup.INGOT_CAST, "Ingot Cast");
         this.addItem(ItemSetup.NUGGET_CAST, "Nugget Cast");
+        this.addItem(ItemSetup.BLADE_SHAPE_CAST, "Blade Shape Cast");
+        this.addItem(ItemSetup.TOOL_SHAPE_CAST, "Tool Shape Cast");
+        this.addItem(ItemSetup.MISC_SHAPE_CAST, "Misc Shape Cast");
     }
 
     private void addBlocks() {
@@ -36,6 +39,8 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addBlock(BlockSetup.CASTING_BASIN, "Casting Basin");
         this.addBlock(BlockSetup.CASTING_TABLE, "Casting Table");
         this.addBlock(BlockSetup.TINKERS_WORKBENCH, "Tinkers' Workbench");
+        this.addBlock(BlockSetup.SMITHING_ANVIL, "Smithing Anvil");
+        this.addBlock(BlockSetup.ARTISAN_TABLE, "Artisan Table");
     }
 
     private void addToolsAndParts() {
@@ -48,14 +53,19 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addItem(ToolItemSetup.SWORD, "%s Sword");
 
         // Parts
-        this.addItem(ToolItemSetup.PICKAXE_HEAD, "%s Pickaxe Head");
-        this.addItem(ToolItemSetup.AXE_HEAD, "%s Axe Head");
-        this.addItem(ToolItemSetup.SHOVEL_HEAD, "%s Shovel Head");
-        this.addItem(ToolItemSetup.HOE_HEAD, "%s Hoe Head");
-        this.addItem(ToolItemSetup.SWORD_BLADE, "%s Sword Head");
-        this.addItem(ToolItemSetup.HANDLE, "%s Handle");
-        this.addItem(ToolItemSetup.BINDING, "%s Tool Binding");
-        this.addItem(ToolItemSetup.WIDE_GUARD, "%s Wide Guard");
+        this.add(PartTypeSetup.PICKAXE_HEAD.getKey().location().toLanguageKey("item"), "%s Pickaxe Head");
+        this.add(PartTypeSetup.AXE_HEAD.getKey().location().toLanguageKey("item"), "%s Axe Head");
+        this.add(PartTypeSetup.SHOVEL_HEAD.getKey().location().toLanguageKey("item"), "%s Shovel Head");
+        this.add(PartTypeSetup.HOE_HEAD.getKey().location().toLanguageKey("item"), "%s Hoe Head");
+        this.add(PartTypeSetup.SWORD_BLADE.getKey().location().toLanguageKey("item"), "%s Sword Blade");
+        this.add(PartTypeSetup.HANDLE.getKey().location().toLanguageKey("item"), "%s Handle");
+        this.add(PartTypeSetup.BINDING.getKey().location().toLanguageKey("item"), "%s Tool Binding");
+        this.add(PartTypeSetup.WIDE_GUARD.getKey().location().toLanguageKey("item"), "%s Wide Guard");
+
+        // Shapes
+        this.addItem(ToolItemSetup.TOOL_SHAPE, "%s Tool Shape");
+        this.addItem(ToolItemSetup.BLADE_SHAPE, "%s Blade Shape");
+        this.addItem(ToolItemSetup.MISC_SHAPE, "%s Misc Shape");
     }
 
     private void addFluids() {
@@ -70,6 +80,8 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add("container.fireandflames.crucible.title", "Crucible");
         this.add("container.fireandflames.crucible_burner.title", "Crucible Fuel Burner");
         this.add("container.fireandflames.tinkers_workbench.title", "Tinker's Workbench");
+        this.add("container.fireandflames.artisan_table.title", "Artisan Table");
+        this.add("container.fireandflames.smithing_anvil.title", "Smithing Anvil");
         this.add("container.fireandflames.crucible.fluid_tank.empty", "Empty");
         this.add("container.fireandflames.fluid_storage.fluid_amount", "%s - %s mb");
         this.add("container.fireandflames.fluid_storage.more", "and %s more...");

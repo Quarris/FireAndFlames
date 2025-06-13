@@ -12,7 +12,7 @@ public class NumberProviderSetup {
     public static final DeferredRegister<MapCodec<? extends INumberProvider>> REGISTRY = DeferredRegister.create(RegistrySetup.Keys.NUMBER_PROVIDERS, ModRef.ID);
 
     public static final DeferredHolder<MapCodec<? extends INumberProvider>, MapCodec<ConstantNumber>> CONSTANT = REGISTRY.register("constant", () -> ConstantNumber.CODEC);
-    public static final DeferredHolder<MapCodec<? extends INumberProvider>, MapCodec<AddNumber>> ADD = REGISTRY.register("ad", () -> AddNumber.CODEC);
+    public static final DeferredHolder<MapCodec<? extends INumberProvider>, MapCodec<AddNumber>> ADD = REGISTRY.register("add", () -> AddNumber.CODEC);
     public static final DeferredHolder<MapCodec<? extends INumberProvider>, MapCodec<MultiplyNumber>> MULTIPLY = REGISTRY.register("multiply", () -> MultiplyNumber.CODEC);
     public static final DeferredHolder<MapCodec<? extends INumberProvider>, MapCodec<ConfigNumber>> CONFIG = REGISTRY.register("config", () -> ConfigNumber.CODEC);
 

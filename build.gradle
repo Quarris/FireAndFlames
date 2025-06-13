@@ -159,10 +159,12 @@ repositories {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
     }
+
+    maven { url = "https://api.modrinth.com/maven" }
 }
 
 dependencies {
-    implementation "curse.maven:jade-324717:${jade_version}"
+    implementation "maven.modrinth:jade:15.10.0+neoforge"
 
     implementation "curse.maven:pretty-pipes-376737:$pp_version"
     implementation "curse.maven:pretty-pipes-fluids-479142:$ppf_version"
@@ -194,6 +196,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
+            mod_credits            : mod_credits,
             mod_description        : mod_description
     ]
     inputs.properties replaceProperties

@@ -24,7 +24,13 @@ public class ItemTagGen extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pLookup) {
-        this.tag(TagSetup.ItemTags.CASTS).add(ItemSetup.NUGGET_CAST.asItem(), ItemSetup.INGOT_CAST.asItem());
+        this.tag(TagSetup.ItemTags.CASTS).add(
+            ItemSetup.NUGGET_CAST.asItem(),
+            ItemSetup.INGOT_CAST.asItem(),
+            ItemSetup.BLADE_SHAPE_CAST.asItem(),
+            ItemSetup.MISC_SHAPE_CAST.asItem(),
+            ItemSetup.TOOL_SHAPE_CAST.asItem()
+        );
     }
 
     private static ResourceKey<Item> key(Block block) {
