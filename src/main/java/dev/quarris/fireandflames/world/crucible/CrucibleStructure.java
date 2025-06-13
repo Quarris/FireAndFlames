@@ -387,7 +387,7 @@ public class CrucibleStructure {
     }
 
     public static boolean isValidCrucibleBlock(BlockState state) {
-        return state.is(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS);
+        return state.is(TagSetup.BlockTags.VALID_CRUCIBLE_BLOCKS) || state.is(BlockSetup.CRUCIBLE_DRAIN);
     }
 
     public void markClean() {

@@ -1,4 +1,2 @@
-# 0.1.0
-- Initial Beta Release.
-- Adds Crucible Structure.
-- Adds Smelting, Entity Melting, Basin Casting, Table Casting and Alloying recipes.
+# 0.1.1
+- Fixes crucibles sometimes not being formed when drains are used.
