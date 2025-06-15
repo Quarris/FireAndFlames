@@ -1,2 +1,3 @@
-# 0.1.1
-- Fixes crucibles sometimes not being formed when drains are used.
+# 0.1.2
+- Adds pseudo EMI-JEI compat
+  - The compat is very crude, but it should do in a pinch.

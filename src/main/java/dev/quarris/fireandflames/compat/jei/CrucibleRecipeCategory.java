@@ -42,16 +42,13 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
 
     private final IDrawable icon;
     private final IDrawableStatic background;
+    private final IDrawableAnimated recipeFlame;
 
     public CrucibleRecipeCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemLike(BlockSetup.CRUCIBLE_CONTROLLER);
         this.background = guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
-    }
 
-    @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, CrucibleRecipe recipe, IFocusGroup focuses) {
-        builder.addAnimatedRecipeFlame(20).setPosition(34, 8);
-
+        this.recipeFlame = guiHelper.createAnimatedRecipeFlame(20);
     }
 
     @Override
@@ -81,6 +78,8 @@ public class CrucibleRecipeCategory implements IRecipeCategory<CrucibleRecipe> {
         int y = (int) (24 / scale);
         guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.literal(recipe.heat() + "°").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFF);
         matrix.popPose();
+
+        this.recipeFlame.draw(guiGraphics, 34, 8);
     }
 
     @Override

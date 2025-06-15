@@ -10,6 +10,7 @@ import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
 import mezz.jei.api.gui.ITickTimer;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
@@ -41,6 +42,9 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
     private final IDrawableStatic background;
     private final IDrawableStatic fluidSlotBackground;
     private final ITickTimer rotationTimer;
+    private final DrawableEntity drawableEntity;
+    private final IDrawableStatic recipeFlame;
+    private final IDrawableAnimated recipeArrow;
 
     public EntityMeltingRecipeCategory(IGuiHelper guiHelper) {
         this.guiHelper = guiHelper;
@@ -48,14 +52,12 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
         this.background = this.guiHelper.drawableBuilder(BACKGROUND, 0, 0, this.getWidth(), this.getHeight()).setTextureSize(this.getWidth(), this.getHeight()).build();
         this.fluidSlotBackground = this.guiHelper.drawableBuilder(FLUID_SLOT_BACKGROUND, 0, 0, 10, 22).setTextureSize(10, 22).build();
         this.rotationTimer = guiHelper.createTickTimer(20, 360, false);
+        this.drawableEntity = new DrawableEntity(this.guiHelper, 16, this.rotationTimer, Axis.XP.rotationDegrees(-10));
+
+        this.recipeFlame = guiHelper.getRecipeFlameFilled();
+        this.recipeArrow = guiHelper.createAnimatedRecipeArrow(20);
     }
 
-    @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, EntityMeltingRecipe recipe, IFocusGroup focuses) {
-        builder.addDrawable(new DrawableEntity(this.guiHelper, recipe.entityPredicate().types(), 16, this.rotationTimer, Axis.XP.rotationDegrees(-10))).setPosition(12, 16);
-        builder.addDrawable(this.guiHelper.getRecipeFlameFilled()).setPosition(41, 17);
-        builder.addAnimatedRecipeArrow(20).setPosition(62, 16);
-    }
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, EntityMeltingRecipe recipe, IFocusGroup focuses) {
@@ -79,6 +81,11 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
         int y = (int) (32 / scale);
         guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.literal(recipe.heat() + "°").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFF);
         matrix.popPose();
+
+        this.drawableEntity.setEntities(recipe.entityPredicate().types());
+        this.drawableEntity.draw(guiGraphics, 12, 16);
+        this.recipeFlame.draw(guiGraphics, 41, 17);
+        this.recipeArrow.draw(guiGraphics, 62, 16);
     }
 
     @Override

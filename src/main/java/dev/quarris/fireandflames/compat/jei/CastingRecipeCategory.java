@@ -7,6 +7,7 @@ import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.world.crucible.crafting.CastingRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
@@ -43,6 +44,8 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
 
     private final Component title;
     private final RecipeType<R> type;
+    private final IDrawableStatic recipePlusSign;
+    private final IDrawableAnimated recipeArrow;
 
     public CastingRecipeCategory(IGuiHelper guiHelper, boolean isBasin, Class<R> recipeClass) {
         this.type = new RecipeType<>(ModRef.res(isBasin ? "basin_casting" : "table_casting"), recipeClass);
@@ -52,13 +55,9 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
         this.itemSlotBackground = guiHelper.drawableBuilder(ITEM_SLOT_BACKGROUND, 0, 0, 18, 18).setTextureSize(18, 18).build();
         this.fluidSlotBackground = guiHelper.drawableBuilder(FLUID_SLOT_BACKGROUND, 0, 0, 10, 22).setTextureSize(10, 22).build();
         this.castingBlockDrawable = guiHelper.createDrawableItemLike(isBasin ? BlockSetup.CASTING_BASIN : BlockSetup.CASTING_TABLE);
-    }
 
-    @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, R recipe, IFocusGroup focuses) {
-        builder.addRecipePlusSign().setPosition(32, 16);
-        builder.addAnimatedRecipeArrow(20).setPosition(70, 16);
-        builder.addDrawable(this.castingBlockDrawable, 51, recipe.getItemInput().isEmpty() ? 16 : 37);
+        this.recipePlusSign = guiHelper.getRecipePlusSign();
+        this.recipeArrow = guiHelper.createAnimatedRecipeArrow(20);
     }
 
     @Override
@@ -94,6 +93,10 @@ public class CastingRecipeCategory<R extends CastingRecipe> implements IRecipeCa
             guiGraphics.drawCenteredString(Minecraft.getInstance().font, CAST_CONSUMED_TEXT.copy().withStyle(ChatFormatting.RED), x, y, 0xFFFFFFFF);
             matrix.popPose();
         }
+
+        this.recipePlusSign.draw(guiGraphics, 32, 16);
+        this.recipeArrow.draw(guiGraphics, 70, 16);
+        this.castingBlockDrawable.draw(guiGraphics, 51, recipe.getItemInput().isEmpty() ? 16 : 37);
     }
 
     @Override

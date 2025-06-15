@@ -13,7 +13,7 @@ import snownee.jade.api.WailaPlugin;
 public class JadeCompat implements IModCompat, IWailaPlugin {
 
     public JadeCompat() {
-        CompatManager.jade = this;
+        CompatManager.JADE = this;
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.HolderSet;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -21,26 +22,35 @@ import org.joml.Quaternionf;
 
 public class DrawableEntity implements IDrawable {
 
-    private final ITickTimer cycleTimer;
-    private final HolderSet<EntityType<?>> entities;
-    private final int size;
+    public static final int CYCLE_SIZE = 256;
 
+    private final ITickTimer cycleTimer;
+    private final int size;
     private final Quaternionf defaultRotation;
     private final ITickTimer rotationTimer;
 
-    public DrawableEntity(IGuiHelper guiHelper, HolderSet<EntityType<?>> entitySet, int size, @Nullable ITickTimer rotationTimer, @Nullable Quaternionf defaultRotation) {
-        this.entities = entitySet;
+    private HolderSet<EntityType<?>> entities;
+
+    public DrawableEntity(IGuiHelper guiHelper, int size, @Nullable ITickTimer rotationTimer, @Nullable Quaternionf defaultRotation) {
         this.size = size;
-        this.cycleTimer = guiHelper.createTickTimer(20 * entitySet.size(), entitySet.size(), false);
+        this.cycleTimer = guiHelper.createTickTimer(20 * CYCLE_SIZE, CYCLE_SIZE, false);
         this.defaultRotation = defaultRotation;
         this.rotationTimer = rotationTimer;
     }
 
+    public void setEntities(HolderSet<EntityType<?>> entities) {
+        this.entities = entities;
+    }
+
     @Override
     public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
+        if (this.entities == null || this.entities.size() == 0) {
+            return;
+        }
+
         int light = LightTexture.pack(15, 15);
         int cycleValue = Math.max(0, this.cycleTimer.getValue() - 1);
-        EntityType<?> entityType = this.entities.get(cycleValue).value();
+        EntityType<?> entityType = this.entities.get(cycleValue % this.entities.size()).value();
 
         PoseStack matrix = guiGraphics.pose();
         matrix.pushPose(); {

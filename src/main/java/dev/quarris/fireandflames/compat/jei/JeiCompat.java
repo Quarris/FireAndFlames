@@ -6,7 +6,6 @@ import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.EntityMeltingRecipe;
 import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -27,7 +26,7 @@ import java.util.Objects;
 public class JeiCompat implements IModCompat, IModPlugin {
 
     public JeiCompat() {
-        CompatManager.jei = this;
+        CompatManager.JEI = this;
     }
 
     private CrucibleRecipeCategory crucibleCategory;
