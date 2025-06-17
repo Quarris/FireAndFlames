@@ -5,6 +5,7 @@ import dev.quarris.fireandflames.network.payload.ArtisanTableSetOutputsS2CPayloa
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.MenuHelper;
+import dev.quarris.fireandflames.world.inventory.crafting.ArtisanCraftingRecipe;
 import dev.quarris.fireandflames.world.inventory.crafting.ArtisanRecipeOutput;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ArtisanTableMenu extends AbstractContainerMenu {
@@ -96,10 +96,10 @@ public class ArtisanTableMenu extends AbstractContainerMenu {
                 .flatMap(Collection::stream),
             level.getRecipeManager().getRecipesFor(RecipeSetup.ARTISAN_CRAFTING_TYPE.get(), input, level).stream()
                 .map(RecipeHolder::value)
-                .map(recipe -> recipe.createResults(input, level.registryAccess())),
+                .map(ArtisanCraftingRecipe::createResult),
             level.getRecipeManager().getRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get(), input, level).stream()
                 .map(RecipeHolder::value)
-                .map(recipe -> recipe.createResults(input, level.registryAccess()))
+                .map(recipe -> recipe.createResults(input))
                 .flatMap(Collection::stream)
         ).flatMap(s -> s).toList();
 

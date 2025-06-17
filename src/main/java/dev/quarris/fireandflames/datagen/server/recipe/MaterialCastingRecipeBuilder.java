@@ -1,13 +1,12 @@
-package dev.quarris.fireandflames.data.recipe;
+package dev.quarris.fireandflames.datagen.server.recipe;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.config.number.ConstantNumber;
 import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
-import dev.quarris.fireandflames.world.inventory.crafting.BasinCastingRecipe;
 import dev.quarris.fireandflames.world.inventory.crafting.CastingRecipe;
-import dev.quarris.fireandflames.world.inventory.crafting.TableCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.TableMaterialCastingRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -17,14 +16,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
-public class CastingRecipeBuilder implements RecipeBuilder {
+public class MaterialCastingRecipeBuilder implements RecipeBuilder {
 
     private final RecipeType<?> type;
-    private final FluidInput fluidInput;
+    private final INumberProvider fluidInput;
     private final IItemOutput result;
 
     private int coolingTime = 100;
@@ -32,63 +30,60 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     private boolean consumesInput;
     private boolean moveItem;
 
-    private CastingRecipeBuilder(RecipeType<?> type, FluidInput fluidInput, IItemOutput result) {
+    private MaterialCastingRecipeBuilder(RecipeType<?> type, INumberProvider fluidInput, IItemOutput result) {
         this.type = type;
         this.fluidInput = fluidInput;
         this.result = result;
     }
 
-    public static CastingRecipeBuilder basin(FluidIngredient fluid, int amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesInput(true);
+    public static MaterialCastingRecipeBuilder basin(int amount, IItemOutput result) {
+        return new MaterialCastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new ConstantNumber(amount), result).consumesInput(true);
     }
 
-    public static CastingRecipeBuilder basin(FluidIngredient fluid, INumberProvider amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(fluid, amount), result).consumesInput(true);
+    public static MaterialCastingRecipeBuilder basin(INumberProvider amount, IItemOutput result) {
+        return new MaterialCastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), amount, result).consumesInput(true);
     }
 
-    public static CastingRecipeBuilder basin(FluidStack fluid, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.BASIN_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result).consumesInput(true);
+    public static MaterialCastingRecipeBuilder table(int amount, IItemOutput result) {
+        return new MaterialCastingRecipeBuilder(RecipeSetup.TABLE_MATERIAL_CASTING_TYPE.get(), new ConstantNumber(amount), result);
     }
 
-    public static CastingRecipeBuilder table(FluidIngredient fluid, int amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(fluid, amount), result);
+    public static MaterialCastingRecipeBuilder table(INumberProvider amount, IItemOutput result) {
+        return new MaterialCastingRecipeBuilder(RecipeSetup.TABLE_MATERIAL_CASTING_TYPE.get(), amount, result);
     }
 
-    public static CastingRecipeBuilder table(FluidIngredient fluid, INumberProvider amount, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(fluid, amount), result);
-    }
-
-    public static CastingRecipeBuilder table(FluidStack fluid, IItemOutput result) {
-        return new CastingRecipeBuilder(RecipeSetup.TABLE_CASTING_TYPE.get(), new FluidInput(FluidIngredient.single(fluid), fluid.getAmount()), result);
-    }
-
-    public CastingRecipeBuilder coolingTime(int time) {
+    public MaterialCastingRecipeBuilder coolingTime(int time) {
         this.coolingTime = time;
         return this;
     }
 
-    public CastingRecipeBuilder withItemInput(Ingredient input) {
+    public MaterialCastingRecipeBuilder withItemInput(Ingredient input) {
         this.itemInput = input;
         return this;
     }
 
-    public CastingRecipeBuilder consumesInput(boolean consumesInput) {
+    public MaterialCastingRecipeBuilder withItemInput(ItemLike input) {
+        this.itemInput = Ingredient.of(input);
+        return this;
+    }
+
+    public MaterialCastingRecipeBuilder consumesInput(boolean consumesInput) {
         this.consumesInput = consumesInput;
         return this;
     }
 
-    public CastingRecipeBuilder moveItem(boolean moveItem) {
+    public MaterialCastingRecipeBuilder moveItem(boolean moveItem) {
         this.moveItem = moveItem;
         return this;
     }
 
     @Override
-    public CastingRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
+    public MaterialCastingRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
         return this;
     }
 
     @Override
-    public CastingRecipeBuilder group(@Nullable String groupName) {
+    public MaterialCastingRecipeBuilder group(@Nullable String groupName) {
         return this;
     }
 
@@ -110,12 +105,9 @@ public class CastingRecipeBuilder implements RecipeBuilder {
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
         CastingRecipe recipe = null;
-        if (this.type == RecipeSetup.BASIN_CASTING_TYPE.get()) {
-            recipe = new BasinCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesInput, this.moveItem);
-        }
 
-        if (this.type == RecipeSetup.TABLE_CASTING_TYPE.get()) {
-            recipe = new TableCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesInput, this.moveItem);
+        if (this.type == RecipeSetup.TABLE_MATERIAL_CASTING_TYPE.get()) {
+            recipe = new TableMaterialCastingRecipe(this.result, this.fluidInput, this.itemInput, this.coolingTime, this.consumesInput, this.moveItem);
         }
 
         if (recipe != null) {

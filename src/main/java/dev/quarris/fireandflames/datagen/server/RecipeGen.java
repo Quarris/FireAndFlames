@@ -4,7 +4,7 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.config.number.ConfigNumber;
 import dev.quarris.fireandflames.data.config.number.ConstantNumber;
 import dev.quarris.fireandflames.data.config.number.MultiplyNumber;
-import dev.quarris.fireandflames.data.recipe.*;
+import dev.quarris.fireandflames.datagen.server.recipe.*;
 import dev.quarris.fireandflames.setup.*;
 import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;

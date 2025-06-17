@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.data.recipe;
+package dev.quarris.fireandflames.datagen.server.recipe;
 
 import dev.quarris.fireandflames.util.recipe.FluidInput;
 import dev.quarris.fireandflames.util.recipe.IFluidOutput;

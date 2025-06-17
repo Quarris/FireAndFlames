@@ -34,7 +34,7 @@ public record ArtisanCraftingRecipe(
         return this.byproduct.createItemStack();
     }
 
-    public ArtisanRecipeOutput createResults(SingleRecipeInput input, HolderLookup.Provider registries) {
+    public ArtisanRecipeOutput createResult() {
         return new ArtisanRecipeOutput(this.ingredient.count().evaluateInt(), this.result().createItemStack(), this.byproduct().createItemStack());
     }
 

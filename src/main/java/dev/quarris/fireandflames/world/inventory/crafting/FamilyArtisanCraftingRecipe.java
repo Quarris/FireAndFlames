@@ -44,7 +44,7 @@ public record FamilyArtisanCraftingRecipe(
         return BlockFamilies.getAllFamilies().map(family -> new ItemStack(family.getBaseBlock())).filter(this.ingredient::test).findFirst().orElse(ItemStack.EMPTY);
     }
 
-    public List<ArtisanRecipeOutput> createResults(SingleRecipeInput input, HolderLookup.Provider registries) {
+    public List<ArtisanRecipeOutput> createResults(SingleRecipeInput input) {
         List<ArtisanRecipeOutput> outputs = new ArrayList<>();
         BlockFamilies.getAllFamilies().filter(family -> input.item().is(family.getBaseBlock().asItem())).findFirst().ifPresent(family -> {
             this.variants.forEach((variant, output) -> {
