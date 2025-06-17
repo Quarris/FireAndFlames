@@ -125,6 +125,7 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.add("gui.fireandflames.jei.category.basin_casting", "Basin Casting");
         this.add("gui.fireandflames.jei.category.table_casting", "Table Casting");
         this.add("gui.fireandflames.jei.category.entity_melting", "Entity Melting");
+        this.add("gui.fireandflames.jei.category.artisan_table", "Artisan Crafting");
         this.add("gui.fireandflames.jei.cast_consumed", "Consumes Cast!");
 
         // Jade

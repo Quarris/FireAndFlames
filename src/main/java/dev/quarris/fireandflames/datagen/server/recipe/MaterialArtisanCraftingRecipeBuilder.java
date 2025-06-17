@@ -1,13 +1,10 @@
-package dev.quarris.fireandflames.data.recipe;
+package dev.quarris.fireandflames.datagen.server.recipe;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.config.number.ConstantNumber;
 import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
-import dev.quarris.fireandflames.util.recipe.ItemInput;
-import dev.quarris.fireandflames.world.inventory.crafting.ArtisanCraftingRecipe;
 import dev.quarris.fireandflames.world.inventory.crafting.MaterialArtisanCraftingRecipe;
-import dev.quarris.fireandflames.world.inventory.crafting.MaterialCastingRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;

@@ -2,65 +2,56 @@ package dev.quarris.fireandflames.compat.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.compat.jei.recipetypes.JeiArtisanRecipe;
+import dev.quarris.fireandflames.compat.jei.recipetypes.ArtisanRecipeDisplay;
 import dev.quarris.fireandflames.setup.BlockSetup;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Arrays;
 
-public class ArtisanRecipeCategory implements IRecipeCategory<JeiArtisanRecipe> {
+public class ArtisanRecipeCategory implements IRecipeCategory<ArtisanRecipeDisplay> {
 
     public static final Component TITLE = Component.translatable("gui.fireandflames.jei.category.artisan_table");
-    public static final RecipeType<JeiArtisanRecipe> TYPE = new RecipeType<>(ModRef.res("artisan"), JeiArtisanRecipe.class);
+    public static final RecipeType<ArtisanRecipeDisplay> TYPE = new RecipeType<>(ModRef.res("artisan"), ArtisanRecipeDisplay.class);
 
     public static final int WIDTH = 96;
-    public static final int HEIGHT = 32;
+    public static final int HEIGHT = 26;
 
     private final IDrawable icon;
+    private final IDrawable recipeArrow;
 
     public ArtisanRecipeCategory(IGuiHelper guiHelper) {
         this.icon = guiHelper.createDrawableItemLike(BlockSetup.ARTISAN_TABLE);
+        this.recipeArrow = guiHelper.getRecipeArrow();
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, JeiArtisanRecipe recipe, IFocusGroup focuses) {
-        builder.addInputSlot(20, 10).addIngredients(recipe.ingredient());
+    public void setRecipe(IRecipeLayoutBuilder builder, ArtisanRecipeDisplay recipe, IFocusGroup focuses) {
+        builder.addInputSlot(5, 5).addItemStacks(Arrays.stream(recipe.ingredient().getItems()).map(stack -> stack.copyWithCount(recipe.output().requiredCount())).toList());
 
-        builder.addOutputSlot(60, 10);
-        builder.addOutputSlot(80, 10);
+        builder.addOutputSlot(53, 5).addItemStack(recipe.output().main());
+        ItemStack byproduct = recipe.output().byproduct();
+        if (!byproduct.isEmpty()) {
+            builder.addOutputSlot(75, 5).addItemStack(byproduct);
+        }
     }
 
     @Override
-    public void createRecipeExtras(IRecipeExtrasBuilder builder, JeiArtisanRecipe recipe, IFocusGroup focuses) {
-        builder.addRecipeArrow().setPosition(40, 10);
-    }
-
-    @Override
-    public void draw(JeiArtisanRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(ArtisanRecipeDisplay recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         PoseStack matrix = guiGraphics.pose();
         matrix.pushPose();
         matrix.popPose();
-    }
-
-    @Override
-    public void onDisplayedIngredientsUpdate(JeiArtisanRecipe recipe, List<IRecipeSlotDrawable> recipeSlots, IFocusGroup focuses) {
-        recipeSlots.get(0).getDisplayedIngredient(VanillaTypes.ITEM_STACK).get();
-        recipeSlots.get(1).createDisplayOverrides();
-        recipeSlots.get(2).createDisplayOverrides();
-        recipeSlots.get(2);
-
+        this.recipeArrow.draw(guiGraphics, 26, 5);
     }
 
     @Override
@@ -84,7 +75,7 @@ public class ArtisanRecipeCategory implements IRecipeCategory<JeiArtisanRecipe> 
     }
 
     @Override
-    public RecipeType<JeiArtisanRecipe> getRecipeType() {
+    public RecipeType<ArtisanRecipeDisplay> getRecipeType() {
         return TYPE;
     }
 }

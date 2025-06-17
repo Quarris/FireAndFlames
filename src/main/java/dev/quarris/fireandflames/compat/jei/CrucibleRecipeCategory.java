@@ -1,24 +1,17 @@
 package dev.quarris.fireandflames.compat.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.serialization.Codec;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.config.ServerConfigs;
 import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.setup.ItemSetup;
 import dev.quarris.fireandflames.world.inventory.crafting.CrucibleRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.gui.placement.HorizontalAlignment;
-import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
-import mezz.jei.api.helpers.ICodecHelper;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.IRecipeManager;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;

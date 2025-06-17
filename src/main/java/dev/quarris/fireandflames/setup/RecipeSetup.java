@@ -1,7 +1,6 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.data.recipe.MaterialArtisanCraftingRecipeBuilder;
 import dev.quarris.fireandflames.world.inventory.crafting.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;

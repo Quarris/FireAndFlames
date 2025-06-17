@@ -6,15 +6,10 @@ import dev.quarris.fireandflames.client.screen.CrucibleScreen;
 import dev.quarris.fireandflames.client.screen.TinkersWorkbenchScreen;
 import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
-import dev.quarris.fireandflames.compat.jei.recipetypes.JeiArtisanRecipe;
+import dev.quarris.fireandflames.compat.jei.recipetypes.ArtisanRecipeDisplay;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.util.data.DataMapUtil;
-import dev.quarris.fireandflames.world.inventory.crafting.ArtisanRecipeOutput;
-import dev.quarris.fireandflames.world.inventory.crafting.BasinCastingRecipe;
-import dev.quarris.fireandflames.world.inventory.crafting.TableCastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.BasinCastingRecipe;
-import dev.quarris.fireandflames.world.crucible.crafting.TableCastingRecipe;
+import dev.quarris.fireandflames.world.inventory.crafting.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -103,13 +98,24 @@ public class JeiCompat implements IModCompat, IModPlugin {
         registerRecipesFor(registration, recipeManager, RecipeSetup.BASIN_CASTING_TYPE.get(), this.basinCategory.getRecipeType());
         registerRecipesFor(registration, recipeManager, RecipeSetup.ENTITY_MELTING_TYPE.get(), this.entityMeltingCategory.getRecipeType());
 
-        List<JeiArtisanRecipe> artisanRecipes = new ArrayList<>();
-        recipeManager.getAllRecipesFor(RecipeSetup.ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient().ingredient(), i -> new ArtisanRecipeOutput(1, ItemStack.EMPTY, ItemStack.EMPTY))));
-        /*recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> {
-            DataMapUtil.
-            artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient().ingredient()));
+        List<ArtisanRecipeDisplay> artisanRecipes = new ArrayList<>();
+        recipeManager.getAllRecipesFor(RecipeSetup.ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
+            ArtisanCraftingRecipe recipe = holder.value();
+            artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), recipe.ingredient().ingredient(), recipe.createResult()));
+        });
+        /*recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
+            MaterialArtisanCraftingRecipe recipe = holder.value();
+            recipe.createResults();
         });*/
-        recipeManager.getAllRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(recipe -> artisanRecipes.add(new JeiArtisanRecipe(recipe.value().ingredient(), i -> new ArtisanRecipeOutput(1, ItemStack.EMPTY, ItemStack.EMPTY))));
+        recipeManager.getAllRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
+            FamilyArtisanCraftingRecipe recipe = holder.value();
+            for (ItemStack item : recipe.ingredient().getItems()) {
+                List<ArtisanRecipeOutput> familyResults = recipe.createResults(new SingleRecipeInput(item));
+                for (ArtisanRecipeOutput familyResult : familyResults) {
+                    artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), Ingredient.of(item), familyResult));
+                }
+            }
+        });
         registration.addRecipes(this.artisanCategory.getRecipeType(), artisanRecipes);
     }
 

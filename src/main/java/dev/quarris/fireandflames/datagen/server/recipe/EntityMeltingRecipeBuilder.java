@@ -1,4 +1,4 @@
-package dev.quarris.fireandflames.data.recipe;
+package dev.quarris.fireandflames.datagen.server.recipe;
 
 import dev.quarris.fireandflames.data.config.number.INumberProvider;
 import dev.quarris.fireandflames.world.inventory.crafting.EntityMeltingRecipe;
