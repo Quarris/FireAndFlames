@@ -8,7 +8,10 @@ import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.compat.jei.recipetypes.ArtisanRecipeDisplay;
 import dev.quarris.fireandflames.setup.BlockSetup;
+import dev.quarris.fireandflames.setup.DataMapSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
+import dev.quarris.fireandflames.setup.RegistrySetup;
+import dev.quarris.fireandflames.util.data.DataMapUtil;
 import dev.quarris.fireandflames.world.inventory.crafting.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -17,8 +20,10 @@ import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiKeyMappings;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
@@ -103,10 +108,16 @@ public class JeiCompat implements IModCompat, IModPlugin {
             ArtisanCraftingRecipe recipe = holder.value();
             artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), recipe.ingredient().ingredient(), recipe.createResult()));
         });
-        /*recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
+        recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
             MaterialArtisanCraftingRecipe recipe = holder.value();
-            recipe.createResults();
-        });*/
+            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(Items.OAK_PLANKS, 10));
+
+            RegistryAccess registries = Minecraft.getInstance().player.registryAccess();
+            //registries.lookupOrThrow(RegistrySetup.Keys.MATERIALS).getData(DataMapSetup.MATERIAL_CONVERSIONS).listElements().toList();
+            for (ArtisanRecipeOutput result : recipe.createResults(input, registries)) {
+                artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), Ingredient.of(input.item()), result));
+            }
+        });
         recipeManager.getAllRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
             FamilyArtisanCraftingRecipe recipe = holder.value();
             for (ItemStack item : recipe.ingredient().getItems()) {
