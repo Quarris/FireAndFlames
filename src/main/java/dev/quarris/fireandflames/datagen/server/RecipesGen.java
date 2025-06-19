@@ -140,6 +140,14 @@ public class RecipesGen extends RecipeProvider {
             .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS))
             .save(pOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_CONTROLLER.get())
+            .pattern("BBB")
+            .pattern("B B")
+            .pattern("BBB")
+            .define('B', ItemSetup.FIRE_BRICK.get())
+            .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
+            .save(pOutput);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_DRAIN.get())
             .pattern("B B")
             .pattern("B B")
