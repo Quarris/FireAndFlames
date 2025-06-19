@@ -233,7 +233,7 @@ public class RecipeGen extends RecipeProvider {
             .pattern("BBB")
             .define('B', ItemSetup.FIRE_BRICK.get())
             .unlockedBy("has_fire_brick", has(ItemSetup.FIRE_BRICK.get()))
-            .save(pOutput);
+            .save(output);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, BlockSetup.CRUCIBLE_DRAIN.get())
             .pattern("B B")
