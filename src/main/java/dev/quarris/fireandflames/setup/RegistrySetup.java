@@ -29,8 +29,7 @@ public class RegistrySetup {
         .add(Registries.DAMAGE_TYPE, DamageTypeGen::bootstrap)
         .add(RegistrySetup.Keys.MATERIALS, MaterialGen::bootstrap);
 
-    public static HolderLookup.Provider createLookup() {
-        RegistryAccess.Frozen registryAccess = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+    public static HolderLookup.Provider createLookup(RegistryAccess registryAccess) {
         return DATAPACK_REGISTRIES.build(registryAccess);
     }
 

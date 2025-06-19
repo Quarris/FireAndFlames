@@ -20,6 +20,7 @@ import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiKeyMappings;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -112,7 +113,7 @@ public class JeiCompat implements IModCompat, IModPlugin {
             MaterialArtisanCraftingRecipe recipe = holder.value();
             SingleRecipeInput input = new SingleRecipeInput(new ItemStack(Items.OAK_PLANKS, 10));
 
-            RegistryAccess registries = Minecraft.getInstance().player.registryAccess();
+            HolderLookup.Provider registries = RegistrySetup.createLookup(Minecraft.getInstance().level.registryAccess());
             //registries.lookupOrThrow(RegistrySetup.Keys.MATERIALS).getData(DataMapSetup.MATERIAL_CONVERSIONS).listElements().toList();
             for (ArtisanRecipeOutput result : recipe.createResults(input, registries)) {
                 artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), Ingredient.of(input.item()), result));
