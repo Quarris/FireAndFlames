@@ -1,12 +1,18 @@
 package dev.quarris.fireandflames.compat.jei;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.client.data.ClientMaterialConverters;
 import dev.quarris.fireandflames.client.screen.ArtisanTableScreen;
 import dev.quarris.fireandflames.client.screen.CrucibleScreen;
 import dev.quarris.fireandflames.client.screen.TinkersWorkbenchScreen;
 import dev.quarris.fireandflames.compat.CompatManager;
 import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.compat.jei.recipetypes.ArtisanRecipeDisplay;
+import dev.quarris.fireandflames.data.map.ConverterData;
+import dev.quarris.fireandflames.data.map.ItemMaterialConverter;
+import dev.quarris.fireandflames.data.map.MaterialConversion;
+import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
+import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.setup.BlockSetup;
 import dev.quarris.fireandflames.setup.DataMapSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
@@ -20,6 +26,7 @@ import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiKeyMappings;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -45,6 +52,11 @@ public class JeiCompat implements IModCompat, IModPlugin {
     private CastingRecipeCategory<TableCastingRecipe> tableCategory;
     private EntityMeltingRecipeCategory entityMeltingCategory;
     private ArtisanRecipeCategory artisanCategory;
+
+    @Override
+    public void registerModInfo(IModInfoRegistration modAliasRegistration) {
+        modAliasRegistration.addModAliases(ModRef.ID, "fnf");
+    }
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
@@ -110,12 +122,19 @@ public class JeiCompat implements IModCompat, IModPlugin {
         });
         recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
             MaterialArtisanCraftingRecipe recipe = holder.value();
-            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(Items.OAK_PLANKS, 10));
 
-            HolderLookup.Provider registries = RegistrySetup.createLookup(Minecraft.getInstance().level.registryAccess());
-            //registries.lookupOrThrow(RegistrySetup.Keys.MATERIALS).getData(DataMapSetup.MATERIAL_CONVERSIONS).listElements().toList();
-            for (ArtisanRecipeOutput result : recipe.createResults(input, registries)) {
-                artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), Ingredient.of(input.item()), result));
+            // TODO Add byproduct based on leftover units
+            for (ConverterData data : ClientMaterialConverters.getConverters()) {
+                if (data.converter() instanceof ItemMaterialConverter converter) {
+                    Holder<ToolMaterial> mat = data.material();
+
+                    ItemStack mainOutput = recipe.result().createItemStack();
+                    if (mainOutput.getItem() instanceof IMaterialHolder materialHolder) {
+                        materialHolder.setMaterial(mainOutput, mat);
+                    }
+
+                    artisanRecipes.add(new ArtisanRecipeDisplay(holder.id().withSuffix("_" + mat.getRegisteredName().replace(':', '_')), converter.item().ingredient(), new ArtisanRecipeOutput(data.converter().getCountForUnits(recipe.units().evaluateInt()), mainOutput, ItemStack.EMPTY)));
+                }
             }
         });
         recipeManager.getAllRecipesFor(RecipeSetup.FAMILY_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {

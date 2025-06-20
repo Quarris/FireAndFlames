@@ -1,12 +1,14 @@
 package dev.quarris.fireandflames.world.inventory.crafting;
 
 import dev.quarris.fireandflames.data.config.number.INumberProvider;
+import dev.quarris.fireandflames.data.map.ConverterData;
 import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
 import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.setup.RegistrySetup;
 import dev.quarris.fireandflames.util.data.DataMapUtil;
 import dev.quarris.fireandflames.util.recipe.IItemOutput;
+import dev.quarris.fireandflames.util.recipe.ItemInput;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -39,10 +41,14 @@ public record MaterialArtisanCraftingRecipe(
     }
 
     public List<ArtisanRecipeOutput> createResults(SingleRecipeInput input, HolderLookup.Provider registries) {
+        return this.createResults(input, DataMapUtil.getConverters(input.item(), registries));
+    }
+
+    public List<ArtisanRecipeOutput> createResults(SingleRecipeInput input, List<ConverterData> converters) {
         List<ArtisanRecipeOutput> outputs = new ArrayList<>();
-        DataMapUtil.getConverters(input.item(), registries).stream()
-            .filter(data -> input.item().getCount() >= data.converter().getCountForUnits(this.units.evaluateInt()))
-            .forEach(data -> {
+        // TODO Add byproduct based on leftover units
+        for (ConverterData data : converters) {
+            if (input.item().getCount() >= data.converter().getCountForUnits(this.units.evaluateInt())) {
                 Holder<ToolMaterial> mat = data.material();
 
                 ItemStack mainOutput = this.result.createItemStack();
@@ -51,7 +57,8 @@ public record MaterialArtisanCraftingRecipe(
                 }
 
                 outputs.add(new ArtisanRecipeOutput(data.converter().getCountForUnits(this.units.evaluateInt()), mainOutput, ItemStack.EMPTY));
-            });
+            }
+        }
 
         return outputs;
     }

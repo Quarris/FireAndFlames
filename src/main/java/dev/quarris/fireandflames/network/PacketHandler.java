@@ -22,5 +22,6 @@ public class PacketHandler {
 
         // Server to Client
         registrar.playToClient(ArtisanTableSetOutputsS2CPayload.TYPE, ArtisanTableSetOutputsS2CPayload.CODEC, ArtisanTableSetOutputsS2CPayload::handle);
+        registrar.playToClient(MaterialConverterDataPayload.TYPE, MaterialConverterDataPayload.CODEC, MaterialConverterDataPayload::handle);
     }
 }

@@ -39,4 +39,15 @@ public class DataMapUtil {
 
         return converterDataList;
     }
+
+    public static List<ConverterData> getAllConverters(HolderLookup.Provider registries) {
+        List<ConverterData> converterDataList = new ArrayList<>();
+        for (Holder.Reference<ToolMaterial> mat : registries.lookupOrThrow(RegistrySetup.Keys.MATERIALS).listElements().toList()) {
+            MaterialConversion conversion = mat.getData(DataMapSetup.MATERIAL_CONVERSIONS);
+            if (conversion == null) continue;
+            conversion.converters().forEach(converter -> converterDataList.add(new ConverterData(mat, converter)));
+        }
+
+        return converterDataList;
+    }
 }
