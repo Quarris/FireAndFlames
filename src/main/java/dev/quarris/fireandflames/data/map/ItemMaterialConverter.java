@@ -7,6 +7,7 @@ import dev.quarris.fireandflames.util.recipe.ItemInput;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public record ItemMaterialConverter(
     ItemInput item,
@@ -25,9 +26,19 @@ public record ItemMaterialConverter(
 
     @Override
     public boolean matches(Object input) {
-        if (!(input instanceof ItemStack stack)) return false;
+        if (input instanceof ItemStack stack) {
+            return this.item.test(stack);
+        }
 
-        return this.item.test(stack);
+        if (input instanceof Ingredient ingredient) {
+            for (ItemStack testStack : ingredient.getItems()) {
+                if (this.item.test(testStack)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

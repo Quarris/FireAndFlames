@@ -10,14 +10,8 @@ import dev.quarris.fireandflames.compat.IModCompat;
 import dev.quarris.fireandflames.compat.jei.recipetypes.ArtisanRecipeDisplay;
 import dev.quarris.fireandflames.data.map.ConverterData;
 import dev.quarris.fireandflames.data.map.ItemMaterialConverter;
-import dev.quarris.fireandflames.data.map.MaterialConversion;
-import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
-import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.setup.BlockSetup;
-import dev.quarris.fireandflames.setup.DataMapSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
-import dev.quarris.fireandflames.setup.RegistrySetup;
-import dev.quarris.fireandflames.util.data.DataMapUtil;
 import dev.quarris.fireandflames.world.inventory.crafting.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -26,11 +20,8 @@ import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiKeyMappings;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
@@ -97,7 +88,7 @@ public class JeiCompat implements IModCompat, IModPlugin {
         registration.addGuiContainerHandler(TinkersWorkbenchScreen.class, new TinkersWorkbenchGuiHandler());
 
         registration.addRecipeClickArea(CrucibleScreen.class, 5, 5, 50, 10, this.crucibleCategory.getRecipeType(), this.alloyingCategory.getRecipeType(), this.entityMeltingCategory.getRecipeType());
-        registration.addRecipeClickArea(ArtisanTableScreen.class, 5, 5, 50, 10, this.artisanCategory.getRecipeType());
+        registration.addRecipeClickArea(ArtisanTableScreen.class, 68, 24, 22, 15, this.artisanCategory.getRecipeType());
     }
 
     @Override
@@ -123,17 +114,18 @@ public class JeiCompat implements IModCompat, IModPlugin {
         recipeManager.getAllRecipesFor(RecipeSetup.MATERIAL_ARTISAN_CRAFTING_TYPE.get()).stream().forEach(holder -> {
             MaterialArtisanCraftingRecipe recipe = holder.value();
 
-            // TODO Add byproduct based on leftover units
-            for (ConverterData data : ClientMaterialConverters.getConverters()) {
+            List<ConverterData> allConverters = ClientMaterialConverters.getConverters();
+            for (ConverterData data : allConverters) {
                 if (data.converter() instanceof ItemMaterialConverter converter) {
-                    Holder<ToolMaterial> mat = data.material();
+                    int requiredCount = converter.getCountForUnits(recipe.units().evaluateInt());
 
-                    ItemStack mainOutput = recipe.result().createItemStack();
-                    if (mainOutput.getItem() instanceof IMaterialHolder materialHolder) {
-                        materialHolder.setMaterial(mainOutput, mat);
+                    List<ConverterData> converters = allConverters.stream()
+                        .filter(cd -> cd.material().equals(data.material()))
+                        .toList();
+
+                    for (ArtisanRecipeOutput result : recipe.createResultsFromConverters(requiredCount, converters, converters.stream().filter(cd -> cd.converter().matches(converter.item().ingredient())).toList())) {
+                        artisanRecipes.add(new ArtisanRecipeDisplay(holder.id(), converter.item().ingredient(), result));
                     }
-
-                    artisanRecipes.add(new ArtisanRecipeDisplay(holder.id().withSuffix("_" + mat.getRegisteredName().replace(':', '_')), converter.item().ingredient(), new ArtisanRecipeOutput(data.converter().getCountForUnits(recipe.units().evaluateInt()), mainOutput, ItemStack.EMPTY)));
                 }
             }
         });
