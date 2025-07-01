@@ -1,14 +1,12 @@
 package dev.quarris.fireandflames.client.event.handler;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.client.ModClient;
-import dev.quarris.fireandflames.client.model.CustomToolModelLoader;
 import dev.quarris.fireandflames.client.renderer.blockentity.*;
 import dev.quarris.fireandflames.client.screen.*;
-import dev.quarris.fireandflames.client.util.extensions.CustomToolClientExtensions;
-import dev.quarris.fireandflames.setup.*;
+import dev.quarris.fireandflames.setup.BlockEntitySetup;
+import dev.quarris.fireandflames.setup.FluidSetup;
+import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.util.fluid.CustomFluidHolder;
-import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -22,7 +20,7 @@ public class ClientSetupEvents {
 
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
-        ModClient.get().init(Minecraft.getInstance());
+
     }
 
     @SubscribeEvent
@@ -30,8 +28,6 @@ public class ClientSetupEvents {
         for (CustomFluidHolder fluidHolder : FluidSetup.REGISTRY.entries()) {
             event.registerFluidType(fluidHolder.getFluidExtensions(), fluidHolder.getFluidType());
         }
-
-        event.registerItem(new CustomToolClientExtensions(), ToolItemSetup.PICKAXE);
     }
 
     @SubscribeEvent
@@ -54,7 +50,7 @@ public class ClientSetupEvents {
 
     @SubscribeEvent
     public static void registerCustomModelLoader(ModelEvent.RegisterGeometryLoaders event) {
-        event.register(CustomToolModelLoader.ID, CustomToolModelLoader.INSTANCE);
+
     }
 
 }
