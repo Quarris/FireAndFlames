@@ -21,7 +21,8 @@ public record ToolMaterial(
     float speedBonus,
     float damageModifier,
     float damageBonus,
-    float attackSpeed
+    float attackSpeed,
+    MaterialColor color
 ) {
 
     private static final Codec<TagKey<Block>> BLOCK_TAG_CODEC = TagKey.codec(Registries.BLOCK);
@@ -36,7 +37,8 @@ public record ToolMaterial(
         Codec.FLOAT.fieldOf("speed_bonus").forGetter(ToolMaterial::speedBonus),
         Codec.FLOAT.fieldOf("damage").forGetter(ToolMaterial::damageModifier),
         Codec.FLOAT.fieldOf("damage_bonus").forGetter(ToolMaterial::damageBonus),
-        Codec.FLOAT.fieldOf("attack_speed").forGetter(ToolMaterial::attackSpeed)
+        Codec.FLOAT.fieldOf("attack_speed").forGetter(ToolMaterial::attackSpeed),
+        MaterialColor.CODEC.fieldOf("color").forGetter(ToolMaterial::color)
     ).apply(instance, ToolMaterial::new));
 
     public static final Codec<Holder<ToolMaterial>> HOLDER_CODEC = RegistryFileCodec.create(RegistrySetup.Keys.MATERIALS, ToolMaterial.CODEC);
@@ -54,6 +56,7 @@ public record ToolMaterial(
         ByteBufCodecs.FLOAT.encode(buf, material.damageModifier());
         ByteBufCodecs.FLOAT.encode(buf, material.damageBonus());
         ByteBufCodecs.FLOAT.encode(buf, material.attackSpeed());
+        MaterialColor.STREAM_CODEC.encode(buf, material.color());
     }
 
     private static ToolMaterial fromNetwork(RegistryFriendlyByteBuf buf) {
@@ -66,7 +69,8 @@ public record ToolMaterial(
         var damage = ByteBufCodecs.FLOAT.decode(buf);
         var damageBonus = ByteBufCodecs.FLOAT.decode(buf);
         var attackSpeed = ByteBufCodecs.FLOAT.decode(buf);
+        var color = MaterialColor.STREAM_CODEC.decode(buf);
 
-        return new ToolMaterial(name, durability, durabilityBonus, deniesBlocks, speed, speedBonus, damage, damageBonus, attackSpeed);
+        return new ToolMaterial(name, durability, durabilityBonus, deniesBlocks, speed, speedBonus, damage, damageBonus, attackSpeed, color);
     }
 }

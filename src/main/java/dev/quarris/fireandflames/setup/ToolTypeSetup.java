@@ -67,11 +67,11 @@ public final class ToolTypeSetup {
     public static final DeferredHolder<ToolType<?>, ToolType<PickaxeToolItem>> HAMMER = REGISTRY.register("hammer", () ->
         ToolType.of(ToolItemSetup.HAMMER)
             .ordering(2)
-            .addPart(CommonPartSlots.HAMMER_LEFT, 44, 46)
-            .addPart(CommonPartSlots.HAMMER_RIGHT, 67, 69)
-            .addPart(CommonPartSlots.BINDING, 63, 50)
+            .addPart(CommonPartSlots.HAMMER_LEFT.withIndex(3), 44, 46)
+            .addPart(CommonPartSlots.HAMMER_RIGHT.withIndex(4), 67, 69)
+            .addPart(CommonPartSlots.BINDING.withIndex(1), 63, 50)
             .addPart(CommonPartSlots.HANDLE, 44, 69)
-            .addPart(CommonPartSlots.GRIP, 25, 88)
+            .addPart(CommonPartSlots.GRIP.withIndex(2), 25, 88)
             .durabilityModifier(5.0f).miningSpeed(0.8f).durabilityLossPerBlock(1)
             .addRule(Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_PICKAXE, 0.8f))
             .build(CommonPartSlots.HAMMER_LEFT.name()));

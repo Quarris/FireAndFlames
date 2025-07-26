@@ -11,7 +11,7 @@ public interface IMaterialHolder {
     void setMaterial(ItemStack stack, Holder<ToolMaterial> material);
 
     default boolean hasMaterial(ItemStack stack) {
-        return this.getMaterial(stack) == null;
+        return this.getMaterial(stack) != null;
     }
 
     default ItemStack createFrom(Holder<ToolMaterial> material) {

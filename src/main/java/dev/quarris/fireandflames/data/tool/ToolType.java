@@ -19,8 +19,8 @@ public final class ToolType<T extends ICustomTool> {
     private final Supplier<T> toolItem;
     private final String mainPartName;
     private final Map<String, PartSlot> parts;
-    private final Map<PartSlot, PartPosition> slots;
-    private final int ordering;
+    private final Map<PartSlot, PartPosition> slots; // The slot positions within the workbench TODO Move outside of tooltype class?
+    private final int ordering; // Ordering within the workbench TODO Move outside of this class?
     private final Set<Tool.Rule> rules;
     private final ToolStats baseStats;
 
@@ -151,12 +151,12 @@ public final class ToolType<T extends ICustomTool> {
             return this.addPart(slot, new PartPosition(slotX, slotY));
         }
 
-        public Builder<T> addPart(String name, Holder<PartType> partType, float affect, int slotX, int slotY) {
-            return this.addPart(name, partType, affect, new PartPosition(slotX, slotY));
+        public Builder<T> addPart(int index, String name, Holder<PartType> partType, float affect, int slotX, int slotY) {
+            return this.addPart(index, name, partType, affect, new PartPosition(slotX, slotY));
         }
 
-        public Builder<T> addPart(String name, Holder<PartType> partType, float affect, PartPosition position) {
-            return this.addPart(new PartSlot(name, partType, affect), position);
+        public Builder<T> addPart(int index, String name, Holder<PartType> partType, float affect, PartPosition position) {
+            return this.addPart(new PartSlot(index, name, partType, affect), position);
         }
 
         public Builder<T> addPart(PartSlot slot, PartPosition position) {

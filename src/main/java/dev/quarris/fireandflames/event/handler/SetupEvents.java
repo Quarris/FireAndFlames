@@ -73,9 +73,7 @@ public class SetupEvents {
         if (event.getRegistryKey() == RegistrySetup.Keys.PART_TYPES) {
             for (ResourceKey<PartType> key : RegistrySetup.PART_TYPES.registryKeySet()) {
                 Optional<Holder.Reference<PartType>> optional = RegistrySetup.PART_TYPES.getHolder(key.location());
-                optional.ifPresent(holder -> {
-                    Registry.register(BuiltInRegistries.ITEM, holder.key().location(), new PartItem(holder, new Item.Properties().component(DataComponentSetup.TOOL_PART, ToolPart.EMPTY)));
-                });
+                optional.ifPresent(holder -> PartTypeSetup.REGISTERED_PARTS.put(holder.key().location(), Registry.register(BuiltInRegistries.ITEM, holder.key().location(), new PartItem(holder, new Item.Properties().component(DataComponentSetup.TOOL_PART, ToolPart.EMPTY)))));
             }
         }
     }

@@ -2,9 +2,14 @@ package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.data.tool.part.PartType;
+import dev.quarris.fireandflames.world.item.tool.PartItem;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PartTypeSetup {
 
@@ -18,6 +23,8 @@ public class PartTypeSetup {
     public static final DeferredHolder<PartType, PartType> WIDE_GUARD = REGISTRY.register("wide_guard", PartType::new);
     public static final DeferredHolder<PartType, PartType> HANDLE = REGISTRY.register("handle", PartType::new);
     public static final DeferredHolder<PartType, PartType> BINDING = REGISTRY.register("binding", PartType::new);
+
+    public static final Map<ResourceLocation, PartItem> REGISTERED_PARTS = new HashMap<>();
 
     public static void init(IEventBus modBus) {
         REGISTRY.register(modBus);
