@@ -12,6 +12,7 @@ import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
 import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.part.ICustomPart;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
+import dev.quarris.fireandflames.data.tool.part.ToolPart;
 import dev.quarris.fireandflames.data.tool.part.ToolParts;
 import dev.quarris.fireandflames.setup.*;
 import dev.quarris.fireandflames.util.fluid.CustomFluidHolder;
@@ -88,7 +89,12 @@ public class ClientSetupEvents {
 
             for (PartSlot part : toolType.parts().values()) {
                 if (tint == part.index()) {
-                    Holder<ToolMaterial> partMaterial = toolParts.getPart(part.name()).material();
+                    ToolPart toolPart = toolParts.getPart(part.name());
+                    if (toolPart == null) {
+                        ModRef.LOGGER.warn("Tool part {} not found in tool data", part.name());
+                        return -1;
+                    }
+                    Holder<ToolMaterial> partMaterial = toolPart.material();
                     return partMaterial.value().color().packed();
                 }
             }

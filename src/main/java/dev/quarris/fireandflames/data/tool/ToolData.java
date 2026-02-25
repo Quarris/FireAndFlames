@@ -25,6 +25,4 @@ public record ToolData(ToolParts toolParts, List<ToolModifier> modifiers) {
     public boolean isEmpty() {
         return this == EMPTY || this.toolParts.isEmpty();
     }
-
-
 }
