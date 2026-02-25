@@ -1,6 +1,6 @@
 package dev.quarris.fireandflames.world.inventory.menu;
 
-import dev.quarris.fireandflames.network.payload.CrucibleScrollC2SPayload;
+import dev.quarris.fireandflames.network.payload.SBCrucibleScroll;
 import dev.quarris.fireandflames.setup.BlockEntitySetup;
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.util.MenuHelper;
@@ -64,7 +64,7 @@ public class CrucibleMenu extends AbstractContainerMenu {
 
     public void scroll(int scrollY) {
         this.scrollTo(Mth.clamp(this.scroll - (int) Math.signum(scrollY), 0, this.maxScroll));
-        PacketDistributor.sendToServer(new CrucibleScrollC2SPayload(this.scroll));
+        PacketDistributor.sendToServer(new SBCrucibleScroll(this.scroll));
     }
 
     public void scrollTo(int scroll) {

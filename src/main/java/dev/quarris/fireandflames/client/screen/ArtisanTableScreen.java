@@ -2,7 +2,7 @@ package dev.quarris.fireandflames.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.network.payload.ArtisanTableSetOutputSelectionS2CPayload;
+import dev.quarris.fireandflames.network.payload.CBArtisanTableSetOutputSelection;
 import dev.quarris.fireandflames.world.inventory.crafting.ArtisanRecipeOutput;
 import dev.quarris.fireandflames.world.inventory.menu.ArtisanTableMenu;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,10 +10,12 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -114,6 +116,6 @@ public class ArtisanTableScreen extends AbstractContainerScreen<ArtisanTableMenu
 
     private void select(int selection) {
         this.getMenu().selectOutput(selection);
-        PacketDistributor.sendToServer(new ArtisanTableSetOutputSelectionS2CPayload(selection));
+        PacketDistributor.sendToServer(new CBArtisanTableSetOutputSelection(selection));
     }
 }

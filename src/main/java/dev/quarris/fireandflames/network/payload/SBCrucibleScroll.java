@@ -9,18 +9,18 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record CrucibleScrollC2SPayload(int scroll) implements CustomPacketPayload {
+public record SBCrucibleScroll(int scroll) implements CustomPacketPayload {
 
     public static final ResourceLocation ID = ModRef.res("crucible_scroll");
-    public static final Type<CrucibleScrollC2SPayload> TYPE = new Type<>(ID);
-    public static final StreamCodec<RegistryFriendlyByteBuf, CrucibleScrollC2SPayload> CODEC = StreamCodec.composite(ByteBufCodecs.INT, CrucibleScrollC2SPayload::scroll, CrucibleScrollC2SPayload::new);
+    public static final Type<SBCrucibleScroll> TYPE = new Type<>(ID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, SBCrucibleScroll> CODEC = StreamCodec.composite(ByteBufCodecs.INT, SBCrucibleScroll::scroll, SBCrucibleScroll::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public static void handle(CrucibleScrollC2SPayload payload, IPayloadContext ctx) {
+    public static void handle(SBCrucibleScroll payload, IPayloadContext ctx) {
         if (ctx.player().containerMenu instanceof CrucibleMenu menu) {
             menu.scrollTo(payload.scroll);
         }

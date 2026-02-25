@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.data.tool;
 
 import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
+import dev.quarris.fireandflames.data.tool.modifier.ToolModifier;
+import dev.quarris.fireandflames.data.tool.modifier.effect.MiningSpeedEffect;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.PartType;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
@@ -37,7 +39,7 @@ public final class ToolType<T extends ICustomTool> {
     public ItemStack buildFrom(ToolParts parts) {
         if (!this.partsValid(parts)) return ItemStack.EMPTY;
 
-        return this.toolItem.get().createFrom(new ToolData(parts));
+        return this.toolItem.get().createFrom(new ToolData(parts, List.of(new ToolModifier(List.of(new MiningSpeedEffect(2, 2))))));
     }
 
     public boolean partsValid(ToolParts parts) {

@@ -3,8 +3,8 @@ package dev.quarris.fireandflames.client.screen;
 import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.screen.widgets.DefaultedEditBox;
 import dev.quarris.fireandflames.client.screen.widgets.TabSelectionWidget;
-import dev.quarris.fireandflames.network.payload.TinkersWorkbenchChangeTabC2SPayload;
-import dev.quarris.fireandflames.network.payload.TinkersWorkbenchToolNameChangeC2SPayload;
+import dev.quarris.fireandflames.network.payload.SBTinkersWorkbenchChangeTab;
+import dev.quarris.fireandflames.network.payload.SBTinkersWorkbenchToolNameChange;
 import dev.quarris.fireandflames.world.inventory.menu.NamedSlot;
 import dev.quarris.fireandflames.world.inventory.menu.TinkersWorkbenchMenu;
 import net.minecraft.Util;
@@ -53,13 +53,13 @@ public class TinkersWorkbenchScreen extends AbstractContainerScreen<TinkersWorkb
 
     private void changeTab(ResourceLocation tabName) {
         if (this.menu.setTabByName(tabName)) {
-            PacketDistributor.sendToServer(new TinkersWorkbenchChangeTabC2SPayload(tabName));
+            PacketDistributor.sendToServer(new SBTinkersWorkbenchChangeTab(tabName));
         }
     }
 
     private void onNameChanged(String name) {
         if (this.menu.setToolName(name)) {
-            PacketDistributor.sendToServer(new TinkersWorkbenchToolNameChangeC2SPayload(name));
+            PacketDistributor.sendToServer(new SBTinkersWorkbenchToolNameChange(name));
         }
     }
 

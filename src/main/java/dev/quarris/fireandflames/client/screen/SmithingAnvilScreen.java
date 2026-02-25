@@ -4,7 +4,7 @@ import dev.quarris.fireandflames.ModRef;
 import dev.quarris.fireandflames.client.screen.widgets.HeldButton;
 import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
 import dev.quarris.fireandflames.data.tool.material.IMaterialHolder;
-import dev.quarris.fireandflames.network.payload.SmithingAnvilHammerPayload;
+import dev.quarris.fireandflames.network.payload.SBSmithingAnvilHammer;
 import dev.quarris.fireandflames.setup.SoundSetup;
 import dev.quarris.fireandflames.world.inventory.crafting.SmithingAnvilRecipe;
 import dev.quarris.fireandflames.world.inventory.menu.SmithingAnvilMenu;
@@ -171,7 +171,7 @@ public class SmithingAnvilScreen extends AbstractContainerScreen<SmithingAnvilMe
         int index = Math.min((int) (perc * outputs), outputs - 1);
 
         if (this.menu.onHammerHit(index)) {
-            PacketDistributor.sendToServer(new SmithingAnvilHammerPayload(index));
+            PacketDistributor.sendToServer(new SBSmithingAnvilHammer(index));
             this.minecraft.getSoundManager().stop(this.hitSound);
             this.startTime = -1;
 

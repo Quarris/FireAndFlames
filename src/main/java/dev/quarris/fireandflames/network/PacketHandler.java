@@ -14,14 +14,15 @@ public class PacketHandler {
         var registrar = event.registrar("1");
 
         // Client to Server
-        registrar.playToServer(CrucibleScrollC2SPayload.TYPE, CrucibleScrollC2SPayload.CODEC, CrucibleScrollC2SPayload::handle);
-        registrar.playToServer(TinkersWorkbenchToolNameChangeC2SPayload.TYPE, TinkersWorkbenchToolNameChangeC2SPayload.CODEC, TinkersWorkbenchToolNameChangeC2SPayload::handle);
-        registrar.playToServer(TinkersWorkbenchChangeTabC2SPayload.TYPE, TinkersWorkbenchChangeTabC2SPayload.CODEC, TinkersWorkbenchChangeTabC2SPayload::handle);
-        registrar.playToServer(SmithingAnvilHammerPayload.TYPE, SmithingAnvilHammerPayload.CODEC, SmithingAnvilHammerPayload::handle);
-        registrar.playToServer(ArtisanTableSetOutputSelectionS2CPayload.TYPE, ArtisanTableSetOutputSelectionS2CPayload.CODEC, ArtisanTableSetOutputSelectionS2CPayload::handle);
+        registrar.playToServer(SBCrucibleScroll.TYPE, SBCrucibleScroll.CODEC, SBCrucibleScroll::handle);
+        registrar.playToServer(SBTinkersWorkbenchToolNameChange.TYPE, SBTinkersWorkbenchToolNameChange.CODEC, SBTinkersWorkbenchToolNameChange::handle);
+        registrar.playToServer(SBTinkersWorkbenchChangeTab.TYPE, SBTinkersWorkbenchChangeTab.CODEC, SBTinkersWorkbenchChangeTab::handle);
+        registrar.playToServer(SBSmithingAnvilHammer.TYPE, SBSmithingAnvilHammer.CODEC, SBSmithingAnvilHammer::handle);
+        registrar.playToServer(CBArtisanTableSetOutputSelection.TYPE, CBArtisanTableSetOutputSelection.CODEC, CBArtisanTableSetOutputSelection::handle);
 
         // Server to Client
-        registrar.playToClient(ArtisanTableSetOutputsS2CPayload.TYPE, ArtisanTableSetOutputsS2CPayload.CODEC, ArtisanTableSetOutputsS2CPayload::handle);
-        registrar.playToClient(MaterialConverterDataPayload.TYPE, MaterialConverterDataPayload.CODEC, MaterialConverterDataPayload::handle);
+        registrar.playToClient(CBArtisanTableSetOutputs.TYPE, CBArtisanTableSetOutputs.CODEC, CBArtisanTableSetOutputs::handle);
+        registrar.playToClient(CBMaterialConverterData.TYPE, CBMaterialConverterData.CODEC, CBMaterialConverterData::handle);
+        registrar.playToClient(CBUpdateToolModifiers.TYPE, CBUpdateToolModifiers.CODEC, CBUpdateToolModifiers::handle);
     }
 }

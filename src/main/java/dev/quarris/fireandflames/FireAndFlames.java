@@ -1,8 +1,11 @@
 package dev.quarris.fireandflames;
 
 
+import com.mojang.serialization.Codec;
 import dev.quarris.fireandflames.config.ServerConfigs;
+import dev.quarris.fireandflames.data.DataManager;
 import dev.quarris.fireandflames.setup.*;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -15,6 +18,8 @@ public class FireAndFlames {
         container.registerConfig(ModConfig.Type.SERVER, ServerConfigs.SPEC);
 
         RegistrySetup.init(modBus);
+        ToolEffectSetup.init(modBus);
+        ToolModifierSetup.init(modBus);
         BlockSetup.init(modBus);
         ItemSetup.init(modBus);
         ToolItemSetup.init(modBus);
@@ -29,6 +34,8 @@ public class FireAndFlames {
         MaterialConverterSetup.init(modBus);
         PartTypeSetup.init(modBus);
         ToolTypeSetup.init(modBus);
+
+        ModRef.DATA_MANAGER.init();
     }
 
 

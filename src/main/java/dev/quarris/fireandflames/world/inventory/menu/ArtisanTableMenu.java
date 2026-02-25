@@ -1,7 +1,7 @@
 package dev.quarris.fireandflames.world.inventory.menu;
 
 import dev.quarris.fireandflames.ModRef;
-import dev.quarris.fireandflames.network.payload.ArtisanTableSetOutputsS2CPayload;
+import dev.quarris.fireandflames.network.payload.CBArtisanTableSetOutputs;
 import dev.quarris.fireandflames.setup.MenuSetup;
 import dev.quarris.fireandflames.setup.RecipeSetup;
 import dev.quarris.fireandflames.util.MenuHelper;
@@ -104,7 +104,7 @@ public class ArtisanTableMenu extends AbstractContainerMenu {
         ).flatMap(s -> s).toList();
 
         this.setPossibleOutputs(allRecipes);
-        PacketDistributor.sendToPlayer((ServerPlayer) this.playerInventory.player, new ArtisanTableSetOutputsS2CPayload(new ArrayList<>(this.outputs)));
+        PacketDistributor.sendToPlayer((ServerPlayer) this.playerInventory.player, new CBArtisanTableSetOutputs(new ArrayList<>(this.outputs)));
     }
 
     public void setPossibleOutputs(List<ArtisanRecipeOutput> outputs) {

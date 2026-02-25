@@ -35,7 +35,7 @@ public interface ICustomTool {
     }
 
     default ItemStack createFrom(Holder<ToolMaterial> material) {
-        return this.createFrom(new ToolData(this.getType().createPartsFrom(material)));
+        return this.createFrom(new ToolData(this.getType().createPartsFrom(material), List.of()));
     }
 
     default void onItemLoad(ItemStack stack) {
@@ -89,5 +89,10 @@ public interface ICustomTool {
         attributesBuilder.add(Attributes.ATTACK_SPEED, new AttributeModifier(AttributeUtil.BASE_ATTACK_SPEED_ID, toolStats.attackSpeed() + attackSpeed, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
         // TODO Custom tool attributes
         stack.set(DataComponents.ATTRIBUTE_MODIFIERS, attributesBuilder.build());
+
+        // Modifiers
+        toolData.modifiers().forEach(modifier -> modifier.modifyItem(stack));
+
+        // Traits
     }
 }

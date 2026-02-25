@@ -42,6 +42,7 @@ public class DataGenEvents {
         );
 
         gen.addProvider(event.includeServer(), (DataProvider.Factory<RecipeGen>) (packOutput -> new RecipeGen(packOutput, lookup)));
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<ToolModifierGen>) (packOutput -> new ToolModifierGen(packOutput, lookup)));
         var blockTags = gen.addProvider(event.includeClient(), (DataProvider.Factory<BlockTagGen>) (packOutput -> new BlockTagGen(packOutput, lookup, existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<ItemTagGen>) (packOutput -> new ItemTagGen(packOutput, lookup, blockTags.contentsGetter(), existingFiles)));
         gen.addProvider(event.includeServer(), (DataProvider.Factory<FluidTagGen>) (packOutput -> new FluidTagGen(packOutput, lookup, existingFiles)));
