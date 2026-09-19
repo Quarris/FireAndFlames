@@ -1,3 +1,2 @@
-# 0.1.3
-- Fixed no Controller recipe
-  - Why am I like this?
+# 0.1.5
+- Fixed casting table and casting basin losing contents when reloading world.

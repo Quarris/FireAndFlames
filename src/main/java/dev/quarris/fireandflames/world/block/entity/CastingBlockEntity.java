@@ -63,7 +63,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         public int fill(FluidStack resource, FluidAction action) {
             if (!CastingBlockEntity.this.inventory.getStackInSlot(1).isEmpty()) return 0;
 
-            RecipeHolder<T> recipe = CastingBlockEntity.this.recipe;
+            RecipeHolder<T> recipe = CastingBlockEntity.this.getRecipe();
             if (recipe == null) {
                 // Set recipe based on input
                 recipe = CastingBlockEntity.this.getLevel().getRecipeManager().getRecipeFor(CastingBlockEntity.this.getRecipeType(), new CastingRecipe.Input(resource, CastingBlockEntity.this.inventory.getStackInSlot(0)), CastingBlockEntity.this.getLevel()).orElse(null);
@@ -116,6 +116,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         protected void onContentsChanged() {
             if (this.isEmpty()) {
                 CastingBlockEntity.this.recipe = null;
+                CastingBlockEntity.this.recipeId = null;
                 this.setCapacity(0);
             }
 
@@ -124,6 +125,7 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
     };
 
     private RecipeHolder<T> recipe;
+    private ResourceLocation recipeId;
     private int coolingTicks;
 
     protected CastingBlockEntity(BlockEntityType<? extends CastingBlockEntity> type, BlockPos pPos, BlockState pState) {
@@ -131,12 +133,13 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
     }
 
     public static <T extends CastingRecipe> void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CastingBlockEntity<T> pBasin) {
-        if (pBasin.recipe == null) {
+        RecipeHolder<T> holder = pBasin.getRecipe();
+        if (holder == null) {
             pBasin.coolingTicks = 0;
             return;
         }
 
-        T recipe = pBasin.recipe.value();
+        T recipe = holder.value();
         if (pBasin.tank.getFluid().getAmount() < recipe.getFluidInput().amount().evaluateInt()) {
             pBasin.coolingTicks = 0;
             pBasin.recipe = null;
@@ -183,7 +186,20 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
     }
 
     public RecipeHolder<T> getRecipe() {
+        if (this.recipeId != null && this.getLevel() != null) {
+            this.resolvePendingRecipe();
+        }
+
         return this.recipe;
+    }
+
+    private void resolvePendingRecipe() {
+        ResourceLocation recipeId = this.recipeId;
+        this.recipeId = null;
+        this.recipe = this.getLevel().getRecipeManager().byKey(recipeId)
+            .filter(holder -> holder.value().getType() == this.getRecipeType())
+            .map(holder -> (RecipeHolder<T>) holder)
+            .orElse(null);
     }
 
     public int getCoolingTicks() {
@@ -206,8 +222,9 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         pTag.put("Inventory", this.inventory.serializeNBT(pRegistries));
         pTag.put("Tank", this.tank.writeToNBT(pRegistries, new CompoundTag()));
         pTag.putInt("CoolingTicks", this.coolingTicks);
-        if (this.recipe != null) {
-            pTag.putString("RecipeId", this.recipe.id().toString());
+        ResourceLocation recipeId = this.recipe != null ? this.recipe.id() : this.recipeId;
+        if (recipeId != null) {
+            pTag.putString("RecipeId", recipeId.toString());
         }
     }
 
@@ -218,11 +235,10 @@ public abstract class CastingBlockEntity<T extends CastingRecipe> extends BlockE
         this.tank.readFromNBT(pRegistries, pTag.getCompound("Tank"));
         this.coolingTicks = pTag.getInt("CoolingTicks");
         this.recipe = null;
+        this.recipeId = null;
         if (pTag.contains("RecipeId")) {
-            ResourceLocation recipeId = ResourceLocation.parse(pTag.getString("RecipeId"));
-            // TODO Level can be null during world load
-            var recipe = this.getLevel().getRecipeManager().byKey(recipeId);
-            this.recipe = recipe.map(r -> (RecipeHolder<T>) r).orElse(null);
+            // The level is not set yet while a chunk loads, so the lookup is deferred to getRecipe()
+            this.recipeId = ResourceLocation.tryParse(pTag.getString("RecipeId"));
         }
     }
 
