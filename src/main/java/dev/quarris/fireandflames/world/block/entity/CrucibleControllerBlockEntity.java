@@ -286,7 +286,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             for (int slot = 0; slot < this.getInventory().getSlots(); slot++) {
                 if (slot >= newSize) {
                     // If the inventory decreased in size, drop the overflowing items.
-                    if (this.getLevel() != null) {
+                    if (this.getLevel() instanceof ServerLevel) {
                         Containers.dropItemStack(this.getLevel(), dropItemsPos.getX(), dropItemsPos.getY(), dropItemsPos.getZ(), this.getInventory().getStackInSlot(slot));
                     }
                     continue;
