@@ -226,7 +226,9 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                     EntityMeltingRecipe.Input recipeInput = new EntityMeltingRecipe.Input(entity.getType(), pCrucible.getFluidTank().getStored() > 0, pCrucible.heat);
                     pLevel.getRecipeManager().getRecipeFor(RecipeSetup.ENTITY_MELTING_TYPE.get(), recipeInput, pLevel).ifPresent(recipeHolder -> {
                         EntityMeltingRecipe recipe = recipeHolder.value();
-                        pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
+                        if (pLevel.getRandom().nextFloat() < recipe.chance()) {
+                            pCrucible.getFluidTank().fill(recipe.result().createFluid(), IFluidHandler.FluidAction.EXECUTE); // Try fill regardless of state of tank
+                        }
                     });
                     pCrucible.burnTicks -= 10;
                     pCrucible.setChanged();
