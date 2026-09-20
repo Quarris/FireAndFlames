@@ -268,17 +268,10 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
 
 
     private void setInventoryWithSize(int size) {
-        CrucibleRecipe.Active[] newRecipes = new CrucibleRecipe.Active[size];
-        for (int i = 0, len = newRecipes.length; i < len; i++)
-            newRecipes[i] = new CrucibleRecipe.Active();
+        int newSize = Math.max(0, size);
+        this.resizeActiveRecipes(newSize);
 
-        if (this.activeRecipes != null) {
-            System.arraycopy(this.activeRecipes, 0, newRecipes, 0, Math.min(this.activeRecipes.length, size));
-        }
-        this.activeRecipes = newRecipes;
-
-
-        ItemStackHandler newInventory = new ItemStackHandler(size) {
+        ItemStackHandler newInventory = new ItemStackHandler(newSize) {
 
             @Override
             public int getSlotLimit(int slot) {
@@ -291,7 +284,7 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         if (this.getInventory().getSlots() > 0) {
             BlockPos dropItemsPos = this.getBlockPos().relative(this.getBlockState().getValue(CrucibleControllerBlock.FACING));
             for (int slot = 0; slot < this.getInventory().getSlots(); slot++) {
-                if (this.getLevel() != null && slot >= size) {
+                if (this.getLevel() != null && slot >= newSize) {
                     // If the inventory decreased in size, drop the overflowing items.
                     Containers.dropItemStack(this.getLevel(), dropItemsPos.getX(), dropItemsPos.getY(), dropItemsPos.getZ(), this.getInventory().getStackInSlot(slot));
                     continue;
@@ -302,6 +295,18 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
         }
 
         this.inventory = newInventory;
+    }
+
+    private void resizeActiveRecipes(int size) {
+        CrucibleRecipe.Active[] newRecipes = new CrucibleRecipe.Active[Math.max(0, size)];
+        for (int i = 0, len = newRecipes.length; i < len; i++)
+            newRecipes[i] = new CrucibleRecipe.Active();
+
+        if (this.activeRecipes != null) {
+            System.arraycopy(this.activeRecipes, 0, newRecipes, 0, Math.min(this.activeRecipes.length, newRecipes.length));
+        }
+
+        this.activeRecipes = newRecipes;
     }
 
     private void setTankSize(int size) {
@@ -405,9 +410,19 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
                 });
         }
 
+        this.inventory.deserializeNBT(pRegistries, pTag.getCompound("Inventory"));
+        this.fluidTank.deserializeNBT(pRegistries, pTag.getCompound("FluidTank"));
+
+        if (this.activeRecipes.length != this.inventory.getSlots()) {
+            this.resizeActiveRecipes(this.inventory.getSlots());
+        }
+
         ListTag activeRecipesTag = pTag.getList("ActiveRecipes", Tag.TAG_COMPOUND);
         activeRecipesTag.stream().map(tag -> ((CompoundTag) tag)).forEach(recipeTag -> {
             int slot = recipeTag.getInt("Slot");
+            if (slot < 0 || slot >= this.activeRecipes.length) {
+                return;
+            }
             CrucibleRecipe.Active recipe = new CrucibleRecipe.Active();
             recipe.deserializeNbt(recipeTag, pRegistries);
             this.activeRecipes[slot] = recipe;
@@ -421,8 +436,6 @@ public class CrucibleControllerBlockEntity extends BlockEntity implements MenuPr
             this.activeFuels.add(fuel);
         });
 
-        this.inventory.deserializeNBT(pRegistries, pTag.getCompound("Inventory"));
-        this.fluidTank.deserializeNBT(pRegistries, pTag.getCompound("FluidTank"));
         this.heat = pTag.getInt("Heat");
         this.burnTicks = pTag.getInt("BurnTicks");
     }
