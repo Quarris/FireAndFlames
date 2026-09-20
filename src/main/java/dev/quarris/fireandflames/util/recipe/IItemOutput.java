@@ -82,7 +82,7 @@ public interface IItemOutput {
 
         @Override
         public ItemStack createItemStack() {
-            return BuiltInRegistries.ITEM.getTag(this.tag).map(tags -> new ItemStack(tags.get(0), this.count)).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
+            return BuiltInRegistries.ITEM.getTag(this.tag).filter(tags -> tags.size() > 0).map(tags -> new ItemStack(tags.get(0), this.count)).orElseThrow(() -> new IllegalArgumentException("Could not create item from tag " + this.tag));
         }
     }
 }
