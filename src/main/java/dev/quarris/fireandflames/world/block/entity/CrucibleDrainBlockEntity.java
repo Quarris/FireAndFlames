@@ -20,7 +20,7 @@ public class CrucibleDrainBlockEntity extends BlockEntity {
     }
 
     public void setCruciblePosition(BlockPos pos) {
-        if (this.controllerPosition == pos) {
+        if (this.controllerPosition.equals(pos)) {
             return;
         }
 
