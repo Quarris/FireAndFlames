@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,18 +57,13 @@ public class CrucibleFawsitBlockEntity extends BlockEntity {
             return;
         }
 
-        // Test simulation
-        FluidStack simulatedDrain = input.drain(FLOW_RATE, IFluidHandler.FluidAction.SIMULATE);
-        int simulatedFill = output.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
-        if (simulatedDrain.isEmpty() || simulatedFill <= 0) {
+        FluidStack moved = FluidUtil.tryFluidTransfer(output, input, FLOW_RATE, true);
+        if (moved.isEmpty()) {
             pFawsit.setManuallyToggled(false);
             return;
         }
 
-        // Execute
-        FluidStack drained = input.drain(simulatedFill, IFluidHandler.FluidAction.EXECUTE);
-        output.fill(drained, IFluidHandler.FluidAction.EXECUTE);
-        pFawsit.setActive(drained);
+        pFawsit.setActive(moved);
     }
 
     private void setManuallyToggled(boolean toggledOn) {

@@ -353,7 +353,7 @@ public class CrucibleStructure {
 
         // Find right-most air extent by searching right from behind the controller
         BlockPos downCheckPos = searchPos.below();
-        while (level.getBlockState(downCheckPos).isAir()) {
+        while (downCheckPos.getY() > level.getMinBuildHeight() && level.getBlockState(downCheckPos).isAir()) {
             downCheckPos = downCheckPos.below();
         }
 

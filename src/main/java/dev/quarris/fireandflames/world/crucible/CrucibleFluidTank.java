@@ -99,13 +99,22 @@ public class CrucibleFluidTank implements IFluidHandler {
             }
         }
 
-        if (this.getTanks() - stacksRemoved + alloysAdded <= MAX_FLUID_COUNT && this.getRemainingVolume() - amountDrained + toFill <= this.getCapacity()) {
-            iterations = Math.min(iterations, (int) Math.floor((float) (this.getRemainingVolume() - amountDrained) / toFill));
-            pInputsToDrain.addAll(finalInputsToDrain.values());
-            return iterations;
+        int totalFluidCount = this.getTanks() - stacksRemoved + alloysAdded;
+        if (totalFluidCount > MAX_FLUID_COUNT) {
+            return 0;
         }
 
-        return 0;
+        int netGrowth = toFill - amountDrained;
+        if (netGrowth > 0) {
+            iterations = Math.min(iterations, this.getRemainingVolume() / netGrowth);
+        }
+
+        if (iterations <= 0) {
+            return 0;
+        }
+
+        pInputsToDrain.addAll(finalInputsToDrain.values());
+        return iterations;
     }
 
     @Override

@@ -22,7 +22,7 @@ public record EntityMeltingRecipe(
 
     @Override
     public boolean matches(Input input, Level level) {
-        return input.heat >= this.heat && level.getRandom().nextFloat() <= this.chance && this.entityPredicate.matches(input.entity()) && (!this.requiresFluid || input.hasFluid());
+        return input.heat >= this.heat && this.entityPredicate.matches(input.entity()) && (!this.requiresFluid || input.hasFluid());
     }
 
     @Override

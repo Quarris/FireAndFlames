@@ -80,7 +80,7 @@ public interface IFluidOutput {
 
         @Override
         public FluidStack createFluid() {
-            return BuiltInRegistries.FLUID.getTag(this.tag).map(tags -> new FluidStack(tags.get(0), this.amount.evaluateInt())).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
+            return BuiltInRegistries.FLUID.getTag(this.tag).filter(tags -> tags.size() > 0).map(tags -> new FluidStack(tags.get(0), this.amount.evaluateInt())).orElseThrow(() -> new IllegalArgumentException("Could not create fluid from tag " + this.tag));
         }
     }
 }

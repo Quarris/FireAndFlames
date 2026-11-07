@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class CrucibleDrainBlockEntity extends BlockEntity {
@@ -20,7 +21,7 @@ public class CrucibleDrainBlockEntity extends BlockEntity {
     }
 
     public void setCruciblePosition(BlockPos pos) {
-        if (this.controllerPosition == pos) {
+        if (Objects.equals(this.controllerPosition, pos)) {
             return;
         }
 

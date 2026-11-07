@@ -185,7 +185,7 @@ public abstract class CastingBlockEntity extends BlockEntity {
     }
 
     public RecipeHolder<? extends CastingRecipe> getRecipe() {
-        if (this.recipeContents == null) return null;
+        if (this.recipeContents == null || this.getLevel() == null) return null;
 
         return (RecipeHolder<? extends CastingRecipe>) this.getLevel().getRecipeManager().byKey(this.recipeContents.recipeId).orElse(null);
     }
