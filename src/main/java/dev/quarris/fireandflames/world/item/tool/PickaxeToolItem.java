@@ -1,21 +1,13 @@
 package dev.quarris.fireandflames.world.item.tool;
 
 import dev.quarris.fireandflames.data.tool.*;
-import dev.quarris.fireandflames.data.tool.part.PartSlot;
-import dev.quarris.fireandflames.data.tool.part.ToolPart;
-import dev.quarris.fireandflames.data.tool.part.ToolParts;
 import dev.quarris.fireandflames.setup.*;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.Tool;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -34,19 +26,8 @@ public class PickaxeToolItem extends PickaxeItem implements ICustomTool {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        ToolData toolData = stack.get(DataComponentSetup.TOOL_DATA);
-        if (toolData == null || toolData.isEmpty()) return;
-
-        try {
-            ToolParts toolParts = toolData.toolParts();
-            for (PartSlot slot : this.toolType.get().getAllSlots()) {
-                ToolPart part = toolParts.getPart(slot.name());
-                boolean primaryPart = this.toolType.get().mainPartName().equals(slot.name());
-                tooltipComponents.add(Component.literal("[" + slot.name() + "] - " + part.material().value().name() + (primaryPart ? "(Primary)" : "")).withStyle(ChatFormatting.GRAY));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        this.appendToolTooltip(stack, tooltipComponents);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package dev.quarris.fireandflames.setup;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.ToolStat;
 import dev.quarris.fireandflames.data.tool.part.PartType;
 import dev.quarris.fireandflames.world.item.tool.PartItem;
 import net.minecraft.resources.ResourceLocation;
@@ -15,14 +16,15 @@ public class PartTypeSetup {
 
     public static final DeferredRegister<PartType> REGISTRY = DeferredRegister.create(RegistrySetup.Keys.PART_TYPES, ModRef.ID);
 
-    public static final DeferredHolder<PartType, PartType> PICKAXE_HEAD = REGISTRY.register("pickaxe_head", PartType::new);
-    public static final DeferredHolder<PartType, PartType> AXE_HEAD = REGISTRY.register("axe_head", PartType::new);
-    public static final DeferredHolder<PartType, PartType> SHOVEL_HEAD = REGISTRY.register("shovel_head", PartType::new);
-    public static final DeferredHolder<PartType, PartType> HOE_HEAD = REGISTRY.register("hoe_head", PartType::new);
-    public static final DeferredHolder<PartType, PartType> SWORD_BLADE = REGISTRY.register("sword_blade", PartType::new);
-    public static final DeferredHolder<PartType, PartType> WIDE_GUARD = REGISTRY.register("wide_guard", PartType::new);
-    public static final DeferredHolder<PartType, PartType> HANDLE = REGISTRY.register("handle", PartType::new);
-    public static final DeferredHolder<PartType, PartType> BINDING = REGISTRY.register("binding", PartType::new);
+    // Which tool stats each part type controls. A stat controlled by several parts on one tool is averaged.
+    public static final DeferredHolder<PartType, PartType> PICKAXE_HEAD = REGISTRY.register("pickaxe_head", () -> new PartType(ToolStat.MINING_TIER, ToolStat.MINING_SPEED, ToolStat.ATTACK_DAMAGE));
+    public static final DeferredHolder<PartType, PartType> AXE_HEAD = REGISTRY.register("axe_head", () -> new PartType(ToolStat.MINING_TIER, ToolStat.MINING_SPEED, ToolStat.ATTACK_DAMAGE));
+    public static final DeferredHolder<PartType, PartType> SHOVEL_HEAD = REGISTRY.register("shovel_head", () -> new PartType(ToolStat.MINING_TIER, ToolStat.MINING_SPEED, ToolStat.ATTACK_DAMAGE));
+    public static final DeferredHolder<PartType, PartType> HOE_HEAD = REGISTRY.register("hoe_head", () -> new PartType(ToolStat.MINING_TIER, ToolStat.MINING_SPEED, ToolStat.ATTACK_DAMAGE));
+    public static final DeferredHolder<PartType, PartType> SWORD_BLADE = REGISTRY.register("sword_blade", () -> new PartType(ToolStat.MINING_TIER, ToolStat.MINING_SPEED, ToolStat.ATTACK_DAMAGE));
+    public static final DeferredHolder<PartType, PartType> WIDE_GUARD = REGISTRY.register("wide_guard", () -> new PartType());
+    public static final DeferredHolder<PartType, PartType> HANDLE = REGISTRY.register("handle", () -> new PartType(ToolStat.DURABILITY, ToolStat.ATTACK_SPEED));
+    public static final DeferredHolder<PartType, PartType> BINDING = REGISTRY.register("binding", () -> new PartType());
 
     public static final Map<ResourceLocation, PartItem> REGISTERED_PARTS = new HashMap<>();
 

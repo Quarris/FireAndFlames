@@ -3,11 +3,8 @@ package dev.quarris.fireandflames.world.item.tool;
 import dev.quarris.fireandflames.data.tool.ICustomTool;
 import dev.quarris.fireandflames.data.tool.ToolData;
 import dev.quarris.fireandflames.data.tool.ToolType;
-import dev.quarris.fireandflames.data.tool.part.ToolPart;
-import dev.quarris.fireandflames.data.tool.part.ToolParts;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
 import dev.quarris.fireandflames.setup.ToolTypeSetup;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
@@ -29,14 +26,8 @@ public class AxeToolItem extends AxeItem implements ICustomTool {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        ToolData toolData = stack.get(DataComponentSetup.TOOL_DATA);
-        if (toolData == null || toolData.isEmpty()) return;
-
-        ToolParts toolParts = toolData.toolParts();
-        for (String key : toolParts.partNames()) {
-            ToolPart part = toolParts.getPart(key);
-            tooltipComponents.add(Component.literal("[" + key + "] - " + part.material().value().name()).withStyle(ChatFormatting.GRAY));
-        }
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        this.appendToolTooltip(stack, tooltipComponents);
     }
 
     @Override

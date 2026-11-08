@@ -3,11 +3,7 @@ package dev.quarris.fireandflames.world.item.tool;
 import dev.quarris.fireandflames.data.tool.ICustomTool;
 import dev.quarris.fireandflames.data.tool.ToolData;
 import dev.quarris.fireandflames.data.tool.ToolType;
-import dev.quarris.fireandflames.data.tool.part.PartSlot;
-import dev.quarris.fireandflames.data.tool.part.ToolPart;
-import dev.quarris.fireandflames.data.tool.part.ToolParts;
 import dev.quarris.fireandflames.setup.DataComponentSetup;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
@@ -33,15 +29,8 @@ public class SwordToolItem extends SwordItem implements ICustomTool {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        ToolData toolData = stack.get(DataComponentSetup.TOOL_DATA);
-        if (toolData == null || toolData.isEmpty()) return;
-
-        ToolParts toolParts = toolData.toolParts();
-        for (PartSlot slot : this.toolType.get().getAllSlots()) {
-            ToolPart part = toolParts.getPart(slot.name());
-            boolean primaryPart = this.toolType.get().mainPartName().equals(slot.name());
-            tooltipComponents.add(Component.literal("[" + slot.name() + "] - " + part.material().value().name() + (primaryPart ? "(Primary)" : "")).withStyle(ChatFormatting.GRAY));
-        }
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        this.appendToolTooltip(stack, tooltipComponents);
     }
 
     @Override

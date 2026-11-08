@@ -1,6 +1,8 @@
 package dev.quarris.fireandflames.datagen.client;
 
 import dev.quarris.fireandflames.ModRef;
+import dev.quarris.fireandflames.data.tool.ICustomTool;
+import dev.quarris.fireandflames.data.tool.ToolStat;
 import dev.quarris.fireandflames.data.tool.part.CommonPartSlots;
 import dev.quarris.fireandflames.setup.*;
 import dev.quarris.fireandflames.util.fluid.CustomFluidHolder;
@@ -116,6 +118,15 @@ public class EnUsLanguageGen extends LanguageProvider {
         this.addPartSlot(CommonPartSlots.HANDLE.name(), "Handle");
         this.addPartSlot(CommonPartSlots.GRIP.name(), "Grip");
         this.addPartSlot(CommonPartSlots.WIDE_GUARD.name(), "Wide Guard");
+
+        // Tool stats
+        this.add(ICustomTool.TOOLTIP_PART_KEY, "%s: %s");
+        this.add(ICustomTool.TOOLTIP_STAT_KEY, "%s: %s (%s)");
+        this.add(ToolStat.DURABILITY.getTranslationKey(), "Durability");
+        this.add(ToolStat.MINING_TIER.getTranslationKey(), "Mining Tier");
+        this.add(ToolStat.MINING_SPEED.getTranslationKey(), "Mining Speed");
+        this.add(ToolStat.ATTACK_DAMAGE.getTranslationKey(), "Attack Damage");
+        this.add(ToolStat.ATTACK_SPEED.getTranslationKey(), "Attack Speed");
     }
 
     private void addCompat() {

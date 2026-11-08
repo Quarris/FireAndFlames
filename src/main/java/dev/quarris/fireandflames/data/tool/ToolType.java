@@ -1,8 +1,6 @@
 package dev.quarris.fireandflames.data.tool;
 
 import dev.quarris.fireandflames.data.tool.material.ToolMaterial;
-import dev.quarris.fireandflames.data.tool.modifier.ToolModifier;
-import dev.quarris.fireandflames.data.tool.modifier.effect.MiningSpeedEffect;
 import dev.quarris.fireandflames.data.tool.part.PartSlot;
 import dev.quarris.fireandflames.data.tool.part.PartType;
 import dev.quarris.fireandflames.data.tool.part.ToolPart;
@@ -39,7 +37,7 @@ public final class ToolType<T extends ICustomTool> {
     public ItemStack buildFrom(ToolParts parts) {
         if (!this.partsValid(parts)) return ItemStack.EMPTY;
 
-        return this.toolItem.get().createFrom(new ToolData(parts, List.of(new ToolModifier(List.of(new MiningSpeedEffect(2, 2))))));
+        return this.toolItem.get().createFrom(new ToolData(parts, List.of()));
     }
 
     public boolean partsValid(ToolParts parts) {
@@ -153,12 +151,12 @@ public final class ToolType<T extends ICustomTool> {
             return this.addPart(slot, new PartPosition(slotX, slotY));
         }
 
-        public Builder<T> addPart(int index, String name, Holder<PartType> partType, float affect, int slotX, int slotY) {
-            return this.addPart(index, name, partType, affect, new PartPosition(slotX, slotY));
+        public Builder<T> addPart(int index, String name, Holder<PartType> partType, int slotX, int slotY) {
+            return this.addPart(index, name, partType, new PartPosition(slotX, slotY));
         }
 
-        public Builder<T> addPart(int index, String name, Holder<PartType> partType, float affect, PartPosition position) {
-            return this.addPart(new PartSlot(index, name, partType, affect), position);
+        public Builder<T> addPart(int index, String name, Holder<PartType> partType, PartPosition position) {
+            return this.addPart(new PartSlot(index, name, partType), position);
         }
 
         public Builder<T> addPart(PartSlot slot, PartPosition position) {
